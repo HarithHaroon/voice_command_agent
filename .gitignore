@@ -1,0 +1,22 @@
+.env.local
+.dockerignore
+.venv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Lock files
+uv.lock
+
+# Config files
+agent.yaml
+livekit.toml
+
+# Misc
+.DS_Store
+
+# Misspelled files
+rquirements.txt

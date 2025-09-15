@@ -1,0 +1,13 @@
+# LiveKit AI Assistant Requirements
+
+# Core LiveKit dependencies
+livekit-agents>=0.8.0
+livekit-plugins-openai>=0.7.0
+livekit-plugins-silero>=0.6.0
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Optional: For enhanced weather API integration
+# requests>=2.31.0
+# pytz>=2023.3
