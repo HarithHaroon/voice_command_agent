@@ -1,33 +1,53 @@
 """
-Simple AI Assistant - Final working version for LiveKit Cloud.
+Extensible AI Assistant using Tool Manager - LiveKit Cloud Compatible.
 """
 
 import json
 import logging
 import asyncio
 from livekit.agents import Agent, get_job_context
+
+from tools.tool_manager import ToolManager
 from tools.time_utils import TimeTool
 
 logger = logging.getLogger(__name__)
 
 
 class SimpleAssistant(Agent):
-    def __init__(self) -> None:
-        self.time_tool = TimeTool()
+    """AI Assistant with extensible tool management."""
 
+    def __init__(self) -> None:
+        # Initialize tool manager
+        self.tool_manager = ToolManager()
+
+        # Register tools
+        self._register_tools()
+
+        # Initialize agent with all tool functions
         super().__init__(
-            instructions="You are a helpful AI assistant that can get the current time from the user's device.",
-            tools=[self.time_tool.get_current_time],
+            instructions="You are a helpful AI assistant that can execute various tools on the user's device.",
+            tools=self.tool_manager.get_all_tool_functions(),
+        )
+
+    def _register_tools(self):
+        """Register all available tools."""
+        # Register TimeTool
+        time_tool = TimeTool()
+        self.tool_manager.register_tool(time_tool)
+
+        logger.info(
+            f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
         )
 
     async def on_enter(self):
-        logger.info("Simple Assistant entered the room")
-        self.time_tool.set_agent(self)
+        """Called when the agent enters a room."""
+        logger.info("Assistant entered the room")
 
-        # Use job context to get the room (correct for LiveKit Cloud)
+        # Set agent reference for all tools
+        self.tool_manager.set_agent_for_all_tools(self)
+
+        # Set up data handler
         await self._setup_data_handler()
-
-        await self.session.say("Hello! I'm your time assistant.")
 
     async def _setup_data_handler(self):
         """Setup data handler using job context."""
@@ -45,6 +65,7 @@ class SimpleAssistant(Agent):
             logger.error(f"Data handler setup failed: {e}")
 
     def _handle_data(self, data, participant=None):
+        """Handle incoming data and route to appropriate tools."""
         logger.info("Data received!")
 
         try:
@@ -58,10 +79,13 @@ class SimpleAssistant(Agent):
             message = json.loads(message_bytes.decode("utf-8"))
             logger.info(f"Parsed message: {message}")
 
-            # Route tool responses
+            # Route tool responses through tool manager
             if message.get("type") == "tool_result":
-                logger.info("Routing to time tool...")
-                self.time_tool.handle_tool_response(message)
+                success = self.tool_manager.route_tool_response(message)
+                if not success:
+                    logger.error("Failed to route tool response")
+            else:
+                logger.info(f"Non-tool message type: {message.get('type')}")
 
         except Exception as e:
             logger.error(f"Data handling error: {e}")
