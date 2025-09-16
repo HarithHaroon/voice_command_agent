@@ -40,8 +40,6 @@ async def entrypoint(ctx: agents.JobContext):
     await session.generate_reply(
         instructions=(
             "Greet the user warmly and let them know what you can help with. "
-            "Mention that you can check weather, get current time, do calculations, "
-            "and remember their preferences."
         )
     )
 
