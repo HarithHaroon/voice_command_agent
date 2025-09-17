@@ -36,9 +36,6 @@ class SimpleAssistant(Agent):
         time_tool = TimeTool()
         self.tool_manager.register_tool(time_tool)
 
-        name_field_tool = NameFieldTool()
-        self.tool_manager.register_tool(name_field_tool)
-
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
         )
