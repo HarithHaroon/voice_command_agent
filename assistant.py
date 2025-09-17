@@ -9,6 +9,7 @@ from livekit.agents import Agent, get_job_context
 
 from tools.tool_manager import ToolManager
 from tools.time_utils import TimeTool
+from tools.name_field_tool import NameFieldTool
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,9 @@ class SimpleAssistant(Agent):
         # Register TimeTool
         time_tool = TimeTool()
         self.tool_manager.register_tool(time_tool)
+
+        name_field_tool = NameFieldTool()
+        self.tool_manager.register_tool(name_field_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
