@@ -9,7 +9,10 @@ from livekit.agents import Agent, get_job_context
 
 from tools.tool_manager import ToolManager
 from tools.time_utils import TimeTool
-from tools.name_field_tool import NameFieldTool
+from tools.form_validation_tool import FormValidationTool
+from tools.form_submission_tool import FormSubmissionTool
+from tools.text_field_tool import TextFieldTool
+from tools.form_orchestration_tool import FormOrchestrationTool
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +35,24 @@ class SimpleAssistant(Agent):
 
     def _register_tools(self):
         """Register all available tools."""
-        # Register TimeTool
+        #! Register Tools
         time_tool = TimeTool()
         self.tool_manager.register_tool(time_tool)
+
+        text_field_tool = TextFieldTool()
+        self.tool_manager.register_tool(text_field_tool)
+
+        form_validation_tool = FormValidationTool()
+        self.tool_manager.register_tool(form_validation_tool)
+
+        submission_tool = FormSubmissionTool()
+        self.tool_manager.register_tool(submission_tool)
+
+        orchestration_tool = FormOrchestrationTool()
+        orchestration_tool.set_tools(
+            text_field_tool, form_validation_tool, submission_tool
+        )
+        self.tool_manager.register_tool(orchestration_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
