@@ -3,6 +3,7 @@ Main entry point for the LiveKit AI Assistant.
 """
 
 import dotenv
+import json
 import logging
 from livekit import agents
 from livekit.agents import AgentSession
@@ -31,6 +32,20 @@ async def entrypoint(ctx: agents.JobContext):
     await ctx.connect()
     logger.info("=== CONNECTED TO ROOM ===")
 
+    # Extract voice preference from token metadata
+    voice_preference = "alloy"  # default
+    try:
+        # Access the local participant's metadata (contains the voice preference)
+        local_participant = ctx.room.local_participant
+        if local_participant and local_participant.metadata:
+            participant_data = json.loads(local_participant.metadata)
+            voice_preference = participant_data.get("voice_preference", "alloy")
+            logger.info(f"Using voice preference from token: {voice_preference}")
+    except Exception as e:
+        logger.warning(
+            f"Failed to parse participant metadata, using default voice: {e}"
+        )
+
     # Create agent session with OpenAI for everything
     session = AgentSession(
         # Speech-to-Text using OpenAI Whisper
@@ -38,11 +53,11 @@ async def entrypoint(ctx: agents.JobContext):
         # Large Language Model using OpenAI GPT
         llm=openai.LLM(model="gpt-4o-mini"),
         # Text-to-Speech using OpenAI TTS
-        tts=openai.TTS(),
+        tts=openai.TTS(voice=voice_preference),  # Use dynamic voice
         # Voice Activity Detection (free local model)
         vad=ctx.proc.userdata["vad"],
     )
-    logger.info("=== SESSION CREATED ===")
+    logger.info(f"=== SESSION CREATED WITH VOICE: {voice_preference} ===")
 
     # Start the session with our agent
     await session.start(
