@@ -38,27 +38,30 @@ class NavigationTool(BaseTool):
         """
 
         try:
-
             logger.info(
                 f"Tool agent reference: {id(self.agent) if self.agent else 'None'}"
             )
-            logger.info(
-                f"Agent has navigation_context: {hasattr(self.agent, 'navigation_context') if self.agent else False}"
-            )
-            # Get navigation context from agent
-            if not self.agent or not hasattr(self.agent, "navigation_context"):
-                return (
-                    "Navigation context not available - agent not properly initialized"
-                )
 
-            nav_context = self.agent.navigation_context
-            if not nav_context:
-                return "Navigation context not available - no session data received"
+            # Check NavigationState instead of navigation_context
+            if not self.agent or not hasattr(self.agent, "navigation_state"):
+                return "Navigation state not available - agent not properly initialized"
 
-            current_stack = nav_context.get("current_stack", ["home"])
-            screens = nav_context.get("available_screens", {})
+            nav_state = self.agent.navigation_state
+            if not nav_state.is_initialized():
+                return "Navigation state not available - no session data received"
 
-            logger.info(f"Navigation request: {current_stack[-1]} -> {target_screen}")
+            # Get data from NavigationState
+            current_stack = nav_state.get_current_stack()
+            current_screen = nav_state.get_current_screen()
+            screens = nav_state.available_screens
+
+            # FIXED: Debug logging AFTER variables are defined
+            logger.info(f"Debug - Available screens: {list(screens.keys())}")
+            logger.info(f"Debug - Current stack: {current_stack}")
+            logger.info(f"Debug - Current screen: {current_screen}")
+            logger.info(f"Debug - Target: {target_screen}")
+
+            logger.info(f"Navigation request: {current_screen} -> {target_screen}")
 
             # Calculate path using pathfinding algorithm
             operations = self._calculate_navigation_path(

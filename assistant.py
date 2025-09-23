@@ -14,6 +14,7 @@ from tools.form_submission_tool import FormSubmissionTool
 from tools.text_field_tool import TextFieldTool
 from tools.form_orchestration_tool import FormOrchestrationTool
 from tools.navigation_tool import NavigationTool
+from models.navigation_state import NavigationState
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ class SimpleAssistant(Agent):
     """AI Assistant with extensible tool management."""
 
     def __init__(self) -> None:
-        self.navigation_context = None
+        self.navigation_state = NavigationState()
 
         # Initialize tool manager
         self.tool_manager = ToolManager()
@@ -118,35 +119,26 @@ class SimpleAssistant(Agent):
 
             # Store initial navigation context from session init
             if message.get("type") == "session_init":
-                self.navigation_context = message.get("navigation", {})
-                logger.info(
-                    f"Agent {id(self)} stored navigation context: {self.navigation_context}"
-                )
+                navigation_data = message.get("navigation", {})
+                self.navigation_state.initialize_from_session(navigation_data)
 
-            # Update navigation context from tool responses
             elif (
                 message.get("type") == "tool_result"
                 and message.get("tool") == "navigate_to_screen"
             ):
                 if message.get("success") and "result" in message:
                     result = message.get("result", {})
-                    if "navigation_stack" in result and self.navigation_context:
-                        self.navigation_context["current_stack"] = result[
-                            "navigation_stack"
-                        ]
-                        self.navigation_context["current_screen"] = result[
-                            "current_screen"
-                        ]
-                        logger.info(
-                            f"Updated navigation context: current_stack={result['navigation_stack']}, current_screen={result['current_screen']}"
+                    if "navigation_stack" in result and "current_screen" in result:
+                        self.navigation_state.update_from_navigation_success(
+                            result["navigation_stack"], result["current_screen"]
                         )
 
-                # Route tool response to tool manager
+                # Route tool response to tool manager (unchanged)
                 success = self.tool_manager.route_tool_response(message)
                 if not success:
                     logger.error("Failed to route tool response")
 
-            # Route other tool responses through tool manager
+            # Route other tool responses (unchanged)
             elif message.get("type") == "tool_result":
                 success = self.tool_manager.route_tool_response(message)
                 if not success:
@@ -156,3 +148,8 @@ class SimpleAssistant(Agent):
 
         except Exception as e:
             logger.error(f"Data handling error: {e}")
+
+    async def on_leave(self):
+        """Called when the agent leaves the room."""
+        logger.info("Assistant leaving the room - cleaning up navigation state")
+        self.navigation_state.clear()
