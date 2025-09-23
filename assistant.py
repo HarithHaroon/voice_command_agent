@@ -13,6 +13,7 @@ from tools.form_validation_tool import FormValidationTool
 from tools.form_submission_tool import FormSubmissionTool
 from tools.text_field_tool import TextFieldTool
 from tools.form_orchestration_tool import FormOrchestrationTool
+from tools.navigation_tool import NavigationTool
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,8 @@ class SimpleAssistant(Agent):
     """AI Assistant with extensible tool management."""
 
     def __init__(self) -> None:
+        self.navigation_context = None
+
         # Initialize tool manager
         self.tool_manager = ToolManager()
 
@@ -29,7 +32,19 @@ class SimpleAssistant(Agent):
 
         # Initialize agent with all tool functions
         super().__init__(
-            instructions="You are a helpful AI assistant that can execute various tools on the user's device.",
+            instructions="""You are a helpful AI assistant that can execute various tools on the user's device.
+
+            NAVIGATION CAPABILITIES:
+            - When users request navigation or ask to access specific features, use the navigate_to_screen tool
+            - You receive navigation data at session start with available screens and their descriptions
+            - Match user requests to the appropriate screen using the screen descriptions:
+            - Use the screen descriptions to intelligently determine which screen contains the requested feature
+            - Pass the exact screen route name (not the display name) to the navigate_to_screen tool
+            - The tool will automatically calculate the best navigation path from your current location
+
+            Example: If user says "I want to activate fall detection" and you see a screen with route_name "safety_settings" and description "Safety settings including fall detection and emergency contacts", navigate to "safety_settings".
+
+            Always analyze screen descriptions to find the most relevant screen for the user's specific request.""",
             tools=self.tool_manager.get_all_tool_functions(),
         )
 
@@ -53,6 +68,9 @@ class SimpleAssistant(Agent):
             text_field_tool, form_validation_tool, submission_tool
         )
         self.tool_manager.register_tool(orchestration_tool)
+
+        navigation_tool = NavigationTool(agent=self)
+        self.tool_manager.register_tool(navigation_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
@@ -98,8 +116,38 @@ class SimpleAssistant(Agent):
             message = json.loads(message_bytes.decode("utf-8"))
             logger.info(f"Parsed message: {message}")
 
-            # Route tool responses through tool manager
-            if message.get("type") == "tool_result":
+            # Store initial navigation context from session init
+            if message.get("type") == "session_init":
+                self.navigation_context = message.get("navigation", {})
+                logger.info(
+                    f"Agent {id(self)} stored navigation context: {self.navigation_context}"
+                )
+
+            # Update navigation context from tool responses
+            elif (
+                message.get("type") == "tool_result"
+                and message.get("tool") == "navigate_to_screen"
+            ):
+                if message.get("success") and "result" in message:
+                    result = message.get("result", {})
+                    if "navigation_stack" in result and self.navigation_context:
+                        self.navigation_context["current_stack"] = result[
+                            "navigation_stack"
+                        ]
+                        self.navigation_context["current_screen"] = result[
+                            "current_screen"
+                        ]
+                        logger.info(
+                            f"Updated navigation context: current_stack={result['navigation_stack']}, current_screen={result['current_screen']}"
+                        )
+
+                # Route tool response to tool manager
+                success = self.tool_manager.route_tool_response(message)
+                if not success:
+                    logger.error("Failed to route tool response")
+
+            # Route other tool responses through tool manager
+            elif message.get("type") == "tool_result":
                 success = self.tool_manager.route_tool_response(message)
                 if not success:
                     logger.error("Failed to route tool response")

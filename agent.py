@@ -48,15 +48,12 @@ async def entrypoint(ctx: agents.JobContext):
 
     # Create agent session with OpenAI for everything
     session = AgentSession(
-        # Speech-to-Text using OpenAI Whisper
         stt=openai.STT(),
-        # Large Language Model using OpenAI GPT
-        llm=openai.LLM(model="gpt-4o-mini"),
-        # Text-to-Speech using OpenAI TTS
-        tts=openai.TTS(voice=voice_preference),  # Use dynamic voice
-        # Voice Activity Detection (free local model)
+        llm=openai.LLM(model="gpt-4o", temperature=0.2),
+        tts=openai.TTS(voice=voice_preference),
         vad=ctx.proc.userdata["vad"],
     )
+
     logger.info(f"=== SESSION CREATED WITH VOICE: {voice_preference} ===")
 
     # Start the session with our agent
