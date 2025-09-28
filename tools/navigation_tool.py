@@ -22,11 +22,19 @@ class NavigationTool(BaseTool):
 
     def get_tool_methods(self) -> list:
         """Return list of tool methods this class provides."""
-        return ["navigate_to_screen"]
+        return [
+            "navigate_to_screen",
+            "list_available_screens",
+            "find_screen",
+        ]
 
     def get_tool_functions(self) -> list:
         """Return list of function_tool decorated methods."""
-        return [self.navigate_to_screen]
+        return [
+            self.navigate_to_screen,
+            self.list_available_screens,
+            self.find_screen,
+        ]
 
     @function_tool
     async def navigate_to_screen(self, target_screen: str) -> str:
@@ -83,6 +91,101 @@ class NavigationTool(BaseTool):
         except Exception as e:
             logger.error(f"Navigation failed: {e}")
             return f"Navigation failed: {str(e)}"
+
+    @function_tool
+    async def list_available_screens(self) -> dict:
+        """
+        List available screens with route_name, display_name, and description.
+        Returns a dictionary with current_screen and a list of screen entries.
+        """
+        try:
+            if not self.agent or not hasattr(self.agent, "navigation_state"):
+                return {
+                    "success": False,
+                    "error": "Navigation state not available",
+                }
+
+            nav_state = self.agent.navigation_state
+            if not nav_state.is_initialized():
+                return {"success": False, "error": "No session navigation data"}
+
+            screens = nav_state.available_screens or {}
+            items = []
+            for route_name, meta in screens.items():
+                items.append(
+                    {
+                        "route_name": route_name,
+                        "display_name": meta.get("display_name", route_name),
+                        "description": meta.get("description", ""),
+                    }
+                )
+
+            return {
+                "success": True,
+                "current_screen": nav_state.get_current_screen(),
+                "screens": items,
+            }
+
+        except Exception as e:
+            logger.error(f"list_available_screens failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    @function_tool
+    async def find_screen(self, query: str) -> dict:
+        """
+        Find candidate screens matching a free-text query. Returns top matches
+        with simple keyword scoring over route_name, display_name, and description.
+        """
+        try:
+            if not self.agent or not hasattr(self.agent, "navigation_state"):
+                return {
+                    "success": False,
+                    "error": "Navigation state not available",
+                }
+
+            nav_state = self.agent.navigation_state
+            if not nav_state.is_initialized():
+                return {"success": False, "error": "No session navigation data"}
+
+            screens = nav_state.available_screens or {}
+            q = (query or "").strip().lower()
+            if not q:
+                return {"success": False, "error": "Empty query"}
+
+            def score(text: str) -> int:
+                t = (text or "").lower()
+                s = 0
+                # naive keyword scoring: exact contains and token overlap
+                if q in t:
+                    s += 3
+                for token in set(q.split()):
+                    if token and token in t:
+                        s += 1
+                return s
+
+            results = []
+            for route_name, meta in screens.items():
+                dn = meta.get("display_name", route_name)
+                desc = meta.get("description", "")
+                total = score(route_name) + score(dn) + score(desc)
+                if total > 0:
+                    results.append(
+                        {
+                            "route_name": route_name,
+                            "display_name": dn,
+                            "description": desc,
+                            "score": total,
+                        }
+                    )
+
+            results.sort(key=lambda x: x.get("score", 0), reverse=True)
+            top = results[:5]
+
+            return {"success": True, "query": query, "candidates": top}
+
+        except Exception as e:
+            logger.error(f"find_screen failed: {e}")
+            return {"success": False, "error": str(e)}
 
     def _calculate_navigation_path(self, current_stack, target_screen, screens):
         """Calculate shortest path from current location to target."""

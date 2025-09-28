@@ -8,12 +8,12 @@ import asyncio
 from livekit.agents import Agent, get_job_context
 
 from tools.tool_manager import ToolManager
-from tools.time_utils import TimeTool
 from tools.form_validation_tool import FormValidationTool
 from tools.form_submission_tool import FormSubmissionTool
 from tools.text_field_tool import TextFieldTool
 from tools.form_orchestration_tool import FormOrchestrationTool
 from tools.navigation_tool import NavigationTool
+from tools.preferences import PreferencesTool
 from models.navigation_state import NavigationState
 
 logger = logging.getLogger(__name__)
@@ -31,30 +31,52 @@ class SimpleAssistant(Agent):
         # Register tools
         self._register_tools()
 
+        # Instantiate additional tools to expose to the agent
+        self.preferences_tool = PreferencesTool()
+
         # Initialize agent with all tool functions
         super().__init__(
-            instructions="""You are a helpful AI assistant that can execute various tools on the user's device.
+            instructions="""You are a precise, helpful voice assistant embedded in a mobile app. You can call tools to navigate the app, work with forms, and manage user preferences.
 
-            NAVIGATION CAPABILITIES:
-            - When users request navigation or ask to access specific features, use the navigate_to_screen tool
-            - You receive navigation data at session start with available screens and their descriptions
-            - Match user requests to the appropriate screen using the screen descriptions:
-            - Use the screen descriptions to intelligently determine which screen contains the requested feature
-            - Pass the exact screen route name (not the display name) to the navigate_to_screen tool
-            - The tool will automatically calculate the best navigation path from your current location
+General behavior
+- Ask clarifying questions before acting when requests are incomplete or ambiguous; collect missing details one at a time.
+- Confirm potentially surprising or impactful actions when confidence is low (e.g., leaving the current task or opening settings).
+- Prefer short, direct answers (a few sentences). If a tool errors, translate it into actionable next steps (retry, choose an alternative, or provide missing info).
+- Respect saved user preferences; consult them before asking again.
 
-            Example: If user says "I want to activate fall detection" and you see a screen with route_name "safety_settings" and description "Safety settings including fall detection and emergency contacts", navigate to "safety_settings".
+Tool selection rubric
+- Only call a tool if inputs are known and it best matches the intent.
+- If a navigation destination is unclear, first list or search available screens, then confirm the destination.
+- Prefer asking a targeted question over guessing. If no tool fits, reply conversationally and ask for the needed detail.
 
-            Always analyze screen descriptions to find the most relevant screen for the user's specific request.""",
-            tools=self.tool_manager.get_all_tool_functions(),
+Navigation policy
+- You receive a catalog of screens (route_name, display_name, description) at session start.
+- Map user requests to route_name via screen descriptions, not display names.
+- When certain: call navigate_to_screen with the exact route_name.
+- When uncertain or multiple candidates match: use list_available_screens or find_screen and present 2–3 top candidates; ask the user to pick one.
+- After successful navigation, briefly confirm the new location using the current screen name.
+
+Forms policy
+- For contact form workflows: collect missing fields (name, email, phone) incrementally; validate before submit; on failure, report which fields need changes.
+
+Preferences policy
+- Save preferences (e.g., default city). Use them when relevant; otherwise, ask once and save.
+
+Error & ambiguity handling
+- Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
+""",
+            tools=(
+                self.tool_manager.get_all_tool_functions()
+                + [
+                    self.preferences_tool.save_user_preference,
+                    self.preferences_tool.get_user_preference,
+                ]
+            ),
         )
 
     def _register_tools(self):
         """Register all available tools."""
         #! Register Tools
-        time_tool = TimeTool()
-        self.tool_manager.register_tool(time_tool)
-
         text_field_tool = TextFieldTool()
         self.tool_manager.register_tool(text_field_tool)
 
