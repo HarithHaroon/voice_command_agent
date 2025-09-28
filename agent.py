@@ -9,7 +9,7 @@ from livekit import agents
 from livekit.agents import AgentSession
 from livekit.plugins import openai, silero
 
-from assistant import SimpleAssistant
+from assistant import Assistant
 
 dotenv.load_dotenv(".env.local")
 
@@ -59,7 +59,7 @@ async def entrypoint(ctx: agents.JobContext):
     # Start the session with our agent
     await session.start(
         room=ctx.room,
-        agent=SimpleAssistant(),
+        agent=Assistant(),
     )
     logger.info("=== SESSION STARTED ===")
 

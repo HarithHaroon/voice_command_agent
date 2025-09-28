@@ -18,7 +18,7 @@ from models.navigation_state import NavigationState
 logger = logging.getLogger(__name__)
 
 
-class SimpleAssistant(Agent):
+class Assistant(Agent):
     """AI Assistant with extensible tool management."""
 
     def __init__(self) -> None:
@@ -62,13 +62,7 @@ class SimpleAssistant(Agent):
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
             """,
-            tools=(
-                self.tool_manager.get_all_tool_functions()
-                + [
-                    self.preferences_tool.save_user_preference,
-                    self.preferences_tool.get_user_preference,
-                ]
-            ),
+            tools=(self.tool_manager.get_all_tool_functions()),
         )
 
     def _register_tools(self):
