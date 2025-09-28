@@ -111,8 +111,6 @@ class SimpleAssistant(Agent):
     async def _setup_data_handler(self):
         """Setup data handler using job context."""
         try:
-            await asyncio.sleep(1)  # Wait for initialization
-
             ctx = get_job_context()
             if ctx and ctx.room:
                 ctx.room.on("data_received", self._handle_data)
