@@ -13,7 +13,6 @@ from tools.form_submission_tool import FormSubmissionTool
 from tools.text_field_tool import TextFieldTool
 from tools.form_orchestration_tool import FormOrchestrationTool
 from tools.navigation_tool import NavigationTool
-from tools.preferences import PreferencesTool
 from models.navigation_state import NavigationState
 
 logger = logging.getLogger(__name__)
@@ -32,7 +31,6 @@ class SimpleAssistant(Agent):
         self._register_tools()
 
         # Instantiate additional tools to expose to the agent
-        self.preferences_tool = PreferencesTool()
 
         # Initialize agent with all tool functions
         super().__init__(
