@@ -16,6 +16,7 @@ from tools.navigation_tool import NavigationTool
 from models.navigation_state import NavigationState
 from tools.toggle_fall_detection_tool import ToggleFallDetectionTool
 from tools.fall_detection_sensitivity_tool import FallDetectionSensitivityTool
+from tools.emergency_delay_tool import EmergencyDelayTool
 
 logger = logging.getLogger(__name__)
 
@@ -62,13 +63,14 @@ class Assistant(Agent):
                 * Contact screen: 'name', 'email', 'phone'
                 - For form workflows: collect missing fields incrementally; validate before submit; on failure, report which fields need changes.
                 - Always validate forms before attempting submission.
+                - Use set_emergency_delay(seconds) to adjust emergency call delay. Valid values: 15, 30, or 60 seconds.
 
                 Preferences policy
                 - Save preferences (e.g., default city). Use them when relevant; otherwise, ask once and save.
 
                 - Use toggle_fall_detection() to turn fall detection monitoring on or off
 
-                - Use set_sensitivity(level) to adjust fall detection sensitivity. Valid levels: "gentle", "balanced", "sensitive"
+                - Use set_sensitivity(level) to adjust fall detection sensitivity. Valid levels: "gentle", "balanced", "sensitive".
 
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
@@ -102,6 +104,9 @@ class Assistant(Agent):
 
         sensitivity_tool = FallDetectionSensitivityTool()
         self.tool_manager.register_tool(sensitivity_tool)
+
+        emergency_delay_tool = EmergencyDelayTool()
+        self.tool_manager.register_tool(emergency_delay_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
