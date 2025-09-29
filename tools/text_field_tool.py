@@ -19,28 +19,18 @@ class TextFieldTool(BaseTool):
         return ["fill_text_field"]
 
     def get_tool_functions(self) -> list:
-        return [self.fill_name_field, self.fill_email_field, self.fill_phone_field]
+        return [self.fill_text_field]
 
     @function_tool
-    async def fill_name_field(self, name: str) -> str:
-        """Fill the name field on Flutter client."""
-        result = await self.send_tool_request(
-            "fill_text_field", {"field_type": "name", "value": name}, name
-        )
-        return f"Successfully filled name field with '{name}'"
+    async def fill_text_field(self, field_name: str, value: str) -> str:
+        """
+        Fill any text field on Flutter client.
 
-    @function_tool
-    async def fill_email_field(self, email: str) -> str:
-        """Fill the email field on Flutter client."""
+        Args:
+            field_name: Name of the field to fill (e.g., 'name', 'email', 'person_name', 'person_details')
+            value: Value to fill in the field
+        """
         result = await self.send_tool_request(
-            "fill_text_field", {"field_type": "email", "value": email}, email
+            "fill_text_field", {"field_type": field_name, "value": value}
         )
-        return f"Successfully filled email field with '{email}'"
-
-    @function_tool
-    async def fill_phone_field(self, phone: str) -> str:
-        """Fill the phone field on Flutter client."""
-        result = await self.send_tool_request(
-            "fill_text_field", {"field_type": "phone", "value": phone}, phone
-        )
-        return f"Successfully filled phone field with '{phone}'"
+        return f"Successfully filled {field_name} field with '{value}'"
