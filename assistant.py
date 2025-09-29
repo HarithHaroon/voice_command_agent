@@ -15,6 +15,7 @@ from tools.form_orchestration_tool import FormOrchestrationTool
 from tools.navigation_tool import NavigationTool
 from models.navigation_state import NavigationState
 from tools.toggle_fall_detection_tool import ToggleFallDetectionTool
+from tools.fall_detection_sensitivity_tool import FallDetectionSensitivityTool
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +68,8 @@ class Assistant(Agent):
 
                 - Use toggle_fall_detection() to turn fall detection monitoring on or off
 
+                - Use set_sensitivity(level) to adjust fall detection sensitivity. Valid levels: "gentle", "balanced", "sensitive"
+
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
             """,
@@ -96,6 +99,9 @@ class Assistant(Agent):
 
         toggle_fall_detection_tool = ToggleFallDetectionTool()
         self.tool_manager.register_tool(toggle_fall_detection_tool)
+
+        sensitivity_tool = FallDetectionSensitivityTool()
+        self.tool_manager.register_tool(sensitivity_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
