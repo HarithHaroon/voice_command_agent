@@ -14,6 +14,7 @@ from tools.text_field_tool import TextFieldTool
 from tools.form_orchestration_tool import FormOrchestrationTool
 from tools.navigation_tool import NavigationTool
 from models.navigation_state import NavigationState
+from tools.toggle_fall_detection_tool import ToggleFallDetectionTool
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,8 @@ class Assistant(Agent):
                 Preferences policy
                 - Save preferences (e.g., default city). Use them when relevant; otherwise, ask once and save.
 
+                - Use toggle_fall_detection() to turn fall detection monitoring on or off
+
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
             """,
@@ -90,6 +93,9 @@ class Assistant(Agent):
 
         navigation_tool = NavigationTool(agent=self)
         self.tool_manager.register_tool(navigation_tool)
+
+        toggle_fall_detection_tool = ToggleFallDetectionTool()
+        self.tool_manager.register_tool(toggle_fall_detection_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
