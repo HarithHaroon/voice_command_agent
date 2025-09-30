@@ -19,6 +19,12 @@ from tools.fall_detection_sensitivity_tool import FallDetectionSensitivityTool
 from tools.emergency_delay_tool import EmergencyDelayTool
 from tools.toggle_location_tracking_tool import ToggleLocationTrackingTool
 from tools.update_location_interval_tool import UpdateLocationIntervalTool
+from tools.reminder_tools.set_custom_days_tool import SetCustomDaysTool
+from tools.reminder_tools.set_recurrence_type_tool import SetRecurrenceTypeTool
+from tools.reminder_tools.set_reminder_date_tool import SetReminderDateTool
+from tools.reminder_tools.set_reminder_time_tool import SetReminderTimeTool
+from tools.reminder_tools.submit_reminder_tool import SubmitReminderTool
+from tools.reminder_tools.validate_reminder_form_tool import ValidateReminderFormTool
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +84,15 @@ class Assistant(Agent):
 
                 - Use update_location_interval(interval) to change how often location updates are sent. Valid intervals: 5, 10, 15, or 30 minutes.
 
+                Medication Reminders Policy
+                - Use fill_text_field to set reminder fields: 'medication_name', 'dosage', 'instructions' (optional), 'notes' (optional)
+                - Use set_reminder_time(hour, minute) for 24-hour format times (e.g., hour=14, minute=30 for 2:30 PM)
+                - Use set_reminder_date(year, month, day) for the reminder date (only needed for "once" reminders)
+                - Use set_recurrence_type(recurrence_type) with values: "once", "daily", "weekly", or "custom"
+                - For custom recurrence, use set_custom_days(days) with day numbers: 1=Monday through 7=Sunday
+                - Always validate_reminder_form() before calling submit_reminder()
+                - Collect all required information (medication name, dosage, time, recurrence) before submitting.
+
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
             """,
@@ -119,6 +134,25 @@ class Assistant(Agent):
 
         update_location_interval_tool = UpdateLocationIntervalTool()
         self.tool_manager.register_tool(update_location_interval_tool)
+
+        #! Reminder tools
+        set_reminder_time_tool = SetReminderTimeTool()
+        self.tool_manager.register_tool(set_reminder_time_tool)
+
+        set_reminder_date_tool = SetReminderDateTool()
+        self.tool_manager.register_tool(set_reminder_date_tool)
+
+        set_recurrence_type_tool = SetRecurrenceTypeTool()
+        self.tool_manager.register_tool(set_recurrence_type_tool)
+
+        set_custom_days_tool = SetCustomDaysTool()
+        self.tool_manager.register_tool(set_custom_days_tool)
+
+        validate_reminder_form_tool = ValidateReminderFormTool()
+        self.tool_manager.register_tool(validate_reminder_form_tool)
+
+        submit_reminder_tool = SubmitReminderTool()
+        self.tool_manager.register_tool(submit_reminder_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
