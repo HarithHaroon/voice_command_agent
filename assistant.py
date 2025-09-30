@@ -17,6 +17,8 @@ from models.navigation_state import NavigationState
 from tools.toggle_fall_detection_tool import ToggleFallDetectionTool
 from tools.fall_detection_sensitivity_tool import FallDetectionSensitivityTool
 from tools.emergency_delay_tool import EmergencyDelayTool
+from tools.toggle_location_tracking_tool import ToggleLocationTrackingTool
+from tools.update_location_interval_tool import UpdateLocationIntervalTool
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +74,10 @@ class Assistant(Agent):
 
                 - Use set_sensitivity(level) to adjust fall detection sensitivity. Valid levels: "gentle", "balanced", "sensitive".
 
+                - Use toggle_location_tracking() to turn background location tracking on or off.
+
+                - Use update_location_interval(interval) to change how often location updates are sent. Valid intervals: 5, 10, 15, or 30 minutes.
+
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
             """,
@@ -107,6 +113,12 @@ class Assistant(Agent):
 
         emergency_delay_tool = EmergencyDelayTool()
         self.tool_manager.register_tool(emergency_delay_tool)
+
+        toggle_location_tracking_tool = ToggleLocationTrackingTool()
+        self.tool_manager.register_tool(toggle_location_tracking_tool)
+
+        update_location_interval_tool = UpdateLocationIntervalTool()
+        self.tool_manager.register_tool(update_location_interval_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
