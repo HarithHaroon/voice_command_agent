@@ -25,6 +25,8 @@ from tools.reminder_tools.set_reminder_date_tool import SetReminderDateTool
 from tools.reminder_tools.set_reminder_time_tool import SetReminderTimeTool
 from tools.reminder_tools.submit_reminder_tool import SubmitReminderTool
 from tools.reminder_tools.validate_reminder_form_tool import ValidateReminderFormTool
+from tools.toggle_watchos_fall_detection_tool import ToggleWatchosFallDetectionTool
+from tools.set_watchos_sensitivity_tool import SetWatchosSensitivityTool
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +95,13 @@ class Assistant(Agent):
                 - Always validate_reminder_form() before calling submit_reminder()
                 - Collect all required information (medication name, dosage, time, recurrence) before submitting.
 
+                WatchOS Fall Detection Policy
+                - Use toggle_watchos_fall_detection() to turn fall detection on/off on Apple Watch
+                - Use set_watchos_sensitivity(level) to adjust WatchOS fall detection sensitivity
+                * Valid levels: "low" (fewer alerts), "medium" (balanced), "high" (more sensitive)
+                - WatchOS fall detection is separate from phone-based fall detection
+                - The smartwatch monitors movements and can detect falls to alert emergency contacts
+
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
             """,
@@ -153,6 +162,13 @@ class Assistant(Agent):
 
         submit_reminder_tool = SubmitReminderTool()
         self.tool_manager.register_tool(submit_reminder_tool)
+
+        #! WatchOS fall detection tools
+        toggle_watchos_fall_detection_tool = ToggleWatchosFallDetectionTool()
+        self.tool_manager.register_tool(toggle_watchos_fall_detection_tool)
+
+        set_watchos_sensitivity_tool = SetWatchosSensitivityTool()
+        self.tool_manager.register_tool(set_watchos_sensitivity_tool)
 
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
