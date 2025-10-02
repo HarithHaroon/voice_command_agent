@@ -28,14 +28,24 @@ async def entrypoint(ctx: agents.JobContext):
     """Main entry point for the agent."""
     logger.info("=== ENTRYPOINT START ===")
 
-    # Connect to the room
+    # Get room name
+    room_name = ctx.room.name
+    logger.info(f"Received request for room: {room_name}")
+
+    # Filter: Only join rooms starting with "room_" (your agent rooms)
+    if not room_name.startswith("room_"):
+        logger.info(f"❌ Ignoring room '{room_name}' - not an agent room")
+        return  # Exit immediately without connecting
+
+    logger.info(f"✅ Joining agent room: {room_name}")
+
+    # Connect to the room (only reaches here for agent rooms)
     await ctx.connect()
     logger.info("=== CONNECTED TO ROOM ===")
 
     # Extract voice preference from token metadata
     voice_preference = "alloy"  # default
     try:
-        # Access the local participant's metadata (contains the voice preference)
         local_participant = ctx.room.local_participant
         if local_participant and local_participant.metadata:
             participant_data = json.loads(local_participant.metadata)
@@ -61,10 +71,12 @@ async def entrypoint(ctx: agents.JobContext):
         room=ctx.room,
         agent=Assistant(),
     )
+
     logger.info("=== SESSION STARTED ===")
 
     # Generate an initial greeting
     logger.info("=== GENERATING INITIAL REPLY ===")
+
     await session.generate_reply(
         instructions=(
             "Greet the user warmly and let them know what you can help with. "
