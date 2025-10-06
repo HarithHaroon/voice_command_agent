@@ -27,6 +27,7 @@ from tools.reminder_tools.submit_reminder_tool import SubmitReminderTool
 from tools.reminder_tools.validate_reminder_form_tool import ValidateReminderFormTool
 from tools.toggle_watchos_fall_detection_tool import ToggleWatchosFallDetectionTool
 from tools.set_watchos_sensitivity_tool import SetWatchosSensitivityTool
+from tools.start_video_call_tool import StartVideoCallTool
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +101,14 @@ class Assistant(Agent):
                 - Use set_watchos_sensitivity(level) to adjust WatchOS fall detection sensitivity
                 * Valid levels: "low" (fewer alerts), "medium" (balanced), "high" (more sensitive)
                 - WatchOS fall detection is separate from phone-based fall detection
-                - The smartwatch monitors movements and can detect falls to alert emergency contacts
+                - The smartwatch monitors movements and can detect falls to alert emergency contacts.
+
+                Video Calling Policy
+                - Use start_video_call(family_member_name) to initiate video calls with family members
+                - The tool will search for matching family members by name
+                - If multiple matches are found, ask the user to be more specific
+                - If no match is found, the tool will list available family members
+                - After successful match, the video call lobby screen will open automatically
 
                 Error & ambiguity handling
                 - Provide short explanations and a next step when tools fail. If multiple navigation targets are similarly relevant, ask the user to choose.
@@ -173,6 +181,10 @@ class Assistant(Agent):
         logger.info(
             f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
         )
+
+        #! Video call tool
+        start_video_call_tool = StartVideoCallTool()
+        self.tool_manager.register_tool(start_video_call_tool)
 
     async def on_enter(self):
         """Called when the agent enters a room."""
