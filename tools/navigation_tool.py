@@ -234,12 +234,23 @@ class NavigationTool(BaseTool):
             )
             return []
 
-        # Check for direct connection
+        # Special case: if current screen is not 'home', pop back to home first
+        # then push to target (keeps navigation stack clean)
+        if current_screen != "home" and target_screen != "home":
+            logger.info(
+                f"Lateral navigation: {current_screen} -> {target_screen} via home"
+            )
+            return [
+                {"action": "pop"},  # Go back to home
+                {"action": "push", "screen": target_screen},  # Push target
+            ]
+
+        # Check for direct connection (already at home, just push target)
         current_connections = screens.get(current_screen, {}).get("connections", [])
         if target_screen in current_connections:
             return [{"action": "push", "screen": target_screen}]
 
-        # Find shortest path through graph
+        # Find shortest path through graph (fallback for complex navigation)
         path = self._find_shortest_path(current_screen, target_screen, screens)
 
         if not path:
