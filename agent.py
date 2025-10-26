@@ -79,9 +79,13 @@ async def entrypoint(ctx: agents.JobContext):
 
     await session.generate_reply(
         instructions=(
-            "Greet the user warmly and let them know what you can help with. "
+            "You're now connected! Warmly greet the user and proactively ask what they'd like help with today. "
+            "Be specific about your capabilities: reading text from books/documents, recognizing faces, "
+            "setting medication reminders, making video calls, or managing safety settings. "
+            "Keep it brief and friendly."
         )
     )
+
     logger.info("=== INITIAL REPLY GENERATED ===")
 
 
