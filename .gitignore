@@ -18,3 +18,7 @@ livekit.toml
 
 # Misspelled files
 rquirements.txt
+
+# Firebase credentials
+*_firebase_adminsdk*.json
+firebase-*.json
