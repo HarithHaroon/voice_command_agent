@@ -59,7 +59,7 @@ async def entrypoint(ctx: agents.JobContext):
     # Create agent session with OpenAI for everything
     session = AgentSession(
         stt=openai.STT(),
-        llm=openai.LLM(model="gpt-4o", temperature=0.2),
+        llm=openai.LLM(model="gpt-4o-mini", temperature=0.2),
         tts=openai.TTS(voice=voice_preference),
         vad=ctx.proc.userdata["vad"],
     )
