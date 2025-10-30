@@ -31,6 +31,13 @@ class ToolManager:
         for tool in self._tools.values():
             tool.set_agent(agent)
 
+    def set_user_id_for_all_tools(self, user_id: str):
+        """Set the user_id for all registered tools that support it."""
+        for tool in self._tools.values():
+            if hasattr(tool, "set_user_id"):
+                tool.set_user_id(user_id)
+                logger.info(f"Set user_id for {tool.tool_name}")
+
     def get_all_tool_functions(self) -> List:
         """Get all tool functions for the agent."""
         return self._tool_functions

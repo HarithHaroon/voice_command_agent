@@ -5,9 +5,12 @@ Main entry point for the LiveKit AI Assistant.
 import dotenv
 import json
 import logging
+import re
 from livekit import agents
 from livekit.agents import AgentSession
 from livekit.plugins import openai, silero
+from firebase_client import FirebaseClient
+import asyncio
 
 from assistant import Assistant
 
@@ -41,22 +44,28 @@ async def entrypoint(ctx: agents.JobContext):
 
     # Connect to the room (only reaches here for agent rooms)
     await ctx.connect()
+
     logger.info("=== CONNECTED TO ROOM ===")
 
-    # Extract voice preference from token metadata
-    voice_preference = "alloy"  # default
-    try:
-        local_participant = ctx.room.local_participant
-        if local_participant and local_participant.metadata:
-            participant_data = json.loads(local_participant.metadata)
-            voice_preference = participant_data.get("voice_preference", "alloy")
-            logger.info(f"Using voice preference from token: {voice_preference}")
-    except Exception as e:
-        logger.warning(
-            f"Failed to parse participant metadata, using default voice: {e}"
-        )
+    # Extract voice preference and user_id
+    voice_preference = "alloy"  # Default voice preference
 
-    # Create agent session with OpenAI for everything
+    user_id = None
+    # Extract user_id from room name
+    match = re.search(r"room_user_(user_[a-zA-Z0-9_-]+)_.*", room_name)
+
+    if match:
+        user_id = match.group(1)
+        logger.info(f"✅ Extracted user_id from room name: {user_id}")
+    else:
+        logger.warning(f"❌ Could not extract user_id from room name: {room_name}")
+
+    # Metadata will be extracted from the first data message (session_init)
+    # after the agent connects.
+    # For now, user_id remains None until received via data message.
+    logger.info("Metadata extraction will occur via data message.")
+
+    # Create agent session
     session = AgentSession(
         stt=openai.STT(),
         llm=openai.LLM(model="gpt-4o-mini", temperature=0.2),
@@ -64,12 +73,28 @@ async def entrypoint(ctx: agents.JobContext):
         vad=ctx.proc.userdata["vad"],
     )
 
-    logger.info(f"=== SESSION CREATED WITH VOICE: {voice_preference} ===")
+    logger.info(f"=== SESSION CREATED ===")
+
+    logger.info("=" * 50)
+    logger.info(f"🎯 Creating Assistant with user_id: {user_id}")
+    logger.info("=" * 50)
+
+    assistant = Assistant(user_id=user_id)
+
+    @session.on("conversation_item_added")
+    def on_conversation_item_added(event):
+        role = event.item.role  # "user" or "assistant"
+        content = event.item.text_content
+
+        logger.info(f"💾 Conversation item: {role} - {content[:50]}...")
+
+        # Create background task to save
+        asyncio.create_task(assistant.save_message_to_firebase(role, content))
 
     # Start the session with our agent
     await session.start(
         room=ctx.room,
-        agent=Assistant(),
+        agent=assistant,
     )
 
     logger.info("=== SESSION STARTED ===")

@@ -6,7 +6,6 @@ import json
 import logging
 import asyncio
 from livekit.agents import Agent, get_job_context
-
 from tools.tool_manager import ToolManager
 from tools.form_validation_tool import FormValidationTool
 from tools.form_submission_tool import FormSubmissionTool
@@ -28,6 +27,8 @@ from tools.reminder_tools.validate_reminder_form_tool import ValidateReminderFor
 from tools.toggle_watchos_fall_detection_tool import ToggleWatchosFallDetectionTool
 from tools.set_watchos_sensitivity_tool import SetWatchosSensitivityTool
 from tools.start_video_call_tool import StartVideoCallTool
+from tools.recall_history_tool import RecallHistoryTool
+from firebase_client import FirebaseClient
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +36,14 @@ logger = logging.getLogger(__name__)
 class Assistant(Agent):
     """AI Assistant with extensible tool management."""
 
-    def __init__(self) -> None:
+    def __init__(self, user_id: str = None) -> None:
         self.navigation_state = NavigationState()
+
+        self.user_id = user_id
+
+        self.firebase_client = FirebaseClient()
+
+        logger.info(f"Assistant initialized with user_id: {user_id}")
 
         # Initialize tool manager
         self.tool_manager = ToolManager()
@@ -54,6 +61,13 @@ class Assistant(Agent):
                 - When a user first connects or says hello, warmly greet them by name if available and briefly ask what you can help with today
                 - Actively listen for intent and take initiative to navigate to relevant features
                 - After completing a task, ask if there's anything else you can help with
+
+                MEMORY & RECALL
+                - You have access to past conversation history through the recall_history tool
+                - Use it when users ask about previous discussions: "what did we talk about", "do you remember when", "didn't I mention"
+                - Timeframe options: 1hour, 6hours, 24hours, 7days, 30days, all
+                - Example: recall_history(search_query="medication", timeframe="24hours", max_results=10)
+                - After recalling, naturally reference the past context in your response
 
                 FEATURE UNDERSTANDING & NAVIGATION
                 You have access to these key app features (learn their route names from the screen catalog):
@@ -131,6 +145,16 @@ class Assistant(Agent):
             tools=(self.tool_manager.get_all_tool_functions()),
         )
 
+    async def save_message_to_firebase(self, role: str, content: str):
+        """Save message to Firebase (called from event handler)"""
+        if self.user_id and content:
+            await asyncio.to_thread(
+                self.firebase_client.add_message,
+                self.user_id,
+                role.upper(),  # "USER" or "ASSISTANT"
+                content,
+            )
+
     def _register_tools(self):
         """Register all available tools."""
         #! Register Tools
@@ -201,12 +225,20 @@ class Assistant(Agent):
         start_video_call_tool = StartVideoCallTool()
         self.tool_manager.register_tool(start_video_call_tool)
 
+        #! Recall History tool (server-side)
+        recall_history_tool = RecallHistoryTool()
+        self.tool_manager.register_tool(recall_history_tool)
+
     async def on_enter(self):
         """Called when the agent enters a room."""
         logger.info("Assistant entered the room")
 
         # Set agent reference for all tools
         self.tool_manager.set_agent_for_all_tools(self)
+
+        # Set user_id for all tools that need it
+        if self.user_id:
+            self.tool_manager.set_user_id_for_all_tools(self.user_id)
 
         # Set up data handler
         await self._setup_data_handler()
