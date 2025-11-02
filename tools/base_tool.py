@@ -19,6 +19,7 @@ class BaseTool(ABC):
         self.tool_name = tool_name
         self._pending_responses: Dict[str, asyncio.Future] = {}
         self._agent = None
+        self._user_id = None
         # Start cleanup task
         asyncio.create_task(self._cleanup_old_requests())
 
@@ -26,6 +27,11 @@ class BaseTool(ABC):
         """Set the agent reference."""
         self._agent = agent
         logger.info(f"{self.tool_name} linked to agent")
+
+    def set_user_id(self, user_id: str):
+        """Set the current user ID for this tool instance."""
+        self._user_id = user_id
+        logger.info(f"Set user_id for {self.tool_name}: {user_id}")
 
     async def send_tool_request(
         self, method: str, params: Dict[str, Any], param_for_id: str = None

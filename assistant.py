@@ -28,6 +28,7 @@ from tools.toggle_watchos_fall_detection_tool import ToggleWatchosFallDetectionT
 from tools.set_watchos_sensitivity_tool import SetWatchosSensitivityTool
 from tools.start_video_call_tool import StartVideoCallTool
 from tools.recall_history_tool import RecallHistoryTool
+from tools.read_book_tool import ReadBookTool
 from firebase_client import FirebaseClient
 
 logger = logging.getLogger(__name__)
@@ -122,6 +123,12 @@ class Assistant(Agent):
                 - WatchOS Fall Detection: toggle_watchos_fall_detection(), set_watchos_sensitivity(level: low/medium/high)
                 - Medication Reminders: Use fill_text_field for name/dosage/instructions/notes, set_reminder_time(hour, minute), set_reminder_date(year, month, day), set_recurrence_type(type: once/daily/weekly/custom), set_custom_days(days: 1-7), validate_reminder_form(), submit_reminder()
                 - Video Calls: start_video_call(family_member_name) - automatically opens video lobby
+
+                BOOK READING
+                - You can read books uploaded by users using read_book tool
+                - Parameters: read_book(book_name="My Book", page_number=5, pages_to_read=2)
+                - Use continue_reading=True to resume from last position
+                - Example: "Continue reading Harry Potter" -> read_book(book_name="Harry Potter", continue_reading=True)
 
                 AI ASSISTANT (SIDEKICK) CAPABILITIES
                 When users navigate to the AI Assistant screen, they gain access to advanced features:
@@ -228,6 +235,10 @@ class Assistant(Agent):
         #! Recall History tool (server-side)
         recall_history_tool = RecallHistoryTool()
         self.tool_manager.register_tool(recall_history_tool)
+
+        #! read book tool
+        read_book_tool = ReadBookTool()
+        self.tool_manager.register_tool(read_book_tool)
 
     async def on_enter(self):
         """Called when the agent enters a room."""

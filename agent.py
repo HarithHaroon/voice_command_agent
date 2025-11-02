@@ -3,14 +3,12 @@ Main entry point for the LiveKit AI Assistant.
 """
 
 import dotenv
-import json
 import logging
-import re
 from livekit import agents
 from livekit.agents import AgentSession
 from livekit.plugins import openai, silero
-from firebase_client import FirebaseClient
 import asyncio
+from helpers.extract_user_id import extract_user_id
 
 from assistant import Assistant
 
@@ -51,14 +49,8 @@ async def entrypoint(ctx: agents.JobContext):
     voice_preference = "alloy"  # Default voice preference
 
     user_id = None
-    # Extract user_id from room name
-    match = re.search(r"room_user_(user_[a-zA-Z0-9_-]+)_.*", room_name)
 
-    if match:
-        user_id = match.group(1)
-        logger.info(f"✅ Extracted user_id from room name: {user_id}")
-    else:
-        logger.warning(f"❌ Could not extract user_id from room name: {room_name}")
+    user_id = extract_user_id(room_name)
 
     # Metadata will be extracted from the first data message (session_init)
     # after the agent connects.

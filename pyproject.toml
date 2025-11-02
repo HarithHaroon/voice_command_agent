@@ -1,9 +1,13 @@
 [project]
 name = "livekit-voice-agent"
 version = "0.1.0"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "firebase-admin>=7.1.0",
+    "langchain>=0.3.0,<1.0.0",              # Stay on 0.3.x
+    "langchain-openai>=0.2.0,<1.0.0",       # Stay on 0.3.x  
+    "langchain-pinecone>=0.2.12",           # Latest
+    "langchain-core>=0.3.34,<1.0.0",        # Compatible with pinecone
     "livekit-agents[cartesia,deepgram,openai,silero,turn-detector]~=1.2",
     "livekit-plugins-noise-cancellation~=0.2",
     "livekit-plugins-openai>=1.2.8",
