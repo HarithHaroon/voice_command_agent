@@ -30,6 +30,7 @@ from tools.start_video_call_tool import StartVideoCallTool
 from tools.recall_history_tool import RecallHistoryTool
 from tools.read_book_tool import ReadBookTool
 from firebase_client import FirebaseClient
+from tools.rag_books_tool import RagBooksTool
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,13 @@ class Assistant(Agent):
                 - Parameters: read_book(book_name="My Book", page_number=5, pages_to_read=2)
                 - Use continue_reading=True to resume from last position
                 - Example: "Continue reading Harry Potter" -> read_book(book_name="Harry Potter", continue_reading=True)
+
+                BOOK READING & SEARCH
+                - You can read books page by page using read_book tool
+                - You can search for information across books using rag_books_tool
+                - Parameters: rag_books_tool(query="What is photosynthesis?")
+                - This searches all books and returns relevant passages
+                - Example: "What does the book say about climate change?" -> rag_books_tool(query="climate change")
 
                 AI ASSISTANT (SIDEKICK) CAPABILITIES
                 When users navigate to the AI Assistant screen, they gain access to advanced features:
@@ -239,6 +247,10 @@ class Assistant(Agent):
         #! read book tool
         read_book_tool = ReadBookTool()
         self.tool_manager.register_tool(read_book_tool)
+
+        #! RAG books tool
+        rag_books_tool = RagBooksTool()
+        self.tool_manager.register_tool(rag_books_tool)
 
     async def on_enter(self):
         """Called when the agent enters a room."""
