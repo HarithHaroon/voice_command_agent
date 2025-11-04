@@ -2,6 +2,7 @@
 Main entry point for the LiveKit AI Assistant.
 """
 
+import json
 import dotenv
 import logging
 from livekit import agents
@@ -77,11 +78,27 @@ async def entrypoint(ctx: agents.JobContext):
     def on_conversation_item_added(event):
         role = event.item.role  # "user" or "assistant"
         content = event.item.text_content
-
         logger.info(f"💾 Conversation item: {role} - {content[:50]}...")
 
-        # Create background task to save
+        # Save to Firebase
         asyncio.create_task(assistant.save_message_to_firebase(role, content))
+
+        # Send to client via data channel
+        asyncio.create_task(_send_conversation_message(role, content))
+
+    async def _send_conversation_message(role: str, content: str):
+        """Send conversation message to Flutter client."""
+        try:
+            message = {
+                "type": "conversation_message",
+                "role": role,  # "user" or "assistant"
+                "content": content,
+            }
+            message_bytes = json.dumps(message).encode("utf-8")
+            await ctx.room.local_participant.publish_data(message_bytes)
+            logger.info(f"📤 Sent {role} message to client")
+        except Exception as e:
+            logger.error(f"Error sending message to client: {e}")
 
     # Start the session with our agent
     await session.start(
