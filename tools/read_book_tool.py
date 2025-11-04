@@ -99,6 +99,14 @@ class ReadBookTool(BaseTool):
             # Format the reading content
             result = self._format_reading_content(book_name, ordered_chunks, start_page)
 
+            # Send content to client
+            await self._send_book_content_to_client(
+                book_name, ordered_chunks, start_page
+            )
+
+            # At the very end, before return:
+            logger.info(f"📖 RETURNING RESULT - Length: {len(result)} chars")
+
             logger.info(
                 f"Successfully read {len(ordered_chunks)} chunks from '{book_name}'"
             )
@@ -273,3 +281,74 @@ class ReadBookTool(BaseTool):
         )
 
         return result
+
+    async def _send_book_content_to_client(
+        self, book_name: str, chunks: List, start_page: int
+    ):
+        """Send book content to the Flutter client for display."""
+        try:
+            from livekit.agents import get_job_context
+            import json
+
+            ctx = get_job_context()
+            if not ctx or not ctx.room:
+                logger.error("No room context available to send book content")
+                return
+
+            # Get book metadata
+            first_chunk = chunks[0]
+            metadata = first_chunk.metadata
+            title = metadata.get("title", book_name)
+            author = metadata.get("author", "Unknown Author")
+
+            # Format pages
+            pages = []
+            current_page = None
+            current_page_content = []
+
+            for chunk in chunks:
+                chunk_page = chunk.metadata.get("page_number", "Unknown")
+
+                if chunk_page != current_page:
+                    # Save previous page if exists
+                    if current_page is not None:
+                        pages.append(
+                            {
+                                "page_number": current_page,
+                                "content": "\n\n".join(current_page_content),
+                            }
+                        )
+                    # Start new page
+                    current_page = chunk_page
+                    current_page_content = []
+
+                current_page_content.append(chunk.page_content.strip())
+
+            # Add last page
+            if current_page is not None:
+                pages.append(
+                    {
+                        "page_number": current_page,
+                        "content": "\n\n".join(current_page_content),
+                    }
+                )
+
+            # Format message for client
+            message = {
+                "type": "book_content",
+                "book": {
+                    "title": title,
+                    "author": author,
+                    "start_page": start_page,
+                    "pages": pages,
+                },
+            }
+
+            message_bytes = json.dumps(message).encode("utf-8")
+            await ctx.room.local_participant.publish_data(message_bytes)
+            logger.info(
+                f"Sent book content to client: {title}, pages {start_page}-{pages[-1]['page_number']}"
+            )
+
+        except Exception as e:
+            logger.error(f"Error sending book content to client: {e}", exc_info=True)
