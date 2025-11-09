@@ -74,11 +74,57 @@ async def entrypoint(ctx: agents.JobContext):
 
     assistant = Assistant(user_id=user_id)
 
+    # 🆕 NEW: Dynamic instruction updater
+    async def _update_instructions_for_user_message(user_message: str):
+        """Detect intent and update instructions dynamically."""
+        try:
+            start_time = asyncio.get_event_loop().time()
+
+            # Detect intent from user message + conversation history
+            intent_result = assistant.intent_detector.detect_from_history(
+                user_message,
+                assistant.conversation_history
+            )
+
+            logger.info(f"🎯 Intent: {intent_result.reasoning} | Modules: {intent_result.modules} | Conf: {intent_result.confidence:.2f}")
+
+            # Check if modules need to change
+            new_modules = set(intent_result.modules)
+            current_modules = set(assistant.current_modules)
+
+            if new_modules != current_modules:
+                logger.info(f"🔄 Updating: {sorted(current_modules)} → {sorted(new_modules)}")
+
+                # Assemble new instructions from detected modules
+                new_instructions = assistant.module_manager.assemble_instructions(
+                    modules=list(new_modules),
+                    user_message=user_message
+                )
+
+                # ✨ THE KEY CALL: Update agent's instructions in real-time
+                await assistant.update_instructions(new_instructions)
+
+                assistant.current_modules = list(new_modules)
+                elapsed = (asyncio.get_event_loop().time() - start_time) * 1000
+                logger.info(f"✅ Updated | {len(new_instructions)} chars | {elapsed:.1f}ms")
+
+            # Track conversation history for context-aware intent detection
+            assistant.conversation_history.append({"role": "user", "content": user_message})
+            if len(assistant.conversation_history) > 10:
+                assistant.conversation_history = assistant.conversation_history[-10:]
+
+        except Exception as e:
+            logger.error(f"❌ Error updating instructions: {e}", exc_info=True)
+
     @session.on("conversation_item_added")
     def on_conversation_item_added(event):
         role = event.item.role  # "user" or "assistant"
         content = event.item.text_content
         logger.info(f"💾 Conversation item: {role} - {content[:50]}...")
+
+        # 🆕 NEW: Trigger dynamic instruction update for user messages
+        if role == "user":
+            asyncio.create_task(_update_instructions_for_user_message(content))
 
         # Save to Firebase
         asyncio.create_task(assistant.save_message_to_firebase(role, content))
