@@ -16,6 +16,14 @@ class ToolManager:
         self._tools: Dict[str, BaseTool] = {}
         self._tool_functions: List = []
 
+        self.agent_session = None  # 🆕 ADD THIS LINE
+
+    # 🆕 ADD THIS METHOD at the end of the class
+    def set_session(self, session):
+        """Store LiveKit session for tools."""
+        self.agent_session = session
+        logger.info("Session stored in ToolManager")
+
     def register_tool(self, tool: BaseTool):
         """Register a tool with the manager."""
         tool_name = tool.tool_name

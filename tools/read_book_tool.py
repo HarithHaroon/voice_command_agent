@@ -50,13 +50,13 @@ class ReadBookTool(BaseTool):
         pages_to_read: int = 1,
     ) -> str:
         """
-        Read pages from a book by name.
+        Read pages from a book by name - READS ALOUD VERBATIM.
 
         Args:
             book_name: The name of the book to read
             page_number: Page number to start from (default: 1)
             continue_reading: Continue from last position (default: False)
-            pages_to_read: Number of pages to read, 1-10 (default: 2)
+            pages_to_read: Number of pages to read, 1-10 (default: 1)
         """
         try:
             # Validate user_id
@@ -68,7 +68,7 @@ class ReadBookTool(BaseTool):
             pages_to_read = max(1, min(10, pages_to_read))
 
             logger.info(
-                f"Reading book: {book_name}, page: {page_number}, "
+                f"📖 read_book called: {book_name}, page: {page_number}, "
                 f"continue: {continue_reading}, pages_to_read: {pages_to_read}"
             )
 
@@ -97,27 +97,44 @@ class ReadBookTool(BaseTool):
             self.last_read_positions[book_name.lower()] = last_page + 1
 
             # Format the reading content
-            result = self._format_reading_content(book_name, ordered_chunks, start_page)
+            reading_content = self._format_reading_content(
+                book_name, ordered_chunks, start_page
+            )
 
-            # Send content to client
+            # Send content to client for display
             await self._send_book_content_to_client(
                 book_name, ordered_chunks, start_page
             )
 
-            # At the very end, before return:
-            logger.info(f"📖 RETURNING RESULT - Length: {len(result)} chars")
+            # 🆕 NEW: Get session and speak content directly (bypasses LLM)
+            if not self.agent:
+                logger.error("Tool not linked to agent")
+                return "Error: Tool not initialized properly."
 
-            logger.info(
-                f"Successfully read {len(ordered_chunks)} chunks from '{book_name}'"
+            # Access session from ToolManager
+            session = getattr(self.agent.tool_manager, "agent_session", None)
+            if not session:
+                logger.error("Session not available in ToolManager")
+                return "Error: Voice session not available."
+
+            # 🎤 KEY: Speak the content directly via TTS (bypasses LLM summarization)
+            logger.info(f"🎤 Speaking {len(reading_content)} chars via session.say()")
+
+            await session.say(
+                text=reading_content,
+                allow_interruptions=True,
+                add_to_chat_ctx=False,  # Don't add long content to chat history
             )
 
-            # At the very end, before return:
-            logger.info(f"📖 RETURNING RESULT - Length: {len(result)} chars")
-            logger.info(f"📖 First 200 chars: {result[:200]}")
-            return result
+            logger.info(
+                f"✅ Finished reading from '{book_name}', pages {start_page}-{last_page}"
+            )
+
+            # Return SHORT confirmation to LLM (not the book content)
+            return f"Now reading from '{book_name}', starting at page {start_page}."
 
         except Exception as e:
-            logger.error(f"Error in read_book tool: {e}", exc_info=True)
+            logger.error(f"❌ Error in read_book tool: {e}", exc_info=True)
             return f"Error reading book: {str(e)}. Please try again or check if the book exists in the library."
 
     async def _find_book_chunks(self, book_name: str, user_id: str = None) -> List:

@@ -74,6 +74,9 @@ async def entrypoint(ctx: agents.JobContext):
 
     assistant = Assistant(user_id=user_id)
 
+    assistant.tool_manager.set_session(session)
+    logger.info("✅ Session linked to ToolManager")
+
     # 🆕 NEW: Dynamic instruction updater
     async def _update_instructions_for_user_message(user_message: str):
         """Detect intent and update instructions dynamically."""
@@ -82,23 +85,25 @@ async def entrypoint(ctx: agents.JobContext):
 
             # Detect intent from user message + conversation history
             intent_result = assistant.intent_detector.detect_from_history(
-                user_message,
-                assistant.conversation_history
+                user_message, assistant.conversation_history
             )
 
-            logger.info(f"🎯 Intent: {intent_result.reasoning} | Modules: {intent_result.modules} | Conf: {intent_result.confidence:.2f}")
+            logger.info(
+                f"🎯 Intent: {intent_result.reasoning} | Modules: {intent_result.modules} | Conf: {intent_result.confidence:.2f}"
+            )
 
             # Check if modules need to change
             new_modules = set(intent_result.modules)
             current_modules = set(assistant.current_modules)
 
             if new_modules != current_modules:
-                logger.info(f"🔄 Updating: {sorted(current_modules)} → {sorted(new_modules)}")
+                logger.info(
+                    f"🔄 Updating: {sorted(current_modules)} → {sorted(new_modules)}"
+                )
 
                 # Assemble new instructions from detected modules
                 new_instructions = assistant.module_manager.assemble_instructions(
-                    modules=list(new_modules),
-                    user_message=user_message
+                    modules=list(new_modules), user_message=user_message
                 )
 
                 # ✨ THE KEY CALL: Update agent's instructions in real-time
@@ -106,10 +111,14 @@ async def entrypoint(ctx: agents.JobContext):
 
                 assistant.current_modules = list(new_modules)
                 elapsed = (asyncio.get_event_loop().time() - start_time) * 1000
-                logger.info(f"✅ Updated | {len(new_instructions)} chars | {elapsed:.1f}ms")
+                logger.info(
+                    f"✅ Updated | {len(new_instructions)} chars | {elapsed:.1f}ms"
+                )
 
             # Track conversation history for context-aware intent detection
-            assistant.conversation_history.append({"role": "user", "content": user_message})
+            assistant.conversation_history.append(
+                {"role": "user", "content": user_message}
+            )
             if len(assistant.conversation_history) > 10:
                 assistant.conversation_history = assistant.conversation_history[-10:]
 
