@@ -81,10 +81,13 @@ class NavigationTool(BaseTool):
 
             logger.info(f"Calculated navigation operations: {operations}")
 
-            # Send operations to Flutter
+            # Send operations to Flutter and WAIT for confirmation
             result = await self.send_tool_request(
                 "navigate_to_screen", {"operations": operations}
             )
+
+            # Result now contains the confirmed navigation state from Flutter
+            logger.info(f"Navigation confirmed by Flutter: {result}")
 
             return f"Successfully navigated to {target_screen}"
 

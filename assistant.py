@@ -218,27 +218,23 @@ class Assistant(Agent):
                 navigation_data = message.get("navigation", {})
                 self.navigation_state.initialize_from_session(navigation_data)
 
-            elif (
-                message.get("type") == "tool_result"
-                and message.get("tool") == "navigate_to_screen"
-            ):
-                if message.get("success") and "result" in message:
+            # Route all tool responses through tool manager first
+            elif message.get("type") == "tool_result":
+                success = self.tool_manager.route_tool_response(message)
+                if not success:
+                    logger.error("Failed to route tool response")
+
+                # Update navigation state if this was a successful navigation
+                if (
+                    message.get("tool") == "navigate_to_screen"
+                    and message.get("success")
+                    and "result" in message
+                ):
                     result = message.get("result", {})
                     if "navigation_stack" in result and "current_screen" in result:
                         self.navigation_state.update_from_navigation_success(
                             result["navigation_stack"], result["current_screen"]
                         )
-
-                # Route tool response to tool manager (unchanged)
-                success = self.tool_manager.route_tool_response(message)
-                if not success:
-                    logger.error("Failed to route tool response")
-
-            # Route other tool responses (unchanged)
-            elif message.get("type") == "tool_result":
-                success = self.tool_manager.route_tool_response(message)
-                if not success:
-                    logger.error("Failed to route tool response")
             else:
                 logger.info(f"Non-tool message type: {message.get('type')}")
 
