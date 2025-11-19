@@ -22,24 +22,40 @@ logger = logging.getLogger(__name__)
 def prewarm_fnc(proc: agents.JobProcess):
     """Prewarm function - runs once per worker process."""
     logger.info("=== PREWARM FUNCTION CALLED ===")
+
     proc.userdata["vad"] = silero.VAD.load()
+
     logger.info("=== VAD MODEL LOADED IN PREWARM ===")
 
 
 async def entrypoint(ctx: agents.JobContext):
     """Main entry point for the agent."""
+
     logger.info("=== ENTRYPOINT START ===")
 
     # Get room name
     room_name = ctx.room.name
+
     logger.info(f"Received request for room: {room_name}")
 
     # Filter: Only join rooms starting with "room_" (your agent rooms)
     if not room_name.startswith("room_"):
         logger.info(f"❌ Ignoring room '{room_name}' - not an agent room")
+
         return  # Exit immediately without connecting
 
     logger.info(f"✅ Joining agent room: {room_name}")
+
+    voice_preference = "alloy"
+
+    try:
+        metadata = json.loads(ctx.job.metadata)
+
+        voice_preference = metadata.get("voice_preference", "alloy")
+
+        logger.info(f"✅ Voice preference from metadata: {voice_preference}")
+    except (json.JSONDecodeError, AttributeError) as e:
+        logger.warning(f"⚠️ No metadata or invalid JSON, using default voice: {e}")
 
     # Connect to the room (only reaches here for agent rooms)
     await ctx.connect()
@@ -47,15 +63,10 @@ async def entrypoint(ctx: agents.JobContext):
     logger.info("=== CONNECTED TO ROOM ===")
 
     # Extract voice preference and user_id
-    voice_preference = "alloy"  # Default voice preference
-
     user_id = None
 
     user_id = extract_user_id(room_name)
 
-    # Metadata will be extracted from the first data message (session_init)
-    # after the agent connects.
-    # For now, user_id remains None until received via data message.
     logger.info("Metadata extraction will occur via data message.")
 
     # Create agent session
@@ -75,6 +86,7 @@ async def entrypoint(ctx: agents.JobContext):
     assistant = Assistant(user_id=user_id)
 
     assistant.tool_manager.set_session(session)
+
     logger.info("✅ Session linked to ToolManager")
 
     # 🆕 NEW: Dynamic instruction updater
@@ -94,6 +106,7 @@ async def entrypoint(ctx: agents.JobContext):
 
             # Check if modules need to change
             new_modules = set(intent_result.modules)
+
             current_modules = set(assistant.current_modules)
 
             if new_modules != current_modules:
@@ -110,7 +123,9 @@ async def entrypoint(ctx: agents.JobContext):
                 await assistant.update_instructions(new_instructions)
 
                 assistant.current_modules = list(new_modules)
+
                 elapsed = (asyncio.get_event_loop().time() - start_time) * 1000
+
                 logger.info(
                     f"✅ Updated | {len(new_instructions)} chars | {elapsed:.1f}ms"
                 )
@@ -119,6 +134,7 @@ async def entrypoint(ctx: agents.JobContext):
             assistant.conversation_history.append(
                 {"role": "user", "content": user_message}
             )
+
             if len(assistant.conversation_history) > 10:
                 assistant.conversation_history = assistant.conversation_history[-10:]
 
@@ -128,7 +144,9 @@ async def entrypoint(ctx: agents.JobContext):
     @session.on("conversation_item_added")
     def on_conversation_item_added(event):
         role = event.item.role  # "user" or "assistant"
+
         content = event.item.text_content
+
         logger.info(f"💾 Conversation item: {role} - {content[:50]}...")
 
         # 🆕 NEW: Trigger dynamic instruction update for user messages
@@ -149,8 +167,11 @@ async def entrypoint(ctx: agents.JobContext):
                 "role": role,  # "user" or "assistant"
                 "content": content,
             }
+
             message_bytes = json.dumps(message).encode("utf-8")
+
             await ctx.room.local_participant.publish_data(message_bytes)
+
             logger.info(f"📤 Sent {role} message to client")
         except Exception as e:
             logger.error(f"Error sending message to client: {e}")
