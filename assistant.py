@@ -34,6 +34,11 @@ from tools.rag_books_tool import RagBooksTool
 from tools.query_image_tool import QueryImageTool
 from intent_detection.intent_detector import IntentDetector
 from prompt_management.prompt_module_manager import PromptModuleManager
+from tools.backlog_tools.add_reminder_tool import AddReminderTool
+from tools.backlog_tools.view_upcoming_reminders_tool import ViewUpcomingRemindersTool
+from tools.backlog_tools.complete_reminder_tool import CompleteReminderTool
+from tools.backlog_tools.delete_reminder_tool import DeleteReminderTool
+from tools.backlog_tools.list_all_reminders_tool import ListAllRemindersTool
 
 
 logger = logging.getLogger(__name__)
@@ -170,6 +175,22 @@ class Assistant(Agent):
         #! Query image tool
         query_image_tool = QueryImageTool()
         self.tool_manager.register_tool(query_image_tool)
+
+        #! Backlog reminder tools (server-side)
+        add_reminder_tool = AddReminderTool()
+        self.tool_manager.register_tool(add_reminder_tool)
+
+        view_upcoming_reminders_tool = ViewUpcomingRemindersTool()
+        self.tool_manager.register_tool(view_upcoming_reminders_tool)
+
+        complete_reminder_tool = CompleteReminderTool()
+        self.tool_manager.register_tool(complete_reminder_tool)
+
+        delete_reminder_tool = DeleteReminderTool()
+        self.tool_manager.register_tool(delete_reminder_tool)
+
+        list_all_reminders_tool = ListAllRemindersTool()
+        self.tool_manager.register_tool(list_all_reminders_tool)
 
     async def on_enter(self):
         """Called when the agent enters a room."""
