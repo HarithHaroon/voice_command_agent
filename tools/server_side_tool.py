@@ -17,12 +17,19 @@ class ServerSideTool(ABC):
 
         self._user_id = None
 
+        self._time_tracker = None
+
         logger.info(f"ServerSideTool '{tool_name}' initialized")
 
     def set_user_id(self, user_id: str):
         """Set the current user ID for this tool instance."""
         self._user_id = user_id
         logger.info(f"Set user_id for {self.tool_name}: {user_id}")
+
+    def set_time_tracker(self, time_tracker):
+        """Set the time tracker for accurate client time."""
+        self._time_tracker = time_tracker
+        logger.info(f"Set time_tracker for {self.tool_name}")
 
     def set_agent(self, agent):
         """Set agent reference (for compatibility with ToolManager)."""

@@ -46,6 +46,13 @@ class ToolManager:
                 tool.set_user_id(user_id)
                 logger.info(f"Set user_id for {tool.tool_name}")
 
+    def set_time_tracker_for_all_tools(self, time_tracker):
+        """Set the time_tracker for all registered tools that support it."""
+        for tool in self._tools.values():
+            if hasattr(tool, "set_time_tracker"):
+                tool.set_time_tracker(time_tracker)
+                logger.info(f"Set time_tracker for {tool.tool_name}")
+
     def get_all_tool_functions(self) -> List:
         """Get all tool functions for the agent."""
         return self._tool_functions

@@ -2,6 +2,7 @@
 Extensible AI Assistant using Tool Manager - LiveKit Cloud Compatible.
 """
 
+from datetime import datetime
 import json
 import logging
 import asyncio
@@ -39,6 +40,7 @@ from tools.backlog_tools.view_upcoming_reminders_tool import ViewUpcomingReminde
 from tools.backlog_tools.complete_reminder_tool import CompleteReminderTool
 from tools.backlog_tools.delete_reminder_tool import DeleteReminderTool
 from tools.backlog_tools.list_all_reminders_tool import ListAllRemindersTool
+from helpers.client_time_tracker import ClientTimeTracker
 
 
 logger = logging.getLogger(__name__)
@@ -50,8 +52,12 @@ class Assistant(Agent):
     def __init__(self, user_id: str = None) -> None:
         # Existing navigation and Firebase setup
         self.navigation_state = NavigationState()
+
         self.user_id = user_id
+
         self.firebase_client = FirebaseClient()
+
+        self.time_tracker = ClientTimeTracker()
 
         logger.info(f"Assistant initialized with user_id: {user_id}")
 
@@ -63,18 +69,22 @@ class Assistant(Agent):
 
         # 🆕 NEW: Initialize modular prompt system
         self.module_manager = PromptModuleManager()
+
         self.intent_detector = IntentDetector()
+
         self.current_modules = ["navigation", "memory_recall"]
+
         self.conversation_history = []
 
         # Assemble initial instructions from base + default modules
         base_instructions = self.module_manager.assemble_instructions(
-            modules=self.current_modules
+            modules=self.current_modules,
+            current_time=datetime.now().strftime("%A, %B %d, %Y at %I:%M %p"),
         )
 
         # Initialize agent with dynamically assembled instructions
         super().__init__(
-            instructions=base_instructions,  # 🔄 Changed from hard-coded string to dynamic instructions
+            instructions=base_instructions,
             tools=(self.tool_manager.get_all_tool_functions()),
         )
 
@@ -94,62 +104,80 @@ class Assistant(Agent):
         """Register all available tools."""
         #! Register Tools
         text_field_tool = TextFieldTool()
+
         self.tool_manager.register_tool(text_field_tool)
 
         form_validation_tool = FormValidationTool()
+
         self.tool_manager.register_tool(form_validation_tool)
 
         submission_tool = FormSubmissionTool()
+
         self.tool_manager.register_tool(submission_tool)
 
         orchestration_tool = FormOrchestrationTool()
+
         orchestration_tool.set_tools(
             text_field_tool, form_validation_tool, submission_tool
         )
         self.tool_manager.register_tool(orchestration_tool)
 
         navigation_tool = NavigationTool(agent=self)
+
         self.tool_manager.register_tool(navigation_tool)
 
         toggle_fall_detection_tool = ToggleFallDetectionTool()
+
         self.tool_manager.register_tool(toggle_fall_detection_tool)
 
         sensitivity_tool = FallDetectionSensitivityTool()
+
         self.tool_manager.register_tool(sensitivity_tool)
 
         emergency_delay_tool = EmergencyDelayTool()
+
         self.tool_manager.register_tool(emergency_delay_tool)
 
         toggle_location_tracking_tool = ToggleLocationTrackingTool()
+
         self.tool_manager.register_tool(toggle_location_tracking_tool)
 
         update_location_interval_tool = UpdateLocationIntervalTool()
+
         self.tool_manager.register_tool(update_location_interval_tool)
 
         #! Reminder tools
         set_reminder_time_tool = SetReminderTimeTool()
+
         self.tool_manager.register_tool(set_reminder_time_tool)
 
         set_reminder_date_tool = SetReminderDateTool()
+
         self.tool_manager.register_tool(set_reminder_date_tool)
 
         set_recurrence_type_tool = SetRecurrenceTypeTool()
+
         self.tool_manager.register_tool(set_recurrence_type_tool)
 
         set_custom_days_tool = SetCustomDaysTool()
+
         self.tool_manager.register_tool(set_custom_days_tool)
 
         validate_reminder_form_tool = ValidateReminderFormTool()
+
         self.tool_manager.register_tool(validate_reminder_form_tool)
 
         submit_reminder_tool = SubmitReminderTool()
+
         self.tool_manager.register_tool(submit_reminder_tool)
 
         #! WatchOS fall detection tools
         toggle_watchos_fall_detection_tool = ToggleWatchosFallDetectionTool()
+
         self.tool_manager.register_tool(toggle_watchos_fall_detection_tool)
 
         set_watchos_sensitivity_tool = SetWatchosSensitivityTool()
+
         self.tool_manager.register_tool(set_watchos_sensitivity_tool)
 
         logger.info(
@@ -158,38 +186,48 @@ class Assistant(Agent):
 
         #! Video call tool
         start_video_call_tool = StartVideoCallTool()
+
         self.tool_manager.register_tool(start_video_call_tool)
 
         #! Recall History tool (server-side)
         recall_history_tool = RecallHistoryTool()
+
         self.tool_manager.register_tool(recall_history_tool)
 
         #! read book tool
         read_book_tool = ReadBookTool()
+
         self.tool_manager.register_tool(read_book_tool)
 
         #! RAG books tool
         rag_books_tool = RagBooksTool()
+
         self.tool_manager.register_tool(rag_books_tool)
 
         #! Query image tool
         query_image_tool = QueryImageTool()
+
         self.tool_manager.register_tool(query_image_tool)
 
         #! Backlog reminder tools (server-side)
         add_reminder_tool = AddReminderTool()
+
         self.tool_manager.register_tool(add_reminder_tool)
 
         view_upcoming_reminders_tool = ViewUpcomingRemindersTool()
+
         self.tool_manager.register_tool(view_upcoming_reminders_tool)
 
         complete_reminder_tool = CompleteReminderTool()
+
         self.tool_manager.register_tool(complete_reminder_tool)
 
         delete_reminder_tool = DeleteReminderTool()
+
         self.tool_manager.register_tool(delete_reminder_tool)
 
         list_all_reminders_tool = ListAllRemindersTool()
+
         self.tool_manager.register_tool(list_all_reminders_tool)
 
     async def on_enter(self):
@@ -203,6 +241,9 @@ class Assistant(Agent):
         if self.user_id:
             self.tool_manager.set_user_id_for_all_tools(self.user_id)
 
+        # Set time tracker for all tools that need it
+        self.tool_manager.set_time_tracker_for_all_tools(self.time_tracker)
+
         # Set up data handler
         await self._setup_data_handler()
 
@@ -210,8 +251,10 @@ class Assistant(Agent):
         """Setup data handler using job context."""
         try:
             ctx = get_job_context()
+
             if ctx and ctx.room:
                 ctx.room.on("data_received", self._handle_data)
+
                 logger.info("Data handler registered successfully")
             else:
                 logger.error("No job context room available")
@@ -232,16 +275,44 @@ class Assistant(Agent):
 
             # Parse message
             message = json.loads(message_bytes.decode("utf-8"))
+
             logger.info(f"Parsed message: {message}")
 
             # Store initial navigation context from session init
             if message.get("type") == "session_init":
                 navigation_data = message.get("navigation", {})
+
                 self.navigation_state.initialize_from_session(navigation_data)
+
+                client_time = message.get("current_time")
+
+                timezone_offset = message.get("timezone_offset_minutes", 0)
+
+                if client_time:
+                    self.time_tracker.initialize(client_time, timezone_offset)
+
+                    logger.info(f"🕐 Client time received: {client_time}")
+                    logger.info(f"🕐 Timezone offset: {timezone_offset} minutes")
+                    logger.info(
+                        f"🕐 Formatted time: {self.time_tracker.get_formatted_datetime()}"
+                    )
+
+                    # Rebuild instructions with accurate client time
+                    updated_instructions = self.module_manager.assemble_instructions(
+                        modules=self.current_modules,
+                        current_time=self.time_tracker.get_formatted_datetime(),
+                    )
+                    # Update agent instructions
+                    asyncio.create_task(self.update_instructions(updated_instructions))
+
+                    logger.info(
+                        f"Updated instructions with client time: {self.time_tracker.get_formatted_datetime()}"
+                    )
 
             # Route all tool responses through tool manager first
             elif message.get("type") == "tool_result":
                 success = self.tool_manager.route_tool_response(message)
+
                 if not success:
                     logger.error("Failed to route tool response")
 
@@ -252,6 +323,7 @@ class Assistant(Agent):
                     and "result" in message
                 ):
                     result = message.get("result", {})
+
                     if "navigation_stack" in result and "current_screen" in result:
                         self.navigation_state.update_from_navigation_success(
                             result["navigation_stack"], result["current_screen"]
@@ -265,4 +337,5 @@ class Assistant(Agent):
     async def on_leave(self):
         """Called when the agent leaves the room."""
         logger.info("Assistant leaving the room - cleaning up navigation state")
+
         self.navigation_state.clear()

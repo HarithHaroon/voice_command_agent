@@ -206,7 +206,7 @@ class BacklogManager:
         due_items = []
         for item in upcoming:
             scheduled_time = datetime.fromisoformat(item["scheduled_time"])
-            remind_before = timedelta(minutes=item.get("remind_before_minutes", 15))
+            remind_before = timedelta(minutes=int(item.get("remind_before_minutes", 0)))
             remind_at_time = scheduled_time - remind_before
 
             # Check if it's time to remind
@@ -390,7 +390,7 @@ class BacklogManager:
         return None
 
     def get_items_by_timeframe(
-        self, user_id: str, timeframe: str
+        self, user_id: str, timeframe: str, current_time: Optional[datetime] = None
     ) -> List[Dict[str, Any]]:
         """
         Get items filtered by human-readable timeframe.
@@ -398,12 +398,15 @@ class BacklogManager:
         Args:
             user_id: User identifier
             timeframe: "today", "tomorrow", "week", or "all"
+            current_time: Optional current time (for client timezone accuracy)
 
         Returns:
             List of items matching the timeframe
         """
-        now = datetime.utcnow()
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        if current_time is None:
+            current_time = datetime.utcnow()
+
+        today_start = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
         today_end = today_start + timedelta(days=1)
         tomorrow_end = today_start + timedelta(days=2)
         week_end = today_start + timedelta(days=7)

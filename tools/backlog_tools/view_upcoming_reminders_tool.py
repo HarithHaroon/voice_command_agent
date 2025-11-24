@@ -58,9 +58,15 @@ class ViewUpcomingRemindersTool(ServerSideTool):
                     f"I can show you reminders for: today, tomorrow, this week, or all."
                 )
 
+            # Get current time from tracker or fallback to UTC
+            if self._time_tracker and self._time_tracker.is_initialized():
+                current_time = self._time_tracker.get_current_client_time()
+            else:
+                current_time = None  # BacklogManager will use UTC
+
             # Get items by timeframe
             items = self.backlog_manager.get_items_by_timeframe(
-                self._user_id, timeframe
+                self._user_id, timeframe, current_time
             )
 
             logger.info(f"Found {len(items)} reminders for {timeframe}")
@@ -105,8 +111,8 @@ class ViewUpcomingRemindersTool(ServerSideTool):
                     line += f" {recurrence_text.get(item['recurrence'], '')}"
 
                 # Add remind-before info
-                remind_before = item.get("remind_before_minutes", 15)
-                if remind_before != 15:
+                remind_before = int(item.get("remind_before_minutes", 0))
+                if remind_before > 0:
                     remind_time = scheduled - timedelta(minutes=remind_before)
                     remind_display = remind_time.strftime("%I:%M %p").lstrip("0")
                     line += f" - I'll remind you at {remind_display}"

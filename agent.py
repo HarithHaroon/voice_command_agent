@@ -2,6 +2,7 @@
 Main entry point for the LiveKit AI Assistant.
 """
 
+import datetime
 import json
 import dotenv
 import logging
@@ -116,7 +117,13 @@ async def entrypoint(ctx: agents.JobContext):
 
                 # Assemble new instructions from detected modules
                 new_instructions = assistant.module_manager.assemble_instructions(
-                    modules=list(new_modules), user_message=user_message
+                    modules=list(new_modules),
+                    user_message=user_message,
+                    current_time=(
+                        assistant.time_tracker.get_formatted_datetime()
+                        if assistant.time_tracker.is_initialized()
+                        else datetime.now().strftime("%A, %B %d, %Y at %I:%M %p")
+                    ),
                 )
 
                 # ✨ THE KEY CALL: Update agent's instructions in real-time

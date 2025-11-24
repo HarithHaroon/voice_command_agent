@@ -54,8 +54,14 @@ class ListAllRemindersTool(ServerSideTool):
             if not items:
                 return "You don't have any reminders set up. Would you like me to create one?"
 
+            # Get current time from tracker or fallback to UTC
+            if self._time_tracker and self._time_tracker.is_initialized():
+                now = self._time_tracker.get_current_client_time()
+            else:
+                now = datetime.utcnow()
+
             # Group by date for better readability
-            today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+            today = now.replace(hour=0, minute=0, second=0, microsecond=0)
             tomorrow = today + timedelta(days=1)
             next_week = today + timedelta(days=7)
 
