@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from firebase_client import FirebaseClient
+from clients.firebase_client import FirebaseClient
 
 
 logger = logging.getLogger(__name__)
@@ -103,7 +103,9 @@ class RecallHistoryTool(ServerSideTool):
                 return "Unable to search conversation history: database connection unavailable."
 
             # Use a large number of hours for 'all' to effectively get all messages
-            search_hours = timeframe_hours if timeframe_hours is not None else 87600  # ~10 years
+            search_hours = (
+                timeframe_hours if timeframe_hours is not None else 87600
+            )  # ~10 years
 
             recent_messages = await self.firebase_client.get_messages_by_timeframe(
                 self._user_id, search_hours

@@ -29,7 +29,7 @@ from tools.set_watchos_sensitivity_tool import SetWatchosSensitivityTool
 from tools.start_video_call_tool import StartVideoCallTool
 from tools.recall_history_tool import RecallHistoryTool
 from tools.read_book_tool import ReadBookTool
-from firebase_client import FirebaseClient
+from clients.firebase_client import FirebaseClient
 from tools.rag_books_tool import RagBooksTool
 from tools.query_image_tool import QueryImageTool
 from intent_detection.intent_detector import IntentDetector

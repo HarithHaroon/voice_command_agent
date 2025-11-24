@@ -7,8 +7,7 @@ import logging
 from livekit.agents import function_tool
 from tools.base_tool import BaseTool
 
-
-from books_vector_store import query_books
+from vector_stores.books_vector_store import query_books
 
 logger = logging.getLogger(__name__)
 

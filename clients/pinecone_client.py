@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from pinecone import Pinecone, ServerlessSpec
 from dotenv import load_dotenv
-from embedding_service import EmbeddingService
+from services.embedding_service import EmbeddingService
 
 load_dotenv()
 

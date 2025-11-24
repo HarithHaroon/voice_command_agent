@@ -15,8 +15,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from images_vector_store import query_images
+from vector_stores.images_vector_store import query_images
 from helpers.generate_presigned_url import generate_presigned_url
+
 
 logger = logging.getLogger(__name__)
 
