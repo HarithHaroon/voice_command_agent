@@ -41,6 +41,7 @@ from tools.backlog_tools.complete_reminder_tool import CompleteReminderTool
 from tools.backlog_tools.delete_reminder_tool import DeleteReminderTool
 from tools.backlog_tools.list_all_reminders_tool import ListAllRemindersTool
 from helpers.client_time_tracker import ClientTimeTracker
+from backlog.time_monitor import TimeMonitor
 
 
 logger = logging.getLogger(__name__)
@@ -58,6 +59,8 @@ class Assistant(Agent):
         self.firebase_client = FirebaseClient()
 
         self.time_tracker = ClientTimeTracker()
+
+        self.time_monitor = None
 
         logger.info(f"Assistant initialized with user_id: {user_id}")
 
@@ -244,6 +247,21 @@ class Assistant(Agent):
         # Set time tracker for all tools that need it
         self.tool_manager.set_time_tracker_for_all_tools(self.time_tracker)
 
+        # Start time monitor for backlog reminders
+        if self.user_id:
+            self.time_monitor = TimeMonitor(
+                user_id=self.user_id,
+                time_tracker=self.time_tracker,
+            )
+            # Get session from tool_manager (same pattern as read_book_tool)
+            session = getattr(self.tool_manager, "agent_session", None)
+            if session:
+                self.time_monitor.set_session(session)
+                await self.time_monitor.start()
+                logger.info("✅ TimeMonitor started")
+            else:
+                logger.warning("Session not available, TimeMonitor not started")
+
         # Set up data handler
         await self._setup_data_handler()
 
@@ -336,6 +354,12 @@ class Assistant(Agent):
 
     async def on_leave(self):
         """Called when the agent leaves the room."""
-        logger.info("Assistant leaving the room - cleaning up navigation state")
+        logger.info("Assistant leaving the room - cleaning up")
 
+        # Stop time monitor
+        if self.time_monitor:
+            await self.time_monitor.stop()
+            logger.info("TimeMonitor stopped")
+
+        # Clean up navigation state
         self.navigation_state.clear()
