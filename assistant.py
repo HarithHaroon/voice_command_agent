@@ -42,6 +42,7 @@ from tools.backlog_tools.delete_reminder_tool import DeleteReminderTool
 from tools.backlog_tools.list_all_reminders_tool import ListAllRemindersTool
 from helpers.client_time_tracker import ClientTimeTracker
 from backlog.time_monitor import TimeMonitor
+from backlog.backlog_manager import BacklogManager
 
 
 logger = logging.getLogger(__name__)
@@ -50,18 +51,15 @@ logger = logging.getLogger(__name__)
 class Assistant(Agent):
     """AI Assistant with extensible tool management."""
 
-    def __init__(self, user_id: str = None) -> None:
+    def __init__(self, user_id: str = None, use_llm_intent: bool = True) -> None:
         # Existing navigation and Firebase setup
         self.navigation_state = NavigationState()
-
         self.user_id = user_id
-
+        self.use_llm_intent = use_llm_intent
         self.firebase_client = FirebaseClient()
-
+        self.backlog_manager = BacklogManager()
         self.time_tracker = ClientTimeTracker()
-
         self.time_monitor = None
-
         logger.info(f"Assistant initialized with user_id: {user_id}")
 
         # Initialize tool manager
@@ -73,10 +71,20 @@ class Assistant(Agent):
         # 🆕 NEW: Initialize modular prompt system
         self.module_manager = PromptModuleManager()
 
-        self.intent_detector = IntentDetector()
+        # 🆕 Initialize intent detection (LLM or regex)
+        if use_llm_intent:
+            from intent_detection.llm_intent_detector import LLMIntentDetector
+            from intent_detection.module_definitions import get_module_definitions
+
+            self.intent_detector = LLMIntentDetector(
+                available_modules=get_module_definitions()
+            )
+            logger.info("Using LLM-based intent detection")
+        else:
+            self.intent_detector = IntentDetector()
+            logger.info("Using regex-based intent detection")
 
         self.current_modules = ["navigation", "memory_recall"]
-
         self.conversation_history = []
 
         # Assemble initial instructions from base + default modules
@@ -193,7 +201,7 @@ class Assistant(Agent):
         self.tool_manager.register_tool(start_video_call_tool)
 
         #! Recall History tool (server-side)
-        recall_history_tool = RecallHistoryTool()
+        recall_history_tool = RecallHistoryTool(firebase_client=self.firebase_client)
 
         self.tool_manager.register_tool(recall_history_tool)
 
@@ -213,23 +221,29 @@ class Assistant(Agent):
         self.tool_manager.register_tool(query_image_tool)
 
         #! Backlog reminder tools (server-side)
-        add_reminder_tool = AddReminderTool()
+        add_reminder_tool = AddReminderTool(backlog_manager=self.backlog_manager)
 
         self.tool_manager.register_tool(add_reminder_tool)
 
-        view_upcoming_reminders_tool = ViewUpcomingRemindersTool()
+        view_upcoming_reminders_tool = ViewUpcomingRemindersTool(
+            backlog_manager=self.backlog_manager
+        )
 
         self.tool_manager.register_tool(view_upcoming_reminders_tool)
 
-        complete_reminder_tool = CompleteReminderTool()
+        complete_reminder_tool = CompleteReminderTool(
+            backlog_manager=self.backlog_manager
+        )
 
         self.tool_manager.register_tool(complete_reminder_tool)
 
-        delete_reminder_tool = DeleteReminderTool()
+        delete_reminder_tool = DeleteReminderTool(backlog_manager=self.backlog_manager)
 
         self.tool_manager.register_tool(delete_reminder_tool)
 
-        list_all_reminders_tool = ListAllRemindersTool()
+        list_all_reminders_tool = ListAllRemindersTool(
+            backlog_manager=self.backlog_manager
+        )
 
         self.tool_manager.register_tool(list_all_reminders_tool)
 
@@ -252,6 +266,7 @@ class Assistant(Agent):
             self.time_monitor = TimeMonitor(
                 user_id=self.user_id,
                 time_tracker=self.time_tracker,
+                backlog_manager=self.backlog_manager,
             )
             # Get session from tool_manager (same pattern as read_book_tool)
             session = getattr(self.tool_manager, "agent_session", None)

@@ -16,7 +16,9 @@ class ToolManager:
         self._tools: Dict[str, BaseTool] = {}
         self._tool_functions: List = []
 
-        self.agent_session = None  # 🆕 ADD THIS LINE
+        self.agent_session = None
+
+        self._method_to_tool: Dict[str, BaseTool] = {}
 
     # 🆕 ADD THIS METHOD at the end of the class
     def set_session(self, session):
@@ -27,11 +29,17 @@ class ToolManager:
     def register_tool(self, tool: BaseTool):
         """Register a tool with the manager."""
         tool_name = tool.tool_name
+
         if tool_name in self._tools:
             logger.warning(f"Tool {tool_name} already registered, replacing")
 
         self._tools[tool_name] = tool
+
         self._tool_functions.extend(tool.get_tool_functions())
+
+        for method_name in tool.get_tool_methods():
+            self._method_to_tool[method_name] = tool
+
         logger.info(f"Registered tool: {tool_name}")
 
     def set_agent_for_all_tools(self, agent):
@@ -60,20 +68,35 @@ class ToolManager:
     def route_tool_response(self, response_data: Dict[str, Any]) -> bool:
         """Route a tool response to the appropriate tool."""
         request_id = response_data.get("request_id", "")
+
         tool_name = response_data.get("tool", "")
 
         logger.info(f"Routing response - ID: {request_id}, Tool: {tool_name}")
 
-        # Try to find the right tool to handle this response
+        # ✅ O(1) lookup by method name
+        if tool_name in self._method_to_tool:
+            tool = self._method_to_tool[tool_name]
+
+            logger.info(f"Routing to {tool.tool_name}...")
+
+            tool.handle_tool_response(response_data)
+
+            return True
+
+        # ✅ Fallback: check by request_id prefix (for edge cases)
         for tool in self._tools.values():
-            if tool.can_handle_request(request_id, tool_name):
-                logger.info(f"Routing to {tool.tool_name}...")
+            if request_id.startswith(f"{tool.tool_name}_"):  # ✅ Direct prefix check
+
+                logger.info(f"Routing to {tool.tool_name} by request_id...")
+
                 tool.handle_tool_response(response_data)
+
                 return True
 
         logger.warning(
             f"No tool found to handle response: {tool_name} (ID: {request_id})"
         )
+
         return False
 
     def get_registered_tools(self) -> List[str]:

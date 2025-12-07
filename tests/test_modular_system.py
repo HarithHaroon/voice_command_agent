@@ -5,8 +5,10 @@ Tests all components end-to-end
 """
 
 import sys
+
 from intent_detection.intent_detector import IntentDetector
 from prompt_management.prompt_module_manager import PromptModuleManager
+
 
 def test_module_manager():
     """Test PromptModuleManager"""
@@ -26,12 +28,13 @@ def test_module_manager():
     print(f"✅ Base prompt loaded ({len(manager.base_prompt)} chars)")
 
     # Test module assembly
-    instructions = manager.assemble_instructions(['navigation', 'memory_recall'])
+    instructions = manager.assemble_instructions(["navigation", "memory_recall"])
     print(f"✅ Assembled instructions ({len(instructions)} chars)")
     assert len(instructions) > 1000, "Instructions should be substantial"
 
     print("✅ TEST 1 PASSED\n")
     return manager
+
 
 def test_intent_detector():
     """Test IntentDetector"""
@@ -43,7 +46,10 @@ def test_intent_detector():
 
     # Test basic detection
     test_cases = [
-        ("Remind me to take my medicine", ["medication_reminders", "form_handling", "navigation"]),
+        (
+            "Remind me to take my medicine",
+            ["medication_reminders", "form_handling", "navigation"],
+        ),
         ("Help me read this label", ["reading_ocr", "navigation"]),
         ("Call my daughter", ["video_calling", "navigation"]),
         ("Who is this person?", ["face_recognition", "navigation"]),
@@ -52,17 +58,20 @@ def test_intent_detector():
 
     for message, expected_modules in test_cases:
         result = detector.detect(message)
-        print(f"\nMessage: \"{message}\"")
+        print(f'\nMessage: "{message}"')
         print(f"  → Detected: {result.modules}")
         print(f"  → Confidence: {result.confidence:.2f}")
 
         # Check that expected modules are present
         for expected in expected_modules:
-            assert expected in result.modules, f"Expected '{expected}' in {result.modules}"
+            assert (
+                expected in result.modules
+            ), f"Expected '{expected}' in {result.modules}"
         print(f"  ✅ Correct modules detected")
 
     print("\n✅ TEST 2 PASSED\n")
     return detector
+
 
 def test_integration():
     """Test integration of both components"""
@@ -83,7 +92,7 @@ def test_integration():
     ]
 
     for msg in messages:
-        print(f"\nUser: \"{msg}\"")
+        print(f'\nUser: "{msg}"')
 
         # Detect intent
         result = detector.detect_from_history(msg, conversation_history)
@@ -92,8 +101,7 @@ def test_integration():
 
         # Assemble instructions
         instructions = manager.assemble_instructions(
-            modules=result.modules,
-            user_message=msg
+            modules=result.modules, user_message=msg
         )
         print(f"  → Instructions: {len(instructions)} chars")
 
@@ -104,6 +112,7 @@ def test_integration():
         assert len(result.modules) > 0, "Should detect at least one module"
 
     print("\n✅ TEST 3 PASSED\n")
+
 
 def test_token_reduction():
     """Test that we actually reduce tokens"""
@@ -116,7 +125,10 @@ def test_token_reduction():
     # Simulate different scenarios
     scenarios = [
         (["navigation", "memory_recall"], "Simple navigation"),
-        (["medication_reminders", "form_handling", "navigation"], "Medication reminder"),
+        (
+            ["medication_reminders", "form_handling", "navigation"],
+            "Medication reminder",
+        ),
         (["reading_ocr", "navigation"], "Reading assistance"),
         (["video_calling", "navigation"], "Video call"),
     ]
@@ -137,6 +149,7 @@ def test_token_reduction():
     print(f"✅ Token reduction achieved (avg {avg_chars:.0f} vs 3500 baseline)")
 
     print("\n✅ TEST 4 PASSED\n")
+
 
 def main():
     """Run all tests"""
@@ -170,8 +183,10 @@ def main():
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,0 +1,19 @@
+[
+    {
+        "id": "seed_001",
+        "category": "basic_reminders",
+        "input": "remind me to call mom at 3pm",
+        "expected": {
+            "intent": {
+                "modules": [
+                    "backlog"
+                ],
+                "confidence_min": 0.7
+            },
+            "tool": "add_reminder"
+        },
+        "metadata": {
+            "seed": true
+        }
+    }
+]

@@ -19,7 +19,7 @@ class TimeMonitor:
         self,
         user_id: str,
         time_tracker,
-        backlog_manager: Optional[BacklogManager] = None,
+        backlog_manager: BacklogManager,
     ):
         """
         Initialize TimeMonitor.
@@ -31,7 +31,7 @@ class TimeMonitor:
         """
         self.user_id = user_id
         self.time_tracker = time_tracker
-        self.backlog_manager = backlog_manager or BacklogManager()
+        self.backlog_manager = backlog_manager
         self._running = False
         self._task = None
         self._session = None

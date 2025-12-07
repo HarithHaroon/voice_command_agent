@@ -23,25 +23,14 @@ logger = logging.getLogger(__name__)
 class RecallHistoryTool(ServerSideTool):
     """Tool for searching through past conversation history."""
 
-    def __init__(self):
+    def __init__(self, firebase_client: FirebaseClient):
         super().__init__("recall_history")
 
         self._user_id = None
 
+        self.firebase_client = firebase_client
+
         logger.info("RecallHistoryTool initialized with _user_id = None")
-
-        self.firebase_client = None
-
-        self._initialize_clients()
-
-    def _initialize_clients(self):
-        """Initialize Firebase client."""
-        try:
-            self.firebase_client = FirebaseClient()
-            logger.info("Firebase client initialized for recall_history")
-        except Exception as e:
-            logger.error(f"Failed to initialize Firebase: {e}")
-            self.firebase_client = None
 
     def get_tool_methods(self) -> list:
         """Return list of tool methods this class provides."""

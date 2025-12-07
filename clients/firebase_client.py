@@ -25,7 +25,9 @@ class FirebaseClient:
                 try:
                     cred_dict = json.loads(credentials_json)
                     cred = credentials.Certificate(cred_dict)
-                    logger.info("Using Firebase credentials from FIREBASE_CREDENTIALS_JSON")
+                    logger.info(
+                        "Using Firebase credentials from FIREBASE_CREDENTIALS_JSON"
+                    )
                 except json.JSONDecodeError as e:
                     logger.error(f"Failed to parse FIREBASE_CREDENTIALS_JSON: {e}")
                     raise
@@ -70,21 +72,62 @@ class FirebaseClient:
             logger.error(f"Error adding message to Firestore: {e}")
             return False
 
-    async def get_history(self, user_id: str, limit: int = 50) -> List[Dict[str, Any]]:
+    async def get_history(self, user_id: str, limit: int = 50):
         """Get recent chat history for a user"""
         try:
-            # First, get all messages for the user (without ordering by timestamp to avoid index requirement)
-            messages_ref = self.db.collection("messages").where(
-                filter=firestore.FieldFilter("userId", "==", user_id)
+            # ✅ Order and limit on server-side
+            messages_ref = (
+                self.db.collection("messages")
+                .where(filter=firestore.FieldFilter("userId", "==", user_id))
+                .order_by(
+                    "timestamp", direction=firestore.Query.DESCENDING
+                )  # Newest first
+                .limit(limit)
             )
 
-            # Wrap blocking stream() call in asyncio.to_thread to avoid blocking event loop
             docs = await asyncio.to_thread(lambda: list(messages_ref.stream()))
 
             messages = []
             for doc in docs:
                 data = doc.to_dict()
-                # Convert to format expected by Nova Sonic and include timestamp for sorting
+                messages.append(
+                    {
+                        "role": data["role"],
+                        "content": data["content"],
+                    }
+                )
+
+            # Reverse to chronological order (oldest first)
+            messages.reverse()
+
+            logger.info(f"Retrieved {len(messages)} messages for user {user_id}")
+            return messages
+
+        except Exception as e:
+            logger.error(f"Error retrieving history from Firestore: {e}")
+            return []
+
+    async def get_messages_by_timeframe(self, user_id: str, hours: int = 24):
+        """Get messages within a specific timeframe"""
+        try:
+            from datetime import datetime, timedelta, timezone
+
+            cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
+
+            # ✅ Filter on Firestore server, not in Python
+            messages_ref = (
+                self.db.collection("messages")
+                .where(filter=firestore.FieldFilter("userId", "==", user_id))
+                .where(filter=firestore.FieldFilter("timestamp", ">=", cutoff_time))
+                .order_by("timestamp")  # Sort server-side
+                .limit(100)  # Reasonable limit
+            )
+
+            docs = await asyncio.to_thread(lambda: list(messages_ref.stream()))
+
+            messages = []
+            for doc in docs:
+                data = doc.to_dict()
                 messages.append(
                     {
                         "role": data["role"],
@@ -92,65 +135,6 @@ class FirebaseClient:
                         "timestamp": data.get("timestamp"),
                     }
                 )
-
-            # Sort by timestamp in Python (newest first, then reverse for chronological order)
-            messages.sort(
-                key=lambda x: x.get("timestamp") or datetime.min, reverse=True
-            )
-
-            # Limit the results and remove timestamp from final output
-            limited_messages = []
-            for msg in messages[:limit]:
-                limited_messages.append(
-                    {"role": msg["role"], "content": msg["content"]}
-                )
-
-            # Reverse to get chronological order (oldest first)
-            limited_messages.reverse()
-
-            logger.info(
-                f"Retrieved {len(limited_messages)} messages for user {user_id}"
-            )
-            return limited_messages
-
-        except Exception as e:
-            logger.error(f"Error retrieving history from Firestore: {e}")
-            return []
-
-    async def get_messages_by_timeframe(
-        self, user_id: str, hours: int = 24
-    ) -> List[Dict[str, Any]]:
-        """Get messages within a specific timeframe"""
-        try:
-            from datetime import datetime, timedelta, timezone
-
-            cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
-
-            # Get all messages for user and filter by time in Python to avoid index requirements
-            messages_ref = self.db.collection("messages").where(
-                filter=firestore.FieldFilter("userId", "==", user_id)
-            )
-
-            # Wrap blocking stream() call in asyncio.to_thread to avoid blocking event loop
-            docs = await asyncio.to_thread(lambda: list(messages_ref.stream()))
-
-            messages = []
-            for doc in docs:
-                data = doc.to_dict()
-                msg_timestamp = data.get("timestamp")
-
-                # Filter by timeframe in Python
-                if msg_timestamp and msg_timestamp >= cutoff_time:
-                    messages.append(
-                        {
-                            "role": data["role"],
-                            "content": data["content"],
-                            "timestamp": msg_timestamp,
-                        }
-                    )
-
-            # Sort by timestamp
-            messages.sort(key=lambda x: x.get("timestamp") or datetime.min)
 
             logger.info(
                 f"Retrieved {len(messages)} messages for user {user_id} in last {hours} hours"

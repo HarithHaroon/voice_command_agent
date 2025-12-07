@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 class DeleteReminderTool(ServerSideTool):
     """Tool for deleting reminders."""
 
-    def __init__(self):
+    def __init__(self, backlog_manager: BacklogManager):
         super().__init__("delete_reminder")
-        self.backlog_manager = BacklogManager()
+        self.backlog_manager = backlog_manager
         logger.info("DeleteReminderTool initialized")
 
     def get_tool_methods(self) -> List[str]:

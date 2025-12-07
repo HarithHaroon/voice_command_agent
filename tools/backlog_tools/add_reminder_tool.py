@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 class AddReminderTool(ServerSideTool):
     """Tool for creating new reminders."""
 
-    def __init__(self):
+    def __init__(self, backlog_manager: BacklogManager):
         super().__init__("add_reminder")
-        self.backlog_manager = BacklogManager()
+        self.backlog_manager = backlog_manager
         logger.info("AddReminderTool initialized")
 
     def get_tool_methods(self) -> List[str]:

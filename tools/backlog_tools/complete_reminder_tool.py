@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 class CompleteReminderTool(ServerSideTool):
     """Tool for marking reminders as complete."""
 
-    def __init__(self):
+    def __init__(self, backlog_manager: BacklogManager):
         super().__init__("complete_reminder")
-        self.backlog_manager = BacklogManager()
+        self.backlog_manager = backlog_manager
         logger.info("CompleteReminderTool initialized")
 
     def get_tool_methods(self) -> List[str]:

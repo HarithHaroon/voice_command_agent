@@ -1,0 +1,56 @@
+[
+  {
+    "id": "nav_seed_001",
+    "input": "take me to settings",
+    "category": "navigation_basic",
+    "expected": {
+      "intent": {
+        "modules": ["navigation"],
+        "confidence": 0.8
+      },
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation to settings"
+    }
+  },
+  {
+    "id": "nav_seed_002",
+    "input": "go back home",
+    "category": "navigation_basic",
+    "expected": {
+      "intent": {
+        "modules": ["navigation"],
+        "confidence": 0.8
+      },
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "home"
+      }
+    },
+    "metadata": {
+      "description": "Navigation to home screen"
+    }
+  },
+  {
+    "id": "nav_seed_003",
+    "input": "show me face recognition",
+    "category": "navigation_features",
+    "expected": {
+      "intent": {
+        "modules": ["navigation"],
+        "confidence": 0.8
+      },
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "face_recognition"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to specific feature"
+    }
+  }
+]
