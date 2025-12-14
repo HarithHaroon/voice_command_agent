@@ -11,7 +11,9 @@ from livekit.agents import AgentSession
 from livekit.plugins import openai, silero
 import asyncio
 from helpers.extract_user_id import extract_user_id
-
+from helpers.intent_manager import IntentManager
+from helpers.conversation_tracker import ConversationTracker
+from helpers.data_channel_handler import DataChannelHandler
 from assistant import Assistant
 
 dotenv.load_dotenv(".env.local")
@@ -47,6 +49,7 @@ async def entrypoint(ctx: agents.JobContext):
 
     logger.info(f"✅ Joining agent room: {room_name}")
 
+    # Extract voice preference from metadata
     voice_preference = "alloy"
 
     try:
@@ -58,14 +61,12 @@ async def entrypoint(ctx: agents.JobContext):
     except (json.JSONDecodeError, AttributeError) as e:
         logger.warning(f"⚠️ No metadata or invalid JSON, using default voice: {e}")
 
-    # Connect to the room (only reaches here for agent rooms)
+    # Connect to the room
     await ctx.connect()
 
     logger.info("=== CONNECTED TO ROOM ===")
 
-    # Extract voice preference and user_id
-    user_id = None
-
+    # Extract user_id
     user_id = extract_user_id(room_name)
 
     logger.info("Metadata extraction will occur via data message.")
@@ -78,11 +79,9 @@ async def entrypoint(ctx: agents.JobContext):
         vad=ctx.proc.userdata["vad"],
     )
 
-    logger.info(f"=== SESSION CREATED ===")
+    logger.info("=== SESSION CREATED ===")
 
-    logger.info("=" * 50)
     logger.info(f"🎯 Creating Assistant with user_id: {user_id}")
-    logger.info("=" * 50)
 
     assistant = Assistant(user_id=user_id)
 
@@ -90,104 +89,39 @@ async def entrypoint(ctx: agents.JobContext):
 
     logger.info("✅ Session linked to ToolManager")
 
-    # 🆕 NEW: Dynamic instruction updater
-    async def _update_instructions_for_user_message(user_message: str):
-        """Detect intent and update instructions dynamically."""
-        try:
-            start_time = asyncio.get_event_loop().time()
+    intent_manager = IntentManager(assistant)
 
-            # Detect intent from user message + conversation history
-            intent_result = assistant.intent_detector.detect_from_history(
-                user_message, assistant.conversation_history
-            )
+    conversation_tracker = ConversationTracker(assistant)
 
-            logger.info(
-                f"🎯 Intent: {intent_result.reasoning} | Modules: {intent_result.modules} | Conf: {intent_result.confidence:.2f}"
-            )
+    data_handler = DataChannelHandler(ctx.room)
 
-            # Check if modules need to change
-            new_modules = set(intent_result.modules)
-
-            current_modules = set(assistant.current_modules)
-
-            if new_modules != current_modules:
-                logger.info(
-                    f"🔄 Updating: {sorted(current_modules)} → {sorted(new_modules)}"
-                )
-
-                # Assemble new instructions from detected modules
-                new_instructions = assistant.module_manager.assemble_instructions(
-                    modules=list(new_modules),
-                    user_message=user_message,
-                    current_time=(
-                        assistant.time_tracker.get_formatted_datetime()
-                        if assistant.time_tracker.is_initialized()
-                        else datetime.now().strftime("%A, %B %d, %Y at %I:%M %p")
-                    ),
-                )
-
-                # ✨ THE KEY CALL: Update agent's instructions in real-time
-                await assistant.update_instructions(new_instructions)
-
-                assistant.current_modules = list(new_modules)
-
-                elapsed = (asyncio.get_event_loop().time() - start_time) * 1000
-
-                logger.info(
-                    f"✅ Updated | {len(new_instructions)} chars | {elapsed:.1f}ms"
-                )
-
-            # Track conversation history for context-aware intent detection
-            assistant.conversation_history.append(
-                {"role": "user", "content": user_message}
-            )
-
-            if len(assistant.conversation_history) > 10:
-                assistant.conversation_history = assistant.conversation_history[-10:]
-
-        except Exception as e:
-            logger.error(f"❌ Error updating instructions: {e}", exc_info=True)
-
+    # Register conversation event handler
     @session.on("conversation_item_added")
     def on_conversation_item_added(event):
-        role = event.item.role  # "user" or "assistant"
+        role = event.item.role
 
         content = event.item.text_content
 
         logger.info(f"💾 Conversation item: {role} - {content[:50]}...")
 
-        # 🆕 NEW: Trigger dynamic instruction update for user messages
+        # Track assistant messages (check-in questions)
+        if role == "assistant":
+            conversation_tracker.track_assistant_message(content)
+
+        # Track user messages (responses & intent detection)
         if role == "user":
-            asyncio.create_task(_update_instructions_for_user_message(content))
+            conversation_tracker.track_user_response(content)
+
+            asyncio.create_task(intent_manager.update_from_user_message(content))
 
         # Save to Firebase
         asyncio.create_task(assistant.save_message_to_firebase(role, content))
 
-        # Send to client via data channel
-        asyncio.create_task(_send_conversation_message(role, content))
-
-    async def _send_conversation_message(role: str, content: str):
-        """Send conversation message to Flutter client."""
-        try:
-            message = {
-                "type": "conversation_message",
-                "role": role,  # "user" or "assistant"
-                "content": content,
-            }
-
-            message_bytes = json.dumps(message).encode("utf-8")
-
-            await ctx.room.local_participant.publish_data(message_bytes)
-
-            logger.info(f"📤 Sent {role} message to client")
-        except Exception as e:
-            logger.error(f"Error sending message to client: {e}")
+        # Send to Flutter client
+        asyncio.create_task(data_handler.send_conversation_message(role, content))
 
     # Start the session with our agent
-    await session.start(
-        room=ctx.room,
-        agent=assistant,
-    )
+    await session.start(room=ctx.room, agent=assistant)
 
     logger.info("=== SESSION STARTED ===")
 

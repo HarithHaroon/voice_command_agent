@@ -8,42 +8,16 @@ import logging
 import asyncio
 from livekit.agents import Agent, get_job_context
 from tools.tool_manager import ToolManager
-from tools.form_validation_tool import FormValidationTool
-from tools.form_submission_tool import FormSubmissionTool
-from tools.text_field_tool import TextFieldTool
-from tools.form_orchestration_tool import FormOrchestrationTool
-from tools.navigation_tool import NavigationTool
 from models.navigation_state import NavigationState
-from tools.toggle_fall_detection_tool import ToggleFallDetectionTool
-from tools.fall_detection_sensitivity_tool import FallDetectionSensitivityTool
-from tools.emergency_delay_tool import EmergencyDelayTool
-from tools.toggle_location_tracking_tool import ToggleLocationTrackingTool
-from tools.update_location_interval_tool import UpdateLocationIntervalTool
-from tools.reminder_tools.set_custom_days_tool import SetCustomDaysTool
-from tools.reminder_tools.set_recurrence_type_tool import SetRecurrenceTypeTool
-from tools.reminder_tools.set_reminder_date_tool import SetReminderDateTool
-from tools.reminder_tools.set_reminder_time_tool import SetReminderTimeTool
-from tools.reminder_tools.submit_reminder_tool import SubmitReminderTool
-from tools.reminder_tools.validate_reminder_form_tool import ValidateReminderFormTool
-from tools.toggle_watchos_fall_detection_tool import ToggleWatchosFallDetectionTool
-from tools.set_watchos_sensitivity_tool import SetWatchosSensitivityTool
-from tools.start_video_call_tool import StartVideoCallTool
-from tools.recall_history_tool import RecallHistoryTool
-from tools.read_book_tool import ReadBookTool
 from clients.firebase_client import FirebaseClient
-from tools.rag_books_tool import RagBooksTool
-from tools.query_image_tool import QueryImageTool
 from intent_detection.intent_detector import IntentDetector
 from prompt_management.prompt_module_manager import PromptModuleManager
-from tools.backlog_tools.add_reminder_tool import AddReminderTool
-from tools.backlog_tools.view_upcoming_reminders_tool import ViewUpcomingRemindersTool
-from tools.backlog_tools.complete_reminder_tool import CompleteReminderTool
-from tools.backlog_tools.delete_reminder_tool import DeleteReminderTool
-from tools.backlog_tools.list_all_reminders_tool import ListAllRemindersTool
 from helpers.client_time_tracker import ClientTimeTracker
 from backlog.time_monitor import TimeMonitor
 from backlog.backlog_manager import BacklogManager
-
+from helpers.tool_registry import ToolRegistry
+from helpers.assistant_data_handler import AssistantDataHandler
+from helpers.assistant_lifecycle import AssistantLifecycle
 
 logger = logging.getLogger(__name__)
 
@@ -52,26 +26,57 @@ class Assistant(Agent):
     """AI Assistant with extensible tool management."""
 
     def __init__(self, user_id: str = None, use_llm_intent: bool = True) -> None:
-        # Existing navigation and Firebase setup
-        self.navigation_state = NavigationState()
+        """
+        Initialize the AI Assistant.
+
+        Args:
+            user_id: User identifier
+            use_llm_intent: Use LLM-based intent detection (vs regex)
+        """
+        # Core state
         self.user_id = user_id
+
         self.use_llm_intent = use_llm_intent
-        self.firebase_client = FirebaseClient()
-        self.backlog_manager = BacklogManager()
+
+        self.conversation_history = []
+
+        # State management
+        self.navigation_state = NavigationState()
+
         self.time_tracker = ClientTimeTracker()
+
         self.time_monitor = None
+
+        # External services
+        self.firebase_client = FirebaseClient()
+
+        self.backlog_manager = BacklogManager()
+
+        # Emotion/voice quality tracking
+        self.pending_check_in = None
+
+        self.waiting_for_check_in_response = False
+
+        self.check_in_question = None
+
         logger.info(f"Assistant initialized with user_id: {user_id}")
 
         # Initialize tool manager
         self.tool_manager = ToolManager()
 
-        # Register tools
-        self._register_tools()
+        # Register all tools using ToolRegistry
+        ToolRegistry.register_all_tools(
+            tool_manager=self.tool_manager,
+            navigation_state=self.navigation_state,
+            firebase_client=self.firebase_client,
+            backlog_manager=self.backlog_manager,
+            assistant=self,
+        )
 
-        # 🆕 NEW: Initialize modular prompt system
+        # Initialize modular prompt system
         self.module_manager = PromptModuleManager()
 
-        # 🆕 Initialize intent detection (LLM or regex)
+        # Initialize intent detection (LLM or regex)
         if use_llm_intent:
             from intent_detection.llm_intent_detector import LLMIntentDetector
             from intent_detection.module_definitions import get_module_definitions
@@ -80,18 +85,22 @@ class Assistant(Agent):
                 available_modules=get_module_definitions()
             )
             logger.info("Using LLM-based intent detection")
+
         else:
             self.intent_detector = IntentDetector()
             logger.info("Using regex-based intent detection")
 
         self.current_modules = ["navigation", "memory_recall"]
-        self.conversation_history = []
 
         # Assemble initial instructions from base + default modules
         base_instructions = self.module_manager.assemble_instructions(
             modules=self.current_modules,
             current_time=datetime.now().strftime("%A, %B %d, %Y at %I:%M %p"),
         )
+
+        # Initialize helper classes
+        self.data_handler = AssistantDataHandler(self)
+        self.lifecycle = AssistantLifecycle(self)
 
         # Initialize agent with dynamically assembled instructions
         super().__init__(
@@ -102,279 +111,41 @@ class Assistant(Agent):
         logger.info(f"Assistant ready | Active modules: {self.current_modules}")
 
     async def save_message_to_firebase(self, role: str, content: str):
-        """Save message to Firebase (called from event handler)"""
+        """
+        Save message to Firebase.
+
+        Args:
+            role: Message role (USER or ASSISTANT)
+            content: Message content
+        """
         if self.user_id and content:
             await asyncio.to_thread(
                 self.firebase_client.add_message,
                 self.user_id,
-                role.upper(),  # "USER" or "ASSISTANT"
+                role.upper(),
                 content,
             )
 
-    def _register_tools(self):
-        """Register all available tools."""
-        #! Register Tools
-        text_field_tool = TextFieldTool()
+    async def update_emotion_event_with_interaction(
+        self, timestamp: str, agent_question: str, user_response: str
+    ):
+        """
+        Update emotion event with Q&A interaction.
+        Delegates to data handler.
 
-        self.tool_manager.register_tool(text_field_tool)
-
-        form_validation_tool = FormValidationTool()
-
-        self.tool_manager.register_tool(form_validation_tool)
-
-        submission_tool = FormSubmissionTool()
-
-        self.tool_manager.register_tool(submission_tool)
-
-        orchestration_tool = FormOrchestrationTool()
-
-        orchestration_tool.set_tools(
-            text_field_tool, form_validation_tool, submission_tool
+        Args:
+            timestamp: Event timestamp
+            agent_question: Question asked by agent
+            user_response: User's response
+        """
+        await self.data_handler.update_emotion_event_with_interaction(
+            timestamp, agent_question, user_response
         )
-        self.tool_manager.register_tool(orchestration_tool)
-
-        navigation_tool = NavigationTool(agent=self)
-
-        self.tool_manager.register_tool(navigation_tool)
-
-        toggle_fall_detection_tool = ToggleFallDetectionTool()
-
-        self.tool_manager.register_tool(toggle_fall_detection_tool)
-
-        sensitivity_tool = FallDetectionSensitivityTool()
-
-        self.tool_manager.register_tool(sensitivity_tool)
-
-        emergency_delay_tool = EmergencyDelayTool()
-
-        self.tool_manager.register_tool(emergency_delay_tool)
-
-        toggle_location_tracking_tool = ToggleLocationTrackingTool()
-
-        self.tool_manager.register_tool(toggle_location_tracking_tool)
-
-        update_location_interval_tool = UpdateLocationIntervalTool()
-
-        self.tool_manager.register_tool(update_location_interval_tool)
-
-        #! Reminder tools
-        set_reminder_time_tool = SetReminderTimeTool()
-
-        self.tool_manager.register_tool(set_reminder_time_tool)
-
-        set_reminder_date_tool = SetReminderDateTool()
-
-        self.tool_manager.register_tool(set_reminder_date_tool)
-
-        set_recurrence_type_tool = SetRecurrenceTypeTool()
-
-        self.tool_manager.register_tool(set_recurrence_type_tool)
-
-        set_custom_days_tool = SetCustomDaysTool()
-
-        self.tool_manager.register_tool(set_custom_days_tool)
-
-        validate_reminder_form_tool = ValidateReminderFormTool()
-
-        self.tool_manager.register_tool(validate_reminder_form_tool)
-
-        submit_reminder_tool = SubmitReminderTool()
-
-        self.tool_manager.register_tool(submit_reminder_tool)
-
-        #! WatchOS fall detection tools
-        toggle_watchos_fall_detection_tool = ToggleWatchosFallDetectionTool()
-
-        self.tool_manager.register_tool(toggle_watchos_fall_detection_tool)
-
-        set_watchos_sensitivity_tool = SetWatchosSensitivityTool()
-
-        self.tool_manager.register_tool(set_watchos_sensitivity_tool)
-
-        logger.info(
-            f"Registered {self.tool_manager.get_tool_count()} tools: {self.tool_manager.get_registered_tools()}"
-        )
-
-        #! Video call tool
-        start_video_call_tool = StartVideoCallTool()
-
-        self.tool_manager.register_tool(start_video_call_tool)
-
-        #! Recall History tool (server-side)
-        recall_history_tool = RecallHistoryTool(firebase_client=self.firebase_client)
-
-        self.tool_manager.register_tool(recall_history_tool)
-
-        #! read book tool
-        read_book_tool = ReadBookTool()
-
-        self.tool_manager.register_tool(read_book_tool)
-
-        #! RAG books tool
-        rag_books_tool = RagBooksTool()
-
-        self.tool_manager.register_tool(rag_books_tool)
-
-        #! Query image tool
-        query_image_tool = QueryImageTool()
-
-        self.tool_manager.register_tool(query_image_tool)
-
-        #! Backlog reminder tools (server-side)
-        add_reminder_tool = AddReminderTool(backlog_manager=self.backlog_manager)
-
-        self.tool_manager.register_tool(add_reminder_tool)
-
-        view_upcoming_reminders_tool = ViewUpcomingRemindersTool(
-            backlog_manager=self.backlog_manager
-        )
-
-        self.tool_manager.register_tool(view_upcoming_reminders_tool)
-
-        complete_reminder_tool = CompleteReminderTool(
-            backlog_manager=self.backlog_manager
-        )
-
-        self.tool_manager.register_tool(complete_reminder_tool)
-
-        delete_reminder_tool = DeleteReminderTool(backlog_manager=self.backlog_manager)
-
-        self.tool_manager.register_tool(delete_reminder_tool)
-
-        list_all_reminders_tool = ListAllRemindersTool(
-            backlog_manager=self.backlog_manager
-        )
-
-        self.tool_manager.register_tool(list_all_reminders_tool)
 
     async def on_enter(self):
         """Called when the agent enters a room."""
-        logger.info("Assistant entered the room")
-
-        # Set agent reference for all tools
-        self.tool_manager.set_agent_for_all_tools(self)
-
-        # Set user_id for all tools that need it
-        if self.user_id:
-            self.tool_manager.set_user_id_for_all_tools(self.user_id)
-
-        # Set time tracker for all tools that need it
-        self.tool_manager.set_time_tracker_for_all_tools(self.time_tracker)
-
-        # Start time monitor for backlog reminders
-        if self.user_id:
-            self.time_monitor = TimeMonitor(
-                user_id=self.user_id,
-                time_tracker=self.time_tracker,
-                backlog_manager=self.backlog_manager,
-            )
-            # Get session from tool_manager (same pattern as read_book_tool)
-            session = getattr(self.tool_manager, "agent_session", None)
-            if session:
-                self.time_monitor.set_session(session)
-                await self.time_monitor.start()
-                logger.info("✅ TimeMonitor started")
-            else:
-                logger.warning("Session not available, TimeMonitor not started")
-
-        # Set up data handler
-        await self._setup_data_handler()
-
-    async def _setup_data_handler(self):
-        """Setup data handler using job context."""
-        try:
-            ctx = get_job_context()
-
-            if ctx and ctx.room:
-                ctx.room.on("data_received", self._handle_data)
-
-                logger.info("Data handler registered successfully")
-            else:
-                logger.error("No job context room available")
-
-        except Exception as e:
-            logger.error(f"Data handler setup failed: {e}")
-
-    def _handle_data(self, data, participant=None):
-        """Handle incoming data and route to appropriate tools."""
-        logger.info("Data received!")
-
-        try:
-            # Extract message bytes
-            if hasattr(data, "data"):
-                message_bytes = data.data
-            else:
-                message_bytes = data
-
-            # Parse message
-            message = json.loads(message_bytes.decode("utf-8"))
-
-            logger.info(f"Parsed message: {message}")
-
-            # Store initial navigation context from session init
-            if message.get("type") == "session_init":
-                navigation_data = message.get("navigation", {})
-
-                self.navigation_state.initialize_from_session(navigation_data)
-
-                client_time = message.get("current_time")
-
-                timezone_offset = message.get("timezone_offset_minutes", 0)
-
-                if client_time:
-                    self.time_tracker.initialize(client_time, timezone_offset)
-
-                    logger.info(f"🕐 Client time received: {client_time}")
-                    logger.info(f"🕐 Timezone offset: {timezone_offset} minutes")
-                    logger.info(
-                        f"🕐 Formatted time: {self.time_tracker.get_formatted_datetime()}"
-                    )
-
-                    # Rebuild instructions with accurate client time
-                    updated_instructions = self.module_manager.assemble_instructions(
-                        modules=self.current_modules,
-                        current_time=self.time_tracker.get_formatted_datetime(),
-                    )
-                    # Update agent instructions
-                    asyncio.create_task(self.update_instructions(updated_instructions))
-
-                    logger.info(
-                        f"Updated instructions with client time: {self.time_tracker.get_formatted_datetime()}"
-                    )
-
-            # Route all tool responses through tool manager first
-            elif message.get("type") == "tool_result":
-                success = self.tool_manager.route_tool_response(message)
-
-                if not success:
-                    logger.error("Failed to route tool response")
-
-                # Update navigation state if this was a successful navigation
-                if (
-                    message.get("tool") == "navigate_to_screen"
-                    and message.get("success")
-                    and "result" in message
-                ):
-                    result = message.get("result", {})
-
-                    if "navigation_stack" in result and "current_screen" in result:
-                        self.navigation_state.update_from_navigation_success(
-                            result["navigation_stack"], result["current_screen"]
-                        )
-            else:
-                logger.info(f"Non-tool message type: {message.get('type')}")
-
-        except Exception as e:
-            logger.error(f"Data handling error: {e}")
+        await self.lifecycle.setup()
 
     async def on_leave(self):
         """Called when the agent leaves the room."""
-        logger.info("Assistant leaving the room - cleaning up")
-
-        # Stop time monitor
-        if self.time_monitor:
-            await self.time_monitor.stop()
-            logger.info("TimeMonitor stopped")
-
-        # Clean up navigation state
-        self.navigation_state.clear()
+        await self.lifecycle.teardown()

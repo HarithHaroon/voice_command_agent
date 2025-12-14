@@ -129,3 +129,87 @@ class LLMIntentDetector:
         }}"""
 
         return prompt
+
+    # Add to LLMIntentDetector class
+
+    async def detect_from_history(
+        self, user_message: str, conversation_history: list = None
+    ) -> IntentResult:
+        """
+        Detect intent with conversation history context.
+        Args:
+            user_message: Current user message
+            conversation_history: List of recent messages for context
+        Returns:
+            IntentResult with detected modules
+        """
+        # If no history or high confidence expected, just use current message
+        if not conversation_history or len(conversation_history) < 2:
+            return await self.detect(user_message)
+
+        # Include last 3 user messages for context
+        recent_context = " ".join(
+            [m["content"] for m in conversation_history[-3:] if m.get("role") == "user"]
+        )
+
+        # Build enhanced prompt with context
+        prompt = self._build_prompt_with_context(user_message, recent_context)
+
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are an intent classification expert. Analyze user messages with conversation context and determine which modules should be activated.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+                temperature=self.temperature,
+            )
+
+            result_text = response.choices[0].message.content
+            result_json = json.loads(result_text)
+
+            return IntentResult(
+                modules=result_json.get("modules", []),
+                confidence=result_json.get("confidence", 0.0),
+                reasoning=result_json.get("reasoning", ""),
+                raw_response=result_text,
+            )
+
+        except Exception as e:
+            logger.error(f"Intent detection with history failed: {e}")
+            # Fallback to simple detection
+            return await self.detect(user_message)
+
+    def _build_prompt_with_context(self, user_message: str, recent_context: str) -> str:
+        """Build prompt with conversation context"""
+        modules_desc = "\n".join(
+            [f"- {name}: {desc}" for name, desc in self.available_modules.items()]
+        )
+
+        prompt = f"""Analyze this user message WITH conversation context and determine which modules should be activated.
+
+        Available modules:
+        {modules_desc}
+
+        Recent conversation context: "{recent_context}"
+        Current user message: "{user_message}"
+
+        Rules:
+        1. Return 1-3 most relevant modules
+        2. Use conversation context to better understand intent
+        3. Confidence should be 0.0 to 1.0
+        4. BE RESILIENT TO TYPOS
+        5. Focus on USER INTENT
+
+        Return ONLY valid JSON:
+        {{
+            "modules": ["module1", "module2"],
+            "confidence": 0.95,
+            "reasoning": "Brief explanation"
+        }}"""
+
+        return prompt
