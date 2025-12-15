@@ -5,11 +5,15 @@ Tool Registry - Centralized tool registration for the Assistant.
 import logging
 from typing import TYPE_CHECKING
 
+from models.navigation_state import NavigationState
+from clients.firebase_client import FirebaseClient
+from backlog.backlog_manager import BacklogManager
+from clients.health_data_client import HealthDataClient
+from tools.health_query_tool import HealthQueryTool
+
 if TYPE_CHECKING:
     from tools.tool_manager import ToolManager
-    from models.navigation_state import NavigationState
-    from clients.firebase_client import FirebaseClient
-    from backlog.backlog_manager import BacklogManager
+
 
 logger = logging.getLogger(__name__)
 
@@ -199,3 +203,16 @@ class ToolRegistry:
             f"✅ Registered {tool_manager.get_tool_count()} tools: "
             f"{tool_manager.get_registered_tools()}"
         )
+
+        logger.info("Registering health query tools...")
+
+        # Create health data client
+        health_client = HealthDataClient()
+
+        # Create health query tool
+        health_query_tool = HealthQueryTool(health_client=health_client)
+
+        # Register the tool (so it gets user_id, time_tracker, etc.)
+        tool_manager.register_tool(health_query_tool)
+
+        logger.info("✅ Health query tools registered")

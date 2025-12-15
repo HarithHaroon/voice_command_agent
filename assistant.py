@@ -13,7 +13,6 @@ from clients.firebase_client import FirebaseClient
 from intent_detection.intent_detector import IntentDetector
 from prompt_management.prompt_module_manager import PromptModuleManager
 from helpers.client_time_tracker import ClientTimeTracker
-from backlog.time_monitor import TimeMonitor
 from backlog.backlog_manager import BacklogManager
 from helpers.tool_registry import ToolRegistry
 from helpers.assistant_data_handler import AssistantDataHandler

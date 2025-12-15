@@ -12,6 +12,7 @@ MODULE_DEFINITIONS = {
     "location_tracking": "GPS tracking, location sharing, geofencing settings",
     "books": "Reading books, audiobooks, book recommendations, searching book content",
     "image_recognition": "Analyzing images, identifying objects in photos that are already uploaded, describing what's in a picture, visual analysis of image content. NOT for navigating to face recognition screen.",
+    "health_query": "Health status questions, wellness checks, vital signs, heart rate, blood pressure, blood oxygen, steps, sleep, calories, activity levels, health metrics, 'how am I doing', morning health summaries, health trends, fitness data",
 }
 
 

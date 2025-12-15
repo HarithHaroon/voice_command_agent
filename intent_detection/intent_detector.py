@@ -61,6 +61,16 @@ class IntentDetector:
             r"\b(today|tomorrow|this week)('s| schedule)?\b",
             r"\b(cancel|delete|done|completed|finished)\b.*\breminder\b",
         ],
+        "health_query": [
+            r"\bhow (am I|is my health|am I doing)\b",
+            r"\b(health|wellness) (status|check|update|summary|report)\b",
+            r"\b(heart rate|blood pressure|blood oxygen|steps|sleep|calories)\b",
+            r"\bhow (many|much) (steps|calories|sleep)\b",
+            r"\bwhat('s| is) my (heart rate|blood pressure|steps|sleep)\b",
+            r"\bgood morning\b",
+            r"\bvital signs?\b",
+            r"\bhealth metrics?\b",
+        ],
     }
 
     CORE_MODULES = ["navigation"]

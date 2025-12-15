@@ -1,7 +1,7 @@
 # LiveKit AI Assistant Requirements
 
 # Core LiveKit dependencies
-livekit-agents>=0.8.0
+livekit-agents>=1.2.0
 livekit-plugins-openai>=0.7.0
 livekit-plugins-silero>=0.6.0
 
@@ -12,3 +12,5 @@ python-dotenv>=1.0.0
 boto3>=1.34.0
 # Date utilities (for recurring reminders)
 python-dateutil>=2.8.0
+cryptography>=41.0.0
+requests>=2.31.0
