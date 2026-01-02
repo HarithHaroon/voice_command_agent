@@ -23,6 +23,7 @@ async def generate_presigned_url(
 
     if not image_url:
         result["error"] = "No image URL provided"
+
         return result
 
     try:
@@ -31,6 +32,7 @@ async def generate_presigned_url(
 
         if not parsed_url.netloc.endswith("amazonaws.com"):
             result["error"] = f"URL does not appear to be an S3 URL: {image_url}"
+
             return result
 
         # Extract bucket name from the hostname
@@ -42,6 +44,7 @@ async def generate_presigned_url(
 
         if not bucket_name or not object_key:
             result["error"] = f"Could not parse bucket and key from URL: {image_url}"
+
             return result
 
         # Log the attempt for debugging
@@ -57,19 +60,25 @@ async def generate_presigned_url(
             )
 
             result["status"] = "success"
+
             result["url"] = presigned_url
+
             return result
 
         except ClientError as ce:
             error_code = ce.response.get("Error", {}).get("Code", "Unknown")
+
             if error_code == "AccessDenied":
                 result["error"] = (
                     f"Access denied when generating pre-signed URL. Check IAM permissions for bucket '{bucket_name}'"
                 )
+
             else:
                 result["error"] = f"S3 client error: {str(ce)}"
+
             return result
 
     except Exception as e:
         result["error"] = f"Error generating pre-signed URL: {str(e)}"
+
         return result

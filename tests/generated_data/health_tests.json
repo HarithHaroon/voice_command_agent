@@ -1,0 +1,298 @@
+[
+  {
+    "id": "health_seed_001",
+    "agent": "health",
+    "input": "How am I doing today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Basic health summary request"
+    }
+  },
+  {
+    "id": "health_seed_002",
+    "agent": "health",
+    "input": "What's my blood pressure?",
+    "expected": {
+      "tool": "get_specific_metric",
+      "params": {
+        "metric_type": "bloodPressure",
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Specific metric query"
+    }
+  },
+  {
+    "id": "health_seed_003",
+    "agent": "health",
+    "input": "Good morning, how's my health today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {}
+  },
+  {
+    "id": "health_seed_001_var_1",
+    "agent": "health",
+    "input": "How's my health today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Basic health summary request",
+      "generated": true,
+      "seed_id": "health_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "health_seed_001_var_2",
+    "agent": "health",
+    "input": "Can you tell me how I'm feeling today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Basic health summary request",
+      "generated": true,
+      "seed_id": "health_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "health_seed_001_var_3",
+    "agent": "health",
+    "input": "I’d like to know how I'm doing, if you could.",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Basic health summary request",
+      "generated": true,
+      "seed_id": "health_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "health_seed_001_var_4",
+    "agent": "health",
+    "input": "What’s the report on my health today, please?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Basic health summary request",
+      "generated": true,
+      "seed_id": "health_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "health_seed_001_var_5",
+    "agent": "health",
+    "input": "How am I, uh, doing health-wise today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Basic health summary request",
+      "generated": true,
+      "seed_id": "health_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "health_seed_002_var_1",
+    "agent": "health",
+    "input": "Can you tell me how my blood pressure is doing?",
+    "expected": {
+      "tool": "get_specific_metric",
+      "params": {
+        "metric_type": "bloodPressure",
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Specific metric query",
+      "generated": true,
+      "seed_id": "health_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "health_seed_002_var_2",
+    "agent": "health",
+    "input": "What’s my blood pressure reading right now?",
+    "expected": {
+      "tool": "get_specific_metric",
+      "params": {
+        "metric_type": "bloodPressure",
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Specific metric query",
+      "generated": true,
+      "seed_id": "health_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "health_seed_002_var_3",
+    "agent": "health",
+    "input": "Hey, could you check my blood pressure for me?",
+    "expected": {
+      "tool": "get_specific_metric",
+      "params": {
+        "metric_type": "bloodPressure",
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Specific metric query",
+      "generated": true,
+      "seed_id": "health_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "health_seed_002_var_4",
+    "agent": "health",
+    "input": "I need to know my blood pressure, please.",
+    "expected": {
+      "tool": "get_specific_metric",
+      "params": {
+        "metric_type": "bloodPressure",
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Specific metric query",
+      "generated": true,
+      "seed_id": "health_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "health_seed_002_var_5",
+    "agent": "health",
+    "input": "What’s that number for my blood pressure again?",
+    "expected": {
+      "tool": "get_specific_metric",
+      "params": {
+        "metric_type": "bloodPressure",
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "description": "Specific metric query",
+      "generated": true,
+      "seed_id": "health_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "health_seed_003_var_1",
+    "agent": "health",
+    "input": "Good morning, how am I feeling today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "generated": true,
+      "seed_id": "health_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "health_seed_003_var_2",
+    "agent": "health",
+    "input": "Hey there, can you tell me about my health?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "generated": true,
+      "seed_id": "health_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "health_seed_003_var_3",
+    "agent": "health",
+    "input": "Morning! What's the scoop on my health today?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "generated": true,
+      "seed_id": "health_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "health_seed_003_var_4",
+    "agent": "health",
+    "input": "Could you check my health for me today, please?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "generated": true,
+      "seed_id": "health_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "health_seed_003_var_5",
+    "agent": "health",
+    "input": "How’s my health looking today, if you don’t mind?",
+    "expected": {
+      "tool": "get_health_summary",
+      "params": {
+        "period": "today"
+      }
+    },
+    "metadata": {
+      "generated": true,
+      "seed_id": "health_seed_003",
+      "variation_number": 5
+    }
+  }
+]

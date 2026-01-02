@@ -30,10 +30,15 @@ class TimeMonitor:
             backlog_manager: Optional BacklogManager instance
         """
         self.user_id = user_id
+
         self.time_tracker = time_tracker
+
         self.backlog_manager = backlog_manager
+
         self._running = False
+
         self._task = None
+
         self._session = None
 
         logger.info(f"TimeMonitor initialized for user: {user_id}")
@@ -41,6 +46,7 @@ class TimeMonitor:
     def set_session(self, session):
         """Set the LiveKit session for speaking reminders."""
         self._session = session
+
         logger.info("Session set for TimeMonitor")
 
     async def start(self):
@@ -50,7 +56,9 @@ class TimeMonitor:
             return
 
         self._running = True
+
         self._task = asyncio.create_task(self._monitor_loop())
+
         logger.info("🕐 TimeMonitor started")
 
     async def stop(self):
@@ -59,6 +67,7 @@ class TimeMonitor:
             return
 
         self._running = False
+
         if self._task:
             self._task.cancel()
             try:
@@ -89,6 +98,7 @@ class TimeMonitor:
             # Get current client time
             if self.time_tracker and self.time_tracker.is_initialized():
                 current_time = self.time_tracker.get_current_client_time()
+
             else:
                 current_time = datetime.utcnow()
                 logger.warning("Time tracker not initialized, using UTC")
@@ -119,7 +129,9 @@ class TimeMonitor:
         """
         try:
             title = item.get("title", "something")
+
             scheduled_time = datetime.fromisoformat(item["scheduled_time"])
+
             time_display = scheduled_time.strftime("%I:%M %p").lstrip("0")
 
             # Build announcement message
@@ -127,29 +139,39 @@ class TimeMonitor:
 
             # Check if it's the exact time or early warning
             remind_before = int(item.get("remind_before_minutes", 0))
+
             if remind_before > 0:
                 if self.time_tracker and self.time_tracker.is_initialized():
                     current_time = self.time_tracker.get_current_client_time()
+
                 else:
                     current_time = datetime.utcnow()
 
                 time_until = scheduled_time - current_time
+
                 minutes_until = int(time_until.total_seconds() / 60)
 
                 if minutes_until > 5:
                     # Early warning
                     if minutes_until >= 60:
+
                         hours = minutes_until // 60
+
                         mins = minutes_until % 60
+
                         if mins > 0:
                             time_desc = f"{hours} hour{'s' if hours > 1 else ''} and {mins} minutes"
+
                         else:
                             time_desc = f"{hours} hour{'s' if hours > 1 else ''}"
+
                     else:
                         time_desc = f"{minutes_until} minutes"
+
                     announcement = (
                         f"Reminder: {title} in {time_desc} (at {time_display})"
                     )
+
                 else:
                     # Close to time or past
                     announcement = f"Reminder: It's time to {title}"
@@ -166,6 +188,7 @@ class TimeMonitor:
                     allow_interruptions=True,
                     add_to_chat_ctx=True,  # Add reminders to chat history
                 )
+
             else:
                 logger.error("Session not available, cannot announce reminder")
 

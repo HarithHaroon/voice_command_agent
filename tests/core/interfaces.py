@@ -1,5 +1,5 @@
 """
-Core interfaces for the test framework.
+Core interfaces for the multi-agent test framework.
 Defines contracts that all components must follow.
 """
 
@@ -21,10 +21,10 @@ class TestStatus(Enum):
 
 @dataclass
 class TestCase:
-    """Standard test case structure"""
+    """Standard test case structure for multi-agent system"""
 
     id: str
-    category: str
+    agent: str  # Which agent should handle this (orchestrator, health, backlog, etc.)
     input: str
     expected: Dict[str, Any]
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -52,13 +52,23 @@ class TestResult:
 
 
 @dataclass
+class AgentTrajectory:
+    """Represents the path an agent takes through the system"""
+
+    agents_visited: List[str]  # ["Orchestrator", "HealthAgent", "Orchestrator"]
+    tools_called: List[str]  # ["get_health_summary"]
+    handoffs: List[Dict[str, str]]  # [{"from": "Orchestrator", "to": "HealthAgent"}]
+    duration_ms: float
+
+
+@dataclass
 class TestContext:
     """Context passed through test execution"""
 
-    module_name: str
-    mode: str
+    agent_name: str
+    mode: str  # "mock" or "real"
     config: Dict[str, Any]
-    agent_instance: Any = None
+    shared_state: Any = None  # Reference to agent's SharedState
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -119,20 +129,6 @@ class IExecutionMode(ABC):
         pass
 
 
-# === Evaluation Interfaces ===
-
-
-class IJudge(ABC):
-    """Interface for evaluating test results"""
-
-    @abstractmethod
-    async def evaluate(
-        self, test_case: TestCase, test_result: TestResult, context: TestContext
-    ) -> Dict[str, Any]:
-        """Evaluate test result and return assessment"""
-        pass
-
-
 # === Reporting Interfaces ===
 
 
@@ -151,32 +147,49 @@ class IReportFormatter(ABC):
         pass
 
 
-class IAgentAdapter(ABC):
-    """Interface for connecting to any agent implementation"""
+# ============================================================================
+# Multi-Turn Conversation Testing
+# ============================================================================
 
-    @abstractmethod
-    async def initialize(self, config: Dict[str, Any]) -> None:
-        """Initialize the agent"""
-        pass
 
-    @abstractmethod
-    async def detect_intent(self, user_input: str) -> Dict[str, Any]:
-        """Detect user intent - returns modules/confidence"""
-        pass
+@dataclass
+class ConversationTurn:
+    """Single turn in a multi-turn conversation"""
 
-    @abstractmethod
-    async def process_message(
-        self, user_input: str, mode: str = "mock"
-    ) -> Dict[str, Any]:
-        """Process message - returns tool, params, response"""
-        pass
+    input: str
+    expected_agent: Optional[str] = None
+    expected_tool: Optional[str] = None
+    expected_params: Optional[Dict[str, Any]] = None
+    context_check: Optional[str] = None  # Human-readable expectation
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
-    @abstractmethod
-    def get_available_modules(self) -> List[str]:
-        """Get list of available modules/capabilities"""
-        pass
 
-    @abstractmethod
-    def get_available_tools(self) -> List[str]:
-        """Get list of available tools"""
-        pass
+@dataclass
+class ConversationTest:
+    """Multi-turn conversation test"""
+
+    id: str
+    name: str
+    description: str
+    turns: List[ConversationTurn]
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class ConversationResult:
+    """Result of a conversation test"""
+
+    test_id: str
+    test_name: str
+    status: TestStatus
+    total_turns: int
+    passed_turns: int
+    failed_turns: int
+    turn_results: List[TestResult]
+    overall_score: float
+    duration_ms: float
+    details: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def passed(self) -> bool:
+        return self.status == TestStatus.PASS

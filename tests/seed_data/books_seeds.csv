@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+books_seed_001,books,"Read Harry Potter to me","{""tool"": ""read_book"", ""params"": {""book_name"": ""Harry Potter""}}","{""description"": ""Request to read a book aloud""}"
+books_seed_002,books,"Continue reading the book","{""tool"": ""read_book"", ""params"": {""continue_reading"": true}}","{""description"": ""Continue from last position""}"
+books_seed_003,books,"What does the book say about magic?","{""tool"": ""rag_books_tool"", ""params"": {""query"": ""magic""}}","{""description"": ""Question about book content""}"

@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+video_seed_001,orchestrator,"Call my daughter","{""tool"": ""start_video_call"", ""params"": {""contact"": ""daughter""}}","{""description"": ""Initiate video call by relationship""}"
+video_seed_002,orchestrator,"Video chat with John","{""tool"": ""start_video_call"", ""params"": {""contact"": ""John""}}","{""description"": ""Initiate video call by name""}"
+video_seed_003,orchestrator,"I want to talk to my son","{""tool"": ""start_video_call"", ""params"": {""contact"": ""son""}}","{""description"": ""Video call with casual phrasing""}"

@@ -1,0 +1,160 @@
+# Medication Agent Multi-Turn Conversation Tests
+
+medication_add_and_view:
+  name: "Add Medication Then View List"
+  description: "User adds medication via voice, then asks to see their list"
+  turns:
+    - input: "Add my blood pressure medication, Lisinopril 10mg, twice daily at 8am and 8pm"
+      expected_agent: medication
+      expected_tool: add_medication
+      expected_params:
+        name: Lisinopril
+        dosage: 10mg
+        times: ["08:00", "20:00"]
+      context_check: "Should add Lisinopril to user's medications"
+      
+    - input: "What medications am I taking now?"
+      expected_agent: medication
+      expected_tool: view_medications
+      context_check: "Should show Lisinopril in the list"
+
+medication_add_and_confirm:
+  name: "Add Medication Then Confirm Dose"
+  description: "User adds medication, then confirms taking it"
+  turns:
+    - input: "Add Metformin 500mg, take it twice daily with breakfast and dinner"
+      expected_agent: medication
+      expected_tool: add_medication
+      expected_params:
+        name: Metformin
+        dosage: 500mg
+      
+    - input: "I just took my Metformin"
+      expected_agent: medication
+      expected_tool: confirm_dose
+      expected_params:
+        medication_name: Metformin
+      context_check: "Should log Metformin dose as taken"
+
+medication_interaction_warning:
+  name: "Drug Interaction Warning Flow"
+  description: "System warns about interaction, user decides"
+  turns:
+    - input: "Add Warfarin 5mg daily"
+      expected_agent: medication
+      expected_tool: add_medication
+      context_check: "Should add Warfarin successfully"
+      
+    - input: "Add Aspirin 81mg daily"
+      expected_agent: medication
+      expected_tool: add_medication
+      expected_params:
+        name: Aspirin
+      context_check: "Should warn about Warfarin-Aspirin interaction"
+
+medication_edit_dosage:
+  name: "Add Then Edit Medication Dosage"
+  description: "User adds medication, doctor changes dosage, user updates it"
+  turns:
+    - input: "Add my Lisinopril 10mg, once daily at 8am"
+      expected_agent: medication
+      expected_tool: add_medication
+      
+    - input: "Change my Lisinopril to 20mg"
+      expected_agent: medication
+      expected_tool: edit_medication
+      expected_params:
+        medication_name: Lisinopril
+        new_dosage: 20mg
+      context_check: "Should update dosage from 10mg to 20mg"
+
+medication_check_then_confirm:
+  name: "Check Schedule Then Confirm Dose"
+  description: "User asks about schedule, then confirms taking medication"
+  turns:
+    - input: "What medications do I need to take today?"
+      expected_agent: medication
+      expected_tool: query_schedule
+      expected_params:
+        timeframe: today
+      
+    - input: "I took the first one"
+      expected_agent: medication
+      expected_tool: confirm_dose
+      context_check: "Should confirm the first medication from schedule"
+
+medication_skip_with_reason:
+  name: "Skip Dose With Follow-up"
+  description: "User skips dose, agent asks why, user explains"
+  turns:
+    - input: "Skip my morning medication"
+      expected_agent: medication
+      expected_tool: skip_dose
+      expected_params:
+        time_period: morning
+      
+    - input: "I forgot to take it with me"
+      expected_agent: orchestrator
+      expected_tool: null
+      context_check: "Orchestrator acknowledges reason conversationally"
+
+medication_adherence_conversation:
+  name: "Check Adherence Then Encourage"
+  description: "User asks about adherence, agent provides stats and encouragement"
+  turns:
+    - input: "How am I doing with my medications?"
+      expected_agent: medication
+      expected_tool: check_adherence
+      expected_params:
+        period: week
+      context_check: "Should calculate weekly adherence"
+      
+    - input: "I've been trying my best"
+      expected_agent: orchestrator
+      expected_tool: null
+      context_check: "Orchestrator should provide encouragement"
+
+medication_refill_then_delete:
+  name: "Request Refill Then Stop Medication"
+  description: "User requests refill, then doctor discontinues medication"
+  turns:
+    - input: "I'm running low on Metformin"
+      expected_agent: medication
+      expected_tool: request_refill
+      expected_params:
+        medication_name: Metformin
+      
+    - input: "Actually, my doctor said to stop taking it"
+      expected_agent: medication
+      expected_tool: delete_medication
+      expected_params:
+        medication_name: Metformin
+      context_check: "Should delete Metformin from list"
+
+medication_multi_agent_health:
+  name: "Medication to Health Agent Switch"
+  description: "User asks about medication, then switches to health query"
+  turns:
+    - input: "What medications am I taking for blood pressure?"
+      expected_agent: medication
+      expected_tool: view_medications
+      
+    - input: "What's my blood pressure today?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: bloodPressure
+      context_check: "Should switch from medication to health agent"
+
+medication_multi_agent_backlog:
+  name: "Medication to Backlog Switch"
+  description: "User confirms medication, then sets reminder"
+  turns:
+    - input: "I took my morning pills"
+      expected_agent: medication
+      expected_tool: confirm_dose
+      
+    - input: "Remind me to call my pharmacy tomorrow"
+      expected_agent: backlog
+      expected_tool: add_reminder
+      context_check: "Should switch from medication to backlog agent"

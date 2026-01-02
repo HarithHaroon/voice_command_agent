@@ -1,8 +1,7 @@
 """
-Main entry point for the LiveKit AI Assistant.
+Main entry point for the LiveKit AI Assistant - Multi-Agent System.
 """
 
-import datetime
 import json
 import dotenv
 import logging
@@ -10,11 +9,22 @@ from livekit import agents
 from livekit.agents import AgentSession
 from livekit.plugins import openai, silero
 import asyncio
+
 from helpers.extract_user_id import extract_user_id
-from helpers.intent_manager import IntentManager
 from helpers.conversation_tracker import ConversationTracker
-from helpers.data_channel_handler import DataChannelHandler
-from assistant import Assistant
+from helpers.assistant_data_handler import AssistantDataHandler
+from helpers.assistant_lifecycle import AssistantLifecycle
+from helpers.emotion_handler import EmotionHandler
+
+from models.shared_state import SharedState
+from models.navigation_state import NavigationState
+from helpers.client_time_tracker import ClientTimeTracker
+from tools.tool_manager import ToolManager
+from clients.firebase_client import FirebaseClient
+from clients.health_data_client import HealthDataClient
+from backlog.backlog_manager import BacklogManager
+from helpers.tool_registry import ToolRegistry
+from agents.orchestrator_agent import OrchestratorAgent
 
 dotenv.load_dotenv(".env.local")
 
@@ -32,7 +42,7 @@ def prewarm_fnc(proc: agents.JobProcess):
 
 
 async def entrypoint(ctx: agents.JobContext):
-    """Main entry point for the agent."""
+    """Main entry point for the multi-agent system."""
 
     logger.info("=== ENTRYPOINT START ===")
 
@@ -44,7 +54,6 @@ async def entrypoint(ctx: agents.JobContext):
     # Filter: Only join rooms starting with "room_" (your agent rooms)
     if not room_name.startswith("room_"):
         logger.info(f"❌ Ignoring room '{room_name}' - not an agent room")
-
         return  # Exit immediately without connecting
 
     logger.info(f"✅ Joining agent room: {room_name}")
@@ -52,12 +61,19 @@ async def entrypoint(ctx: agents.JobContext):
     # Extract voice preference from metadata
     voice_preference = "alloy"
 
+    user_name = ""
+
     try:
         metadata = json.loads(ctx.job.metadata)
 
         voice_preference = metadata.get("voice_preference", "alloy")
 
+        user_name = metadata.get("participant_name", "Elderly User")
+
         logger.info(f"✅ Voice preference from metadata: {voice_preference}")
+
+        logger.info(f"✅ @ user name from metadata: {user_name}")
+
     except (json.JSONDecodeError, AttributeError) as e:
         logger.warning(f"⚠️ No metadata or invalid JSON, using default voice: {e}")
 
@@ -69,7 +85,25 @@ async def entrypoint(ctx: agents.JobContext):
     # Extract user_id
     user_id = extract_user_id(room_name)
 
-    logger.info("Metadata extraction will occur via data message.")
+    logger.info(f"🎯 User ID extracted: {user_id}")
+
+    # Initialize shared components
+    navigation_state = NavigationState()
+    time_tracker = ClientTimeTracker()
+    tool_manager = ToolManager()
+    firebase_client = FirebaseClient()
+    health_client = HealthDataClient()
+    backlog_manager = BacklogManager()
+
+    # Register all tools
+    ToolRegistry.register_all_tools(
+        tool_manager=tool_manager,
+        navigation_state=navigation_state,
+        firebase_client=firebase_client,
+        backlog_manager=backlog_manager,
+    )
+
+    logger.info(f"✅ Registered {tool_manager.get_tool_count()} tools")
 
     # Create agent session
     session = AgentSession(
@@ -81,49 +115,98 @@ async def entrypoint(ctx: agents.JobContext):
 
     logger.info("=== SESSION CREATED ===")
 
-    logger.info(f"🎯 Creating Assistant with user_id: {user_id}")
-
-    assistant = Assistant(user_id=user_id)
-
-    assistant.tool_manager.set_session(session)
+    # Store session in tool_manager for tools that need it
+    tool_manager.set_session(session)
 
     logger.info("✅ Session linked to ToolManager")
 
-    intent_manager = IntentManager(assistant)
+    # Create SharedState
+    shared_state = SharedState(
+        user_id=user_id,
+        user_name=user_name,
+        navigation_state=navigation_state,
+        time_tracker=time_tracker,
+        tool_manager=tool_manager,
+        firebase_client=firebase_client,
+        backlog_manager=backlog_manager,
+        health_data_client=health_client,
+    )
 
-    conversation_tracker = ConversationTracker(assistant)
+    logger.info("✅ SharedState created")
 
-    data_handler = DataChannelHandler(ctx.room)
+    shared_state.tool_manager.set_session_for_all_tools(session)
+
+    # Store shared state in session.userdata (accessible by all agents)
+    session.userdata = shared_state
+
+    # Create EmotionHandler
+    emotion_handler = EmotionHandler(
+        session=session, user_id=user_id, shared_state=shared_state
+    )
+
+    logger.info("✅ EmotionHandler created")
+
+    # Create ConversationTracker
+    conversation_tracker = ConversationTracker(emotion_handler=emotion_handler)
+
+    logger.info("✅ ConversationTracker created")
+
+    # Create DataHandler
+    data_handler = AssistantDataHandler(
+        shared_state=shared_state, emotion_handler=emotion_handler
+    )
+
+    logger.info("✅ AssistantDataHandler created")
+
+    # Create Lifecycle manager
+    lifecycle = AssistantLifecycle(shared_state=shared_state, data_handler=data_handler)
+
+    logger.info("✅ AssistantLifecycle created")
+
+    # Setup lifecycle (tools, time monitor, data handler)
+    await lifecycle.setup()
+
+    logger.info("✅ Lifecycle setup complete")
 
     # Register conversation event handler
     @session.on("conversation_item_added")
     def on_conversation_item_added(event):
         role = event.item.role
-
         content = event.item.text_content
 
         logger.info(f"💾 Conversation item: {role} - {content[:50]}...")
 
-        # Track assistant messages (check-in questions)
+        # Track assistant messages
         if role == "assistant":
             conversation_tracker.track_assistant_message(content)
 
-        # Track user messages (responses & intent detection)
+        # Track user messages
         if role == "user":
             conversation_tracker.track_user_response(content)
 
-            asyncio.create_task(intent_manager.update_from_user_message(content))
+            # Add to shared conversation history
+            shared_state.add_to_history("user", content)
+
+        # Track assistant messages in history too
+        if role == "assistant":
+            shared_state.add_to_history("assistant", content)
 
         # Save to Firebase
-        asyncio.create_task(assistant.save_message_to_firebase(role, content))
+        asyncio.create_task(
+            asyncio.to_thread(
+                firebase_client.add_message, user_id, role.upper(), content
+            )
+        )
 
-        # Send to Flutter client
-        asyncio.create_task(data_handler.send_conversation_message(role, content))
+    # Create orchestrator agent
+    orchestrator = OrchestratorAgent(shared_state)
 
-    # Start the session with our agent
-    await session.start(room=ctx.room, agent=assistant)
+    logger.info("✅ OrchestratorAgent created")
 
-    logger.info("=== SESSION STARTED ===")
+    # Start the session with orchestrator
+    await session.start(room=ctx.room, agent=orchestrator)
+
+    logger.info("=== SESSION STARTED WITH ORCHESTRATOR ===")
 
     # Generate an initial greeting
     logger.info("=== GENERATING INITIAL REPLY ===")
@@ -131,9 +214,8 @@ async def entrypoint(ctx: agents.JobContext):
     await session.generate_reply(
         instructions=(
             "You're now connected! Warmly greet the user and proactively ask what they'd like help with today. "
-            "Be specific about your capabilities: reading text from books/documents, recognizing faces, "
-            "setting medication reminders, making video calls, or managing safety settings. "
-            "Keep it brief and friendly."
+            "Be specific about your capabilities: navigation, video calls, reminders, reading books, "
+            "health data, or adjusting settings. Keep it brief and friendly."
         )
     )
 

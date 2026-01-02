@@ -19,12 +19,17 @@ class ServerSideTool(ABC):
 
         self._time_tracker = None
 
+        self._session = None
+
         logger.info(f"ServerSideTool '{tool_name}' initialized")
 
     def set_user_id(self, user_id: str):
         """Set the current user ID for this tool instance."""
         self._user_id = user_id
-        logger.info(f"Set user_id for {self.tool_name}: {user_id}")
+
+    def set_session(self, session):
+        """Set LiveKit session for data channel messages"""
+        self._session = session
 
     def set_time_tracker(self, time_tracker):
         """Set the time tracker for accurate client time."""

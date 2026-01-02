@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+form_seed_001,form,"Create a reminder to call my son at 3pm","{""tool"": ""submit_reminder"", ""params"": {""title"": ""call my son"", ""time"": ""15:00""}}","{""description"": ""Create reminder with time""}"
+form_seed_002,form,"Remind me to take medication daily at 9am","{""tool"": ""submit_reminder"", ""params"": {""title"": ""take medication"", ""time"": ""09:00"", ""recurrence"": ""daily""}}","{""description"": ""Create recurring reminder""}"
+form_seed_003,form,"Set a reminder for my dentist appointment tomorrow at 2pm","{""tool"": ""submit_reminder"", ""params"": {""title"": ""dentist appointment"", ""date"": ""tomorrow"", ""time"": ""14:00""}}","{""description"": ""Create reminder with date""}"

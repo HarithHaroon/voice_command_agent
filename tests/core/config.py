@@ -38,7 +38,7 @@ class ConfigManager:
 
     def _validate_config(self) -> None:
         """Validate required configuration sections exist"""
-        required_sections = ["execution", "storage"]
+        required_sections = ["execution", "storage", "agents"]
 
         for section in required_sections:
             if section not in self._config:
@@ -64,7 +64,7 @@ class ConfigManager:
 
     def get_execution_config(self, mode: str) -> Dict[str, Any]:
         """Get execution configuration for specific mode"""
-        config = self.get(f"execution.modes.{mode}")
+        config = self.get(f"execution.{mode}_mode")
 
         if config is None:
             raise ConfigurationError(f"No configuration found for mode: {mode}")
@@ -74,9 +74,14 @@ class ConfigManager:
 
         return config
 
-    def get_adapter_config(self) -> Dict[str, Any]:
-        """Get agent adapter configuration"""
-        return self.get("adapter", {})
+    def get_agent_config(self, agent_name: str) -> Dict[str, Any]:
+        """Get configuration for specific agent"""
+        config = self.get(f"agents.{agent_name}")
+
+        if config is None:
+            raise ConfigurationError(f"No configuration found for agent: {agent_name}")
+
+        return config
 
     def get_storage_config(self) -> Dict[str, Any]:
         """Get storage configuration"""
@@ -86,8 +91,13 @@ class ConfigManager:
         """Get reporting configuration"""
         return self.get("reporting", {})
 
+    def get_generation_config(self) -> Dict[str, Any]:
+        """Get test generation configuration"""
+        return self.get("generation", {})
+
 
 def load_config(config_path: Optional[str] = None) -> Dict[str, Any]:
     """Convenience function to load configuration"""
     manager = ConfigManager(config_path)
+
     return manager.load()

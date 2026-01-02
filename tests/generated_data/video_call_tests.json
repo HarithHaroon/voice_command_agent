@@ -1,0 +1,299 @@
+[
+  {
+    "id": "video_seed_001",
+    "agent": "orchestrator",
+    "input": "Call my daughter",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "daughter"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by relationship"
+    }
+  },
+  {
+    "id": "video_seed_002",
+    "agent": "orchestrator",
+    "input": "Video chat with John",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "John"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by name"
+    }
+  },
+  {
+    "id": "video_seed_003",
+    "agent": "orchestrator",
+    "input": "I want to talk to my son",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "son"
+      }
+    },
+    "metadata": {
+      "description": "Video call with casual phrasing"
+    }
+  },
+  {
+    "id": "video_seed_001_var_1",
+    "agent": "orchestrator",
+    "input": "Could you give my daughter a call?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "daughter"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by relationship",
+      "generated": true,
+      "seed_id": "video_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "video_seed_001_var_2",
+    "agent": "orchestrator",
+    "input": "I want to video chat with my little girl.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "daughter"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by relationship",
+      "generated": true,
+      "seed_id": "video_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "video_seed_001_var_3",
+    "agent": "orchestrator",
+    "input": "Please call my daughter on the screen.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "daughter"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by relationship",
+      "generated": true,
+      "seed_id": "video_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "video_seed_001_var_4",
+    "agent": "orchestrator",
+    "input": "Can you ring up my daughter for me?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "daughter"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by relationship",
+      "generated": true,
+      "seed_id": "video_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "video_seed_001_var_5",
+    "agent": "orchestrator",
+    "input": "I need to talk to my daughter, can you help?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "daughter"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by relationship",
+      "generated": true,
+      "seed_id": "video_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "video_seed_002_var_1",
+    "agent": "orchestrator",
+    "input": "Can you start a video call with John for me?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "John"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by name",
+      "generated": true,
+      "seed_id": "video_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "video_seed_002_var_2",
+    "agent": "orchestrator",
+    "input": "I want to chat with John on the video thingy.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "John"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by name",
+      "generated": true,
+      "seed_id": "video_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "video_seed_002_var_3",
+    "agent": "orchestrator",
+    "input": "Hey, could you connect me to John on video?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "John"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by name",
+      "generated": true,
+      "seed_id": "video_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "video_seed_002_var_4",
+    "agent": "orchestrator",
+    "input": "Let’s do a video call with John, alright?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "John"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by name",
+      "generated": true,
+      "seed_id": "video_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "video_seed_002_var_5",
+    "agent": "orchestrator",
+    "input": "I need to talk to John face to face, can you help me with that?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "John"
+      }
+    },
+    "metadata": {
+      "description": "Initiate video call by name",
+      "generated": true,
+      "seed_id": "video_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "video_seed_003_var_1",
+    "agent": "orchestrator",
+    "input": "I’d like to have a video call with my boy.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "son"
+      }
+    },
+    "metadata": {
+      "description": "Video call with casual phrasing",
+      "generated": true,
+      "seed_id": "video_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "video_seed_003_var_2",
+    "agent": "orchestrator",
+    "input": "Can you connect me to my son, please?",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "son"
+      }
+    },
+    "metadata": {
+      "description": "Video call with casual phrasing",
+      "generated": true,
+      "seed_id": "video_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "video_seed_003_var_3",
+    "agent": "orchestrator",
+    "input": "I need to chat with my son on the video thing.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "son"
+      }
+    },
+    "metadata": {
+      "description": "Video call with casual phrasing",
+      "generated": true,
+      "seed_id": "video_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "video_seed_003_var_4",
+    "agent": "orchestrator",
+    "input": "Could you start a video call with my son? I really want to see him.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "son"
+      }
+    },
+    "metadata": {
+      "description": "Video call with casual phrasing",
+      "generated": true,
+      "seed_id": "video_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "video_seed_003_var_5",
+    "agent": "orchestrator",
+    "input": "I want to talk to my kid, you know, on that video call.",
+    "expected": {
+      "tool": "start_video_call",
+      "params": {
+        "contact": "son"
+      }
+    },
+    "metadata": {
+      "description": "Video call with casual phrasing",
+      "generated": true,
+      "seed_id": "video_seed_003",
+      "variation_number": 5
+    }
+  }
+]

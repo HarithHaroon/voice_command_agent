@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+image_seed_001,image,"Show me pictures of my garden","{""tool"": ""query_image"", ""params"": {""query"": ""garden""}}","{""description"": ""Search for photos by content""}"
+image_seed_002,image,"Find photos of my vacation","{""tool"": ""query_image"", ""params"": {""query"": ""vacation""}}","{""description"": ""Search for vacation photos""}"
+image_seed_003,image,"Do I have any pictures of my grandchildren?","{""tool"": ""query_image"", ""params"": {""query"": ""grandchildren""}}","{""description"": ""Search for family photos""}"

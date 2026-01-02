@@ -12,9 +12,9 @@ from tests.core.interfaces import (
     TestCase,
     TestResult,
     TestContext,
+    TestStatus,
 )
 from tests.core.exceptions import TestExecutionError
-from tests.core.interfaces import TestStatus
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,6 @@ class TestExecutor:
             except Exception as e:
                 logger.error(f"Failed to execute test '{test.id}': {e}")
                 # Create a failed result
-
                 results.append(
                     TestResult(
                         test_id=test.id,
@@ -98,9 +97,6 @@ class TestExecutor:
         """
         Generate summary statistics from test results.
 
-        Args:
-            results: List of test results
-
         Returns:
             Dictionary with summary stats
         """
@@ -117,6 +113,7 @@ class TestExecutor:
             "passed": passed,
             "failed": failed,
             "warnings": warnings,
+            "success_rate": (passed / total * 100) if total > 0 else 0.0,
             "avg_score": round(avg_score, 2),
             "avg_duration_ms": round(avg_duration, 2),
         }

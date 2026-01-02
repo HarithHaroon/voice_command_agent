@@ -1,0 +1,55 @@
+# Navigation Multi-Turn Conversation Tests
+
+navigation_sequence:
+  name: "Navigate Through Multiple Screens"
+  description: "User navigates through different screens in sequence"
+  turns:
+    - input: "Navigate to settings"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: settings
+      context_check: "Should navigate to settings screen"
+      
+    - input: "Now go to health"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: health
+      context_check: "Should navigate to health screen"
+      
+    - input: "Take me to medication"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: medication
+      context_check: "Should navigate to medication screen"
+
+navigation_then_action:
+  name: "Navigate Then Perform Action"
+  description: "User navigates to a screen then performs an action there"
+  turns:
+    - input: "Go to the health screen"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: health
+      
+    - input: "What's my blood pressure?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: bloodPressure
+        period: today
+      context_check: "Should perform health query after navigation"
+
+navigation_with_clarification:
+  name: "Navigation with Screen Finding"
+  description: "User asks to navigate but isn't sure of exact screen name"
+  turns:
+    - input: "Take me to where I can see my pills"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: medication
+      context_check: "Should infer medication screen from 'pills'"

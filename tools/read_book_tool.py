@@ -106,15 +106,11 @@ class ReadBookTool(BaseTool):
             )
 
             # 🆕 NEW: Get session and speak content directly (bypasses LLM)
-            if not self.agent:
-                logger.error("Tool not linked to agent")
-                return "Error: Tool not initialized properly."
-
-            # Access session from ToolManager
-            session = getattr(self.agent.tool_manager, "agent_session", None)
-            if not session:
-                logger.error("Session not available in ToolManager")
+            if not self.session:
+                logger.error("Session not available in ReadBookTool")
                 return "Error: Voice session not available."
+
+            session = self.session
 
             # 🎤 KEY: Speak the content directly via TTS (bypasses LLM summarization)
             logger.info(f"🎤 Speaking {len(reading_content)} chars via session.say()")

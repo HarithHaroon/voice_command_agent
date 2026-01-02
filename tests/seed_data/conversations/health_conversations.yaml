@@ -1,0 +1,95 @@
+# Health Agent Multi-Turn Conversation Tests
+
+health_deep_dive_001:
+  name: "Blood Pressure Follow-up"
+  description: "User asks about BP today, then asks about yesterday"
+  turns:
+    - input: "What's my blood pressure today?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: bloodPressure
+        period: today
+      context_check: "Should call get_specific_metric for blood pressure"
+      
+    - input: "What about yesterday?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: bloodPressure
+        period: today  # Note: We only have 4 presets, no "yesterday"
+      context_check: "Should remember we're talking about blood pressure"
+
+health_deep_dive_002:
+  name: "General to Specific"
+  description: "User asks general health, then drills down to heart rate"
+  turns:
+    - input: "How am I doing today?"
+      expected_agent: health
+      expected_tool: get_health_summary
+      expected_params:
+        period: today
+      context_check: "Should get overall health summary"
+      
+    - input: "What about my heart rate specifically?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: heartRate
+        period: today
+      context_check: "Should drill down to specific metric"
+
+health_deep_dive_003:
+  name: "Multiple Metrics"
+  description: "User asks about multiple different metrics in sequence"
+  turns:
+    - input: "What's my heart rate?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: heartRate
+        period: today
+      
+    - input: "And my steps?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: steps
+        period: today
+      context_check: "Should handle new metric while maintaining conversation"
+
+multi_agent_001:
+  name: "Health to Reminder"
+  description: "Check health, then create reminder based on results"
+  turns:
+    - input: "What's my blood pressure today?"
+      expected_agent: health
+      expected_tool: get_specific_metric
+      expected_params:
+        metric_type: bloodPressure
+        period: today
+      
+    - input: "Remind me to call my doctor about this tomorrow at 2pm"
+      expected_agent: backlog
+      expected_tool: add_reminder
+      expected_params:
+        title: call my doctor
+        scheduled_time: "14:00"
+      context_check: "Should switch to BacklogAgent for reminder creation"
+
+multi_agent_002:
+  name: "Health Check and Navigate"
+  description: "Check health summary, then navigate to medication screen"
+  turns:
+    - input: "How's my health today?"
+      expected_agent: health
+      expected_tool: get_health_summary
+      expected_params:
+        period: today
+      
+    - input: "Navigate to my medication screen"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: medication
+      context_check: "Should switch to orchestrator for navigation"

@@ -27,7 +27,6 @@ class ToolRegistry:
         navigation_state: "NavigationState",
         firebase_client: "FirebaseClient",
         backlog_manager: "BacklogManager",
-        assistant=None,
     ) -> None:
         """
         Register all available tools with the tool manager.
@@ -37,26 +36,13 @@ class ToolRegistry:
             navigation_state: NavigationState instance
             firebase_client: FirebaseClient instance
             backlog_manager: BacklogManager instance
-            assistant: Assistant instance (for navigation tool)
         """
-        from tools.form_validation_tool import FormValidationTool
-        from tools.form_submission_tool import FormSubmissionTool
-        from tools.text_field_tool import TextFieldTool
-        from tools.form_orchestration_tool import FormOrchestrationTool
         from tools.navigation_tool import NavigationTool
         from tools.toggle_fall_detection_tool import ToggleFallDetectionTool
         from tools.fall_detection_sensitivity_tool import FallDetectionSensitivityTool
         from tools.emergency_delay_tool import EmergencyDelayTool
         from tools.toggle_location_tracking_tool import ToggleLocationTrackingTool
         from tools.update_location_interval_tool import UpdateLocationIntervalTool
-        from tools.reminder_tools.set_custom_days_tool import SetCustomDaysTool
-        from tools.reminder_tools.set_recurrence_type_tool import SetRecurrenceTypeTool
-        from tools.reminder_tools.set_reminder_date_tool import SetReminderDateTool
-        from tools.reminder_tools.set_reminder_time_tool import SetReminderTimeTool
-        from tools.reminder_tools.submit_reminder_tool import SubmitReminderTool
-        from tools.reminder_tools.validate_reminder_form_tool import (
-            ValidateReminderFormTool,
-        )
         from tools.toggle_watchos_fall_detection_tool import (
             ToggleWatchosFallDetectionTool,
         )
@@ -73,29 +59,18 @@ class ToolRegistry:
         from tools.backlog_tools.complete_reminder_tool import CompleteReminderTool
         from tools.backlog_tools.delete_reminder_tool import DeleteReminderTool
         from tools.backlog_tools.list_all_reminders_tool import ListAllRemindersTool
-
-        # Form tools
-        text_field_tool = TextFieldTool()
-
-        tool_manager.register_tool(text_field_tool)
-
-        form_validation_tool = FormValidationTool()
-
-        tool_manager.register_tool(form_validation_tool)
-
-        submission_tool = FormSubmissionTool()
-
-        tool_manager.register_tool(submission_tool)
-
-        orchestration_tool = FormOrchestrationTool()
-
-        orchestration_tool.set_tools(
-            text_field_tool, form_validation_tool, submission_tool
-        )
-        tool_manager.register_tool(orchestration_tool)
+        from tools.medication_tools.view_medications_tool import ViewMedicationsTool
+        from tools.medication_tools.add_medication_tool import AddMedicationTool
+        from tools.medication_tools.confirm_dose_tool import ConfirmDoseTool
+        from tools.medication_tools.skip_dose_tool import SkipDoseTool
+        from tools.medication_tools.query_schedule_tool import QueryScheduleTool
+        from tools.medication_tools.check_adherence_tool import CheckAdherenceTool
+        from tools.medication_tools.request_refill_tool import RequestRefillTool
+        from tools.medication_tools.edit_medication_tool import EditMedicationTool
+        from tools.medication_tools.delete_medication_tool import DeleteMedicationTool
 
         # Navigation tool
-        navigation_tool = NavigationTool(agent=assistant)
+        navigation_tool = NavigationTool(navigation_state=navigation_state)
 
         tool_manager.register_tool(navigation_tool)
 
@@ -119,31 +94,6 @@ class ToolRegistry:
         update_location_interval_tool = UpdateLocationIntervalTool()
 
         tool_manager.register_tool(update_location_interval_tool)
-
-        # Reminder tools
-        set_reminder_time_tool = SetReminderTimeTool()
-
-        tool_manager.register_tool(set_reminder_time_tool)
-
-        set_reminder_date_tool = SetReminderDateTool()
-
-        tool_manager.register_tool(set_reminder_date_tool)
-
-        set_recurrence_type_tool = SetRecurrenceTypeTool()
-
-        tool_manager.register_tool(set_recurrence_type_tool)
-
-        set_custom_days_tool = SetCustomDaysTool()
-
-        tool_manager.register_tool(set_custom_days_tool)
-
-        validate_reminder_form_tool = ValidateReminderFormTool()
-
-        tool_manager.register_tool(validate_reminder_form_tool)
-
-        submit_reminder_tool = SubmitReminderTool()
-
-        tool_manager.register_tool(submit_reminder_tool)
 
         # WatchOS fall detection tools
         toggle_watchos_fall_detection_tool = ToggleWatchosFallDetectionTool()
@@ -216,3 +166,41 @@ class ToolRegistry:
         tool_manager.register_tool(health_query_tool)
 
         logger.info("✅ Health query tools registered")
+
+        view_meds_tool = ViewMedicationsTool()
+
+        tool_manager.register_tool(view_meds_tool)
+
+        add_medication_tool = AddMedicationTool()
+
+        tool_manager.register_tool(add_medication_tool)
+
+        confirm_dose_tool = ConfirmDoseTool()
+
+        tool_manager.register_tool(confirm_dose_tool)
+
+        skip_dose_tool = SkipDoseTool()
+
+        tool_manager.register_tool(skip_dose_tool)
+
+        query_schedule_tool = QueryScheduleTool()
+
+        tool_manager.register_tool(query_schedule_tool)
+
+        check_adherence_tool = CheckAdherenceTool()
+
+        tool_manager.register_tool(check_adherence_tool)
+
+        request_refill_tool = RequestRefillTool()
+
+        tool_manager.register_tool(request_refill_tool)
+
+        edit_medication_tool = EditMedicationTool()
+
+        tool_manager.register_tool(edit_medication_tool)
+
+        delete_medication_tool = DeleteMedicationTool()
+
+        tool_manager.register_tool(delete_medication_tool)
+
+        logger.info("✅ Registered medication tools")

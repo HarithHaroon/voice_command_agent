@@ -5,8 +5,8 @@ Fast execution without actual LLM calls - uses expected values from test cases.
 
 import logging
 import time
-
 from typing import List
+
 from tests.core.interfaces import (
     IExecutionMode,
     ITester,
@@ -23,7 +23,7 @@ class MockMode(IExecutionMode):
     """Mock execution mode - no LLM calls, uses test expectations"""
 
     def __init__(self, adapter):
-        """Initialize mock mode with adapter for intent detection"""
+        """Initialize mock mode with adapter"""
         self.adapter = adapter
 
     async def execute_test(
@@ -31,22 +31,39 @@ class MockMode(IExecutionMode):
     ) -> TestResult:
         """
         Execute test in mock mode.
-        Uses expected values from test_case instead of calling LLM.
+        Uses expected values from test_case instead of calling agent.
         """
         start_time = time.time()
 
         try:
-            # Step 1: Detect intent using the adapter
-            intent_result = await self.adapter.detect_intent(test_case.input)
-
-            # Step 2: Simulate tool selection using expected values
+            # Mock mode: Use expected values directly
             expected_tool = test_case.expected.get("tool")
             expected_params = test_case.expected.get("params", {})
+            expected_agent = test_case.agent
 
             # Store in context for testers to access
-            context.metadata["intent_result"] = intent_result
-            context.metadata["tool_called"] = expected_tool
+            # For orchestrator tasks, path is just ["Orchestrator"]
+            # For specialist tasks, path is ["Orchestrator", "{Agent}Agent", "Orchestrator"]
+            if expected_agent == "orchestrator":
+                context.metadata["agent_path"] = ["Orchestrator"]
+            else:
+                expected_agent_name = f"{expected_agent.title()}Agent"
+                context.metadata["agent_path"] = [
+                    "Orchestrator",
+                    expected_agent_name,
+                    "Orchestrator",
+                ]
+
+            context.metadata["tools_called"] = [expected_tool] if expected_tool else []
+
             context.metadata["tool_params"] = expected_params
+
+            context.metadata["handoffs"] = (
+                [{"from": "Orchestrator", "to": f"{expected_agent.title()}Agent"}]
+                if expected_agent != "orchestrator"
+                else []
+            )
+
             context.metadata["mode"] = "mock"
 
             # Run all testers
@@ -71,12 +88,7 @@ class MockMode(IExecutionMode):
             score = (passed_count / total_count * 100) if total_count > 0 else 0
 
             # Determine status
-            if all_passed:
-                status = TestStatus.PASS
-            elif any(r.get("error") for r in tester_results.values()):
-                status = TestStatus.FAIL
-            else:
-                status = TestStatus.FAIL
+            status = TestStatus.PASS if all_passed else TestStatus.FAIL
 
             duration_ms = (time.time() - start_time) * 1000
 
@@ -86,9 +98,10 @@ class MockMode(IExecutionMode):
                 status=status,
                 score=score,
                 details={
-                    "category": test_case.category,
+                    "agent": test_case.agent,
                     "mode": "mock",
-                    "intent_result": intent_result,
+                    "agent_path": context.metadata["agent_path"],
+                    "tools_called": context.metadata["tools_called"],
                     "tester_results": tester_results,
                     "expected": test_case.expected,
                     "metadata": test_case.metadata,

@@ -1,0 +1,53 @@
+# Image Agent Multi-Turn Conversation Tests
+
+image_progressive_search:
+  name: "Progressive Photo Search Refinement"
+  description: "User searches for photos, then refines the search"
+  turns:
+    - input: "Show me pictures of my garden"
+      expected_agent: image
+      expected_tool: query_image
+      expected_params:
+        query: garden
+      context_check: "Should search for garden photos"
+      
+    - input: "Any with flowers?"
+      expected_agent: image
+      expected_tool: query_image
+      expected_params:
+        query: garden flowers
+      context_check: "Should refine search to include flowers, keeping garden context"
+
+image_multiple_searches:
+  name: "Multiple Different Photo Searches"
+  description: "User searches for different types of photos in sequence"
+  turns:
+    - input: "Find photos of my grandchildren"
+      expected_agent: image
+      expected_tool: query_image
+      expected_params:
+        query: grandchildren
+      
+    - input: "Now show me vacation pictures"
+      expected_agent: image
+      expected_tool: query_image
+      expected_params:
+        query: vacation
+      context_check: "Should search for vacation photos (new search, not related to grandchildren)"
+
+image_search_then_navigate:
+  name: "Photo Search Then Navigate"
+  description: "User searches photos then navigates elsewhere"
+  turns:
+    - input: "Do I have pictures of my cat?"
+      expected_agent: image
+      expected_tool: query_image
+      expected_params:
+        query: cat
+      
+    - input: "Navigate to my health screen"
+      expected_agent: orchestrator
+      expected_tool: navigate_to_screen
+      expected_params:
+        target_screen: health
+      context_check: "Should switch to navigation, leaving photo search"

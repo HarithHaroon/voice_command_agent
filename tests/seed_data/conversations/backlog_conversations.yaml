@@ -1,0 +1,46 @@
+# Backlog Agent Multi-Turn Conversation Tests
+
+backlog_implicit_completion:
+  name: "Implicit Task Completion with Confirmation"
+  description: "User mentions completing a task, orchestrator asks for confirmation, then completes"
+  turns:
+    - input: "I just called my son"
+      expected_agent: orchestrator
+      expected_tool: null  # No tool call - should ask for confirmation
+      context_check: "Orchestrator should ask for confirmation, not call tools yet"
+      
+    - input: "Yes, mark it done"
+      expected_agent: backlog
+      expected_tool: complete_reminder
+      context_check: "Should route to backlog and complete the reminder"
+
+backlog_view_and_complete:
+  name: "View Then Complete Reminder"
+  description: "User views reminders, then completes one"
+  turns:
+    - input: "What's on my schedule today?"
+      expected_agent: backlog
+      expected_tool: view_upcoming_reminders
+      expected_params:
+        timeframe: today
+      
+    - input: "Mark the first one as done"
+      expected_agent: backlog
+      expected_tool: complete_reminder
+      context_check: "Should complete reminder based on previous context"
+
+backlog_create_and_view:
+  name: "Create Then View Reminders"
+  description: "User creates a reminder, then views all reminders"
+  turns:
+    - input: "Remind me to call my doctor tomorrow at 2pm"
+      expected_agent: backlog
+      expected_tool: add_reminder
+      expected_params:
+        title: call my doctor
+        scheduled_time: "14:00"
+      
+    - input: "Show me all my reminders"
+      expected_agent: backlog
+      expected_tool: list_all_reminders
+      context_check: "Should list all reminders including newly created one"

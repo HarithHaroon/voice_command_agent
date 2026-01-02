@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+settings_seed_001,settings,"Turn on fall detection","{""tool"": ""toggle_fall_detection""}","{""description"": ""Enable fall detection""}"
+settings_seed_002,settings,"Set sensitivity to high","{""tool"": ""set_sensitivity"", ""params"": {""level"": ""sensitive""}}","{""description"": ""Change sensitivity level""}"
+settings_seed_003,settings,"Enable location tracking","{""tool"": ""toggle_location_tracking""}","{""description"": ""Turn on location sharing""}"

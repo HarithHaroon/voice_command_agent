@@ -1,67 +1,50 @@
 """
-Conversation Tracker - Handles emotion check-in Q&A tracking.
+Conversation Tracker - Simplified to work with EmotionHandler.
 """
 
 import logging
-import asyncio
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from assistant import Assistant
+    from helpers.emotion_handler import EmotionHandler
 
 logger = logging.getLogger(__name__)
 
 
 class ConversationTracker:
-    """Tracks conversation flow, especially emotion check-ins."""
+    """
+    Tracks conversation flow and routes to EmotionHandler for check-ins.
+    """
 
-    def __init__(self, assistant: "Assistant"):
+    def __init__(self, emotion_handler: "EmotionHandler"):
         """
         Initialize conversation tracker.
 
         Args:
-            assistant: Assistant instance to track
+            emotion_handler: EmotionHandler instance for check-in tracking
         """
-        self.assistant = assistant
+        self.emotion_handler = emotion_handler
         logger.info("ConversationTracker initialized")
 
     def track_assistant_message(self, content: str) -> None:
         """
-        Track assistant's message, especially check-in questions.
+        Track assistant's message.
+
+        Currently just logs - emotion handler speaks check-ins directly.
 
         Args:
             content: The assistant's message content
         """
-        # Track check-in question asked by assistant
-        if self.assistant.pending_check_in:
-            # Agent just asked the check-in question
-            self.assistant.waiting_for_check_in_response = True
-
-            self.assistant.check_in_question = content
-
-            logger.info(f"✅ Check-in question tracked: {content[:50]}...")
+        logger.debug(f"Assistant message: {content[:50]}...")
 
     def track_user_response(self, content: str) -> None:
         """
-        Track user's response, especially to check-in questions.
+        Track user's response, checking if it's a check-in response.
 
         Args:
             content: The user's message content
         """
-        # Track user response to check-in
-        if self.assistant.waiting_for_check_in_response:
-            logger.info(f"✅ User responded to check-in: {content[:50]}...")
+        # Route to emotion handler to check if this is a check-in response
+        self.emotion_handler.track_user_response(content)
 
-            # Update DynamoDB with Q&A
-            asyncio.create_task(
-                self.assistant.update_emotion_event_with_interaction(
-                    timestamp=self.assistant.pending_check_in["timestamp"],
-                    agent_question=self.assistant.check_in_question,
-                    user_response=content,
-                )
-            )
-
-            # Clear tracking state
-            self.assistant.waiting_for_check_in_response = False
-
-            self.assistant.pending_check_in = None
+        logger.debug(f"User message: {content[:50]}...")

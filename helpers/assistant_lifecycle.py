@@ -1,5 +1,6 @@
 """
-Assistant Lifecycle - Handles setup and teardown for the assistant.
+Assistant Lifecycle - Handles setup and teardown for the multi-agent system.
+Refactored to work with SharedState.
 """
 
 import logging
@@ -7,48 +8,58 @@ from typing import TYPE_CHECKING
 from livekit.agents import get_job_context
 
 if TYPE_CHECKING:
-    from assistant import Assistant
+    from models.shared_state import SharedState
+    from helpers.assistant_data_handler import AssistantDataHandler
 
 logger = logging.getLogger(__name__)
 
 
 class AssistantLifecycle:
-    """Manages assistant lifecycle (initialization and cleanup)."""
+    """Manages lifecycle (initialization and cleanup) for the multi-agent system."""
 
-    def __init__(self, assistant: "Assistant"):
+    def __init__(
+        self, shared_state: "SharedState", data_handler: "AssistantDataHandler"
+    ):
         """
         Initialize lifecycle manager.
 
         Args:
-            assistant: Assistant instance to manage
+            shared_state: SharedState instance
+            data_handler: AssistantDataHandler instance
         """
-        self.assistant = assistant
+        self.shared_state = shared_state
+
+        self.data_handler = data_handler
+
+        self.time_monitor = None
 
         logger.info("AssistantLifecycle initialized")
 
     async def setup(self):
         """
-        Setup assistant when entering a room.
-        Called from assistant.on_enter()
+        Setup multi-agent system when entering a room.
+        Called once at session start.
         """
-        logger.info("Assistant entered the room")
+        logger.info("Multi-agent system entering the room")
 
         # Set agent reference for all tools
-        self.assistant.tool_manager.set_agent_for_all_tools(self.assistant)
+        # Note: We'll pass the current agent dynamically, but tools need initial setup
+        # For now, tools don't need agent reference until they're called
+        # (Navigation tool gets it when accessed)
 
         # Set user_id for all tools that need it
-        if self.assistant.user_id:
-            self.assistant.tool_manager.set_user_id_for_all_tools(
-                self.assistant.user_id
+        if self.shared_state.user_id:
+            self.shared_state.tool_manager.set_user_id_for_all_tools(
+                self.shared_state.user_id
             )
 
         # Set time tracker for all tools that need it
-        self.assistant.tool_manager.set_time_tracker_for_all_tools(
-            self.assistant.time_tracker
+        self.shared_state.tool_manager.set_time_tracker_for_all_tools(
+            self.shared_state.time_tracker
         )
 
         # Start time monitor for backlog reminders
-        if self.assistant.user_id:
+        if self.shared_state.user_id:
             await self._setup_time_monitor()
 
         # Set up data handler
@@ -59,22 +70,19 @@ class AssistantLifecycle:
         try:
             from backlog.time_monitor import TimeMonitor
 
-            self.assistant.time_monitor = TimeMonitor(
-                user_id=self.assistant.user_id,
-                time_tracker=self.assistant.time_tracker,
-                backlog_manager=self.assistant.backlog_manager,
+            self.time_monitor = TimeMonitor(
+                user_id=self.shared_state.user_id,
+                time_tracker=self.shared_state.time_tracker,
+                backlog_manager=self.shared_state.backlog_manager,
             )
 
             # Get session from tool_manager
-            session = getattr(self.assistant.tool_manager, "agent_session", None)
+            session = getattr(self.shared_state.tool_manager, "agent_session", None)
 
             if session:
-                self.assistant.time_monitor.set_session(session)
-
-                await self.assistant.time_monitor.start()
-
+                self.time_monitor.set_session(session)
+                await self.time_monitor.start()
                 logger.info("✅ TimeMonitor started")
-
             else:
                 logger.warning("Session not available, TimeMonitor not started")
 
@@ -88,7 +96,7 @@ class AssistantLifecycle:
 
             if ctx and ctx.room:
                 # Use the data handler's handle_data method
-                ctx.room.on("data_received", self.assistant.data_handler.handle_data)
+                ctx.room.on("data_received", self.data_handler.handle_data)
 
                 logger.info("Data handler registered successfully")
             else:
@@ -99,16 +107,16 @@ class AssistantLifecycle:
 
     async def teardown(self):
         """
-        Cleanup assistant when leaving a room.
-        Called from assistant.on_leave()
+        Cleanup multi-agent system when leaving a room.
+        Called once at session end.
         """
-        logger.info("Assistant leaving the room - cleaning up")
+        logger.info("Multi-agent system leaving the room - cleaning up")
 
         # Stop time monitor
-        if self.assistant.time_monitor:
-            await self.assistant.time_monitor.stop()
+        if self.time_monitor:
+            await self.time_monitor.stop()
 
             logger.info("TimeMonitor stopped")
 
         # Clean up navigation state
-        self.assistant.navigation_state.clear()
+        self.shared_state.navigation_state.clear()

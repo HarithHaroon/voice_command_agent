@@ -1,445 +1,412 @@
-# Voice Agent Test Framework
 
-A simple, powerful testing framework for your LiveKit voice agent. Test your agent's intelligence without writing complex code.
+# Multi-Agent Voice Assistant Test Framework
 
----
+A comprehensive testing framework for the multi-agent voice assistant system. Tests agent routing, tool selection, handoffs, and end-to-end conversation flows.
 
-## What Does It Do?
 
-Tests your voice agent end-to-end:
-- ✅ Does it understand what users want? (Intent detection)
-- ✅ Does it call the right tools? (Tool selection)
-- ✅ Does it extract information correctly? (Parameter parsing)
+## 🎯 Features
 
-**No audio needed** - Tests text-to-text, making it fast and cheap.
-
----
-
-## Quick Start
-
-### 1. Generate Test Variations
-
-Create one example (seed), generate many variations automatically:
-
-```bash
-python3 -m tests.cli.commands generate \
-  --module backlog \
-  --seed-file tests/seeds/backlog_seeds.json \
-  --count 10
-```
-
-**Input:** 1 seed test
-**Output:** 11 total tests (1 seed + 10 AI-generated variations)
-
-### 2. Run Tests
-
-```bash
-# Test with mock mode (fast, free)
-python3 -m tests.cli.commands test --module backlog --mode mock
-
-# Test with real mode (slow, validates actual agent)
-python3 -m tests.cli.commands test --module backlog --mode real
-```
-
-### 3. Read Results
-
-Check the generated report:
-```bash
-cat tests/results/backlog_real_report.md
-```
+- ✅ **Test Generation**: AI-powered test variation generation from seed cases
+- ✅ **Mock Mode**: Fast, free testing using expected values
+- ✅ **Real Mode**: Full pipeline testing with actual LLM calls
+- ✅ **Multi-Agent Testing**: Tests orchestrator routing, specialist agents, and handoffs
+- ✅ **Component Testing**: Individual testers for tools, routing, and handoffs
+- ✅ **Markdown Reports**: Auto-generated, human-readable test reports
+- ✅ **CSV/JSON Support**: Easy test data management for non-technical users
 
 ---
 
-## How It Works
-
-```
-┌─────────────────────────────────────────────────┐
-│  1. Create Seed Test (You)                     │
-│     "remind me to call mom at 3pm"             │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  2. Generate Variations (AI)                    │
-│     - "set a reminder to ring mom at 3"        │
-│     - "don't let me forget to call mom at 3pm" │
-│     - "I need to call my mother at 3 o'clock"  │
-│     ... (7 more)                                │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  3. Run Tests (Framework)                       │
-│     For each test:                              │
-│     - Send text to agent                        │
-│     - Check if correct tool called              │
-│     - Verify parameters extracted               │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│  4. Get Report                                  │
-│     ✅ Passed: 10/11 (90.9%)                    │
-│     ❌ Failed: 1 test (show details)            │
-│     📊 Performance: 5.5s avg per test           │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## File Structure
+## 📁 Directory Structure
 
 ```
 tests/
-├── seeds/                    # Your example tests
-│   └── backlog_seeds.json   # 1-3 hand-written examples
+├── seed_data/              # Hand-written seed test cases (CSV)
+│   ├── health_seeds.csv
+│   ├── backlog_seeds.csv
+│   ├── navigation_seeds.csv
+│   ├── settings_seeds.csv
+│   ├── books_seeds.csv
+│   ├── image_seeds.csv
+│   ├── form_seeds.csv
+│   └── video_call_seeds.csv
 │
-├── variations/               # AI-generated tests
-│   └── backlog_variations.json  # 10-20 variations per seed
+├── generated_data/         # AI-generated test variations (JSON)
+│   ├── health_tests.json (18 tests)
+│   ├── backlog_tests.json (18 tests)
+│   └── ... (144 total tests)
 │
-├── results/                  # Test reports
-│   └── backlog_real_report.md   # Easy-to-read results
+├── reports/                # Generated markdown reports
+│   └── {agent}_{mode}_{timestamp}.md
 │
-├── cli/
-│   └── commands.py          # Main commands (test, generate)
+├── core/                   # Framework core
+│   ├── interfaces.py       # Test interfaces & data structures
+│   ├── exceptions.py       # Custom exceptions
+│   └── config.py          # Configuration manager
 │
-├── adapters/                # Connects to your agent
-│   └── livekit_adapter.py  # LiveKit integration
+├── fixtures/               # Test setup
+│   └── agent_adapter.py   # Multi-agent system adapter
 │
-└── config.yaml              # Framework settings
+├── storage/                # Test data storage
+│   ├── json_storage.py
+│   └── csv_storage.py
+│
+├── generation/             # Test generation
+│   ├── generator.py       # Main generator
+│   └── llm_strategy.py    # LLM-based variation strategy
+│
+├── execution/              # Test execution
+│   ├── test_executor.py   # Main executor
+│   └── modes/
+│       ├── mock_mode.py
+│       └── real_mode.py
+│
+├── evaluators/             # Component testers
+│   ├── tool_tester.py     # Tool selection validation
+│   ├── routing_tester.py  # Agent routing validation
+│   └── handoff_tester.py  # Agent handoff validation
+│
+├── reporting/              # Report generation
+│   └── markdown_formatter.py
+│
+├── cli/                    # Command-line interface
+│   └── commands.py
+│
+├── config.yaml            # Framework configuration
+└── README.md              # This file
 ```
 
 ---
 
-## Creating Seed Tests
+## 🚀 Quick Start
 
-Seed tests are JSON files with expected behavior:
+### 1. Generate Test Variations
 
-**File:** `tests/seeds/backlog_seeds.json`
+Generate test variations from seed cases:
 
-```json
-[
-  {
-    "id": "seed_001",
-    "input": "remind me to call mom at 3pm",
-    "category": "basic_reminders",
-    "expected": {
-      "intent": {
-        "modules": ["backlog"],
-        "confidence": 0.7
-      },
-      "tool": "add_reminder",
-      "params": {
-        "title": "call mom",
-        "scheduled_time": "15:00"
-      }
-    },
-    "metadata": {
-      "description": "Basic reminder with specific time"
-    }
-  }
-]
+```bash
+# Estimate cost first
+python -m tests.cli.commands generate \
+  --agent health \
+  --seed-file tests/seed_data/health_seeds.csv \
+  --count 5 \
+  --estimate-only
+
+# Generate tests (~$0.01 per agent)
+python -m tests.cli.commands generate \
+  --agent health \
+  --seed-file tests/seed_data/health_seeds.csv \
+  --count 5
 ```
 
-**What each field means:**
-- `input`: What the user says
-- `category`: Group similar tests
-- `expected.intent.modules`: Which modules should activate
-- `expected.tool`: Which tool should be called
-- `expected.params`: What information should be extracted
+### 2. Run Tests
+
+Run tests in mock mode (fast, free):
+
+```bash
+python -m tests.cli.commands test \
+  --agent health \
+  --mode mock
+```
+
+Run tests in real mode (slow, costs money):
+
+```bash
+python -m tests.cli.commands test \
+  --agent health \
+  --mode real
+```
+
+### 3. View Reports
+
+```bash
+cat tests/reports/health_mock_*.md
+```
 
 ---
 
-## Configuration
+## 📊 Test Modes
+
+### Mock Mode (Fast & Free)
+- Uses expected values from test cases
+- No LLM calls
+- Speed: ~0-1ms per test
+- Cost: $0
+- Use for: Daily development, quick validation
+
+```bash
+python -m tests.cli.commands test --agent health --mode mock
+```
+
+### Real Mode (Comprehensive)
+- Actual LLM calls through multi-agent system
+- Tests full pipeline including routing, handoffs, tool calls
+- Speed: ~3-5 seconds per test
+- Cost: ~$0.003-0.01 per test
+- Use for: Pre-deployment validation, regression testing
+
+```bash
+python -m tests.cli.commands test --agent health --mode real
+```
+
+---
+
+## 🧪 What Gets Tested
+
+### Agent Routing
+- Does orchestrator route to correct specialist agent?
+- Example: "What's my blood pressure?" → Routes to HealthAgent
+
+### Tool Selection
+- Does agent call the correct tool?
+- Example: "What's my blood pressure?" → Calls `get_specific_metric`
+
+### Agent Handoffs
+- Do agent transitions work correctly?
+- Example: Orchestrator → HealthAgent → Orchestrator
+
+### Tool Parameters
+- Are tool parameters extracted correctly?
+- Example: `get_specific_metric(metric_type="bloodPressure", period="today")`
+
+---
+
+## 📝 Creating Seed Tests
+
+Seed tests are CSV files with expected behaviors. Easy for non-technical users to edit!
+
+**Example:** `tests/seed_data/health_seeds.csv`
+
+```csv
+id,agent,input,expected,metadata
+health_seed_001,health,"How am I doing today?","{""tool"": ""get_health_summary"", ""params"": {""period"": ""today""}}","{""description"": ""Basic health summary request""}"
+```
+
+**CSV Format:**
+- `id`: Unique test identifier
+- `agent`: Which agent should handle (health, backlog, settings, etc.)
+- `input`: User's spoken input
+- `expected`: JSON with expected tool and parameters
+- `metadata`: JSON with test description
+
+---
+
+## 🤖 Generating Variations
+
+The framework uses LLMs to generate realistic variations:
+
+```bash
+python -m tests.cli.commands generate \
+  --agent health \
+  --seed-file tests/seed_data/health_seeds.csv \
+  --count 10
+```
+
+**Input:** 3 seed tests  
+**Output:** 33 total tests (3 seeds + 30 variations)  
+**Cost:** ~$0.03
+
+**Generated variations include:**
+- Different phrasings ("How am I?" vs "How's my health?")
+- Casual vs formal language
+- Elderly user speech patterns
+- Speech recognition errors
+- Edge cases
+
+---
+
+## 📈 Understanding Reports
+
+Reports include:
+
+### Summary Statistics
+- Total tests, passed, failed
+- Success rate, average score
+- Performance metrics
+
+### Failed Test Details
+- Which tester failed (tool, routing, handoff)
+- Expected vs actual values
+- Error messages
+
+### Performance Metrics
+- Total duration, average per test
+- Slowest and fastest tests
+
+**Example Report:** `tests/reports/health_mock_2025-12-18.md`
+
+---
+
+## 💰 Cost Management
+
+### Generation Costs
+- ~$0.001 per variation
+- 10 variations per seed = ~$0.01
+- 8 agents × 3 seeds × 10 variations = ~$0.24 total
+
+### Execution Costs
+
+| Mode | Cost per Test | 100 Tests | 1000 Tests |
+|------|---------------|-----------|------------|
+| **Mock** | $0 | $0 | $0 |
+| **Real** | ~$0.005 | ~$0.50 | ~$5.00 |
+
+### Cost Limits
+
+Set in `tests/config.yaml`:
+
+```yaml
+generation:
+  cost_limits:
+    max_cost_per_run: 5.00  # dollars
+    warn_threshold: 2.00
+```
+
+---
+
+## 🔧 Configuration
 
 **File:** `tests/config.yaml`
 
 ```yaml
-# Which agent to test
-adapter:
-  type: livekit
-  user_id: test_user_123
-  use_llm_intent: true  # Use AI for intent detection
-
-# Test generation settings
-generation:
-  llm_strategy:
-    model: gpt-4o-mini
-    temperature: 0.7
-    variations_per_request: 10
-
-# Test execution settings
+# Test execution modes
 execution:
   mock_mode:
     enabled: true
-    
   real_mode:
     enabled: true
     model: gpt-4o-mini
     temperature: 0.2
-    timeout: 30
+
+# Test generation
+generation:
+  llm_strategy:
+    model: gpt-4o-mini
+    temperature: 0.7
+    variations_per_seed: 10
+
+# Reporting
+reporting:
+  markdown:
+    enabled: true
+    show_passed_tests: false  # Only show failures
 ```
 
 ---
 
-## Test Modes
+## 🎯 Best Practices
 
-### Mock Mode (Fast & Free)
-- Tests intent detection only
-- No actual LLM calls to your agent
-- Uses expected values from test file
-- **Speed:** ~100ms per test
-- **Cost:** Free
-
+### 1. Start with Mock Mode
 ```bash
-python3 -m tests.cli.commands test --module backlog --mode mock
+# Daily development
+python -m tests.cli.commands test --agent health --mode mock
 ```
 
-### Real Mode (Slow & Validates Everything)
-- Tests full agent pipeline
-- Actually calls your agent's LLM
-- Tests tool selection and parameters
-- **Speed:** ~5000ms per test
-- **Cost:** ~$0.003 per test
-
+### 2. Test Critical Paths in Real Mode
 ```bash
-python3 -m tests.cli.commands test --module backlog --mode real
+# Before deployment
+python -m tests.cli.commands test --agent health --mode real
 ```
 
-**When to use which:**
-- **Mock:** Daily development, quick checks
-- **Real:** Before deploying, validating prompts
+### 3. Keep Seed Tests Simple
+- 2-3 seeds per agent
+- Cover common use cases
+- Generate variations for edge cases
+
+### 4. Update Tests Continuously
+- Add failing user queries as new seeds
+- Regenerate variations after prompt changes
+- Track success rates over time
 
 ---
 
-## Understanding Results
+## 📚 Available Agents
 
-### Report Structure
+| Agent | Tests | Description |
+|-------|-------|-------------|
+| **health** | 18 | Health data queries, morning summaries |
+| **backlog** | 18 | Reminder management (view, complete, delete) |
+| **navigation** | 18 | Screen navigation commands |
+| **settings** | 18 | Device settings (fall detection, location) |
+| **books** | 18 | Book reading, content Q&A |
+| **image** | 18 | Photo search and retrieval |
+| **form** | 18 | Reminder creation via forms |
+| **video_call** | 18 | Video call initiation |
 
-```markdown
-# Test Report: backlog
-
-## Summary
-- Total: 11 tests
-- Passed: 10 ✅
-- Failed: 1 ❌
-- Success Rate: 90.9%
-
-## Failed Tests
-Test #1: "I should call my mom at 3-ish"
-- Expected tool: add_reminder
-- Actual tool: start_video_call
-- Issue: Ambiguous phrasing confused agent
-```
-
-### What to do with failures:
-
-1. **Real bug?** Fix your agent's prompt or logic
-2. **Test too strict?** Update expected values
-3. **Ambiguous input?** Both answers valid? Update test to accept either
+**Total:** 144 tests across 8 agents
 
 ---
 
-## Common Workflows
+## 🔄 Workflow Examples
 
 ### Daily Development
 ```bash
-# Quick check before committing code
-python3 -m tests.cli.commands test --module backlog --mode mock
+# Fast validation (free)
+python -m tests.cli.commands test --agent health --mode mock
 ```
 
 ### Before Deployment
 ```bash
-# Full validation
-python3 -m tests.cli.commands test --module backlog --mode real
-python3 -m tests.cli.commands test --module navigation --mode real
+# Test all agents in mock mode (fast)
+for agent in health backlog navigation settings books image form video_call; do
+  python -m tests.cli.commands test --agent $agent --mode mock
+done
+
+# Test critical agents in real mode
+python -m tests.cli.commands test --agent health --mode real
+python -m tests.cli.commands test --agent backlog --mode real
 ```
 
-### Testing New Prompts
+### After Prompt Changes
 ```bash
-# 1. Edit your prompt
-nano prompt_modules/backlog.md
-
-# 2. Test immediately
-python3 -m tests.cli.commands test --module backlog --mode real
-
-# 3. Check results
-cat tests/results/backlog_real_report.md
+# Regenerate and test
+python -m tests.cli.commands generate --agent health --seed-file tests/seed_data/health_seeds.csv --count 10 --regenerate
+python -m tests.cli.commands test --agent health --mode real
 ```
 
-### Adding New Test Coverage
+---
+
+## 🐛 Troubleshooting
+
+### Test file not found
 ```bash
-# 1. Create seed file
-nano tests/seeds/navigation_seeds.json
-
-# 2. Generate variations
-python3 -m tests.cli.commands generate \
-  --module navigation \
-  --seed-file tests/seeds/navigation_seeds.json \
-  --count 10
-
-# 3. Run tests
-python3 -m tests.cli.commands test --module navigation --mode real
+# Generate tests first
+python -m tests.cli.commands generate --agent health --seed-file tests/seed_data/health_seeds.csv
 ```
 
----
-
-## Cost & Performance
-
-### Test Generation
-- **Cost:** ~$0.001 per variation
-- **Speed:** ~2 seconds for 10 variations
-- **10 tests = $0.01**
-
-### Test Execution (Real Mode)
-- **Cost:** ~$0.003 per test
-- **Speed:** ~5 seconds per test
-- **100 tests = $0.30**
-
-### Tips to Save Money
-1. Use mock mode during development
-2. Generate variations once, run tests many times
-3. Start with 5-10 tests per module
-
----
-
-## Troubleshooting
-
-### "No tool was called"
-**Problem:** Agent didn't call any tool
-**Fix:** Check if tools are registered in your agent
-
-### "Intent detection failed"
-**Problem:** Wrong modules detected
-**Fix:** 
-- Check `intent_detection/module_definitions.py`
-- Update module descriptions
-- Check `prompt_modules/` for clarity
-
-### "Tests taking too long"
-**Problem:** Real mode is slow
-**Fix:** 
-- Use mock mode for quick checks
-- Reduce number of tests
-- Run tests in parallel (future feature)
-
-### "Import errors"
-**Problem:** Can't find test modules
-**Fix:** Run from repo root: `python3 -m tests.cli.commands ...`
-
----
-
-## Advanced Features
-
-### Custom Test Expectations
-
-Test for multiple valid tools:
-```json
-{
-  "expected": {
-    "tool": ["add_reminder", "start_video_call"]
-  }
-}
-```
-
-Test for partial parameter match:
-```json
-{
-  "expected": {
-    "params": {
-      "title": "call"  // Matches "call mom", "call dad", etc.
-    }
-  }
-}
-```
-
-### Filtering Tests
-
-Run specific test by ID:
+### Agent initialization fails
 ```bash
-python3 -m tests.cli.commands test --module backlog --test-id seed_001
+# Check environment variables
+echo $OPENAI_API_KEY
+echo $AWS_ACCESS_KEY_ID
 ```
 
-### Custom Report Formats
-
-Add to `config.yaml`:
-```yaml
-reporting:
-  markdown:
-    enabled: true
-    show_passed_tests: false  # Hide passing tests
-```
+### All tests pass but they shouldn't
+- You're in mock mode (uses expected values)
+- Switch to real mode to test actual behavior
 
 ---
 
-## Best Practices
+## 📖 Further Reading
 
-### 1. Start Small
-- 2-3 seed tests per module
-- Generate 5-10 variations each
-- Expand coverage gradually
-
-### 2. Test Edge Cases
-Include in your seeds:
-- Typos: "remnd me"
-- Vague times: "later", "soon"
-- Ambiguous: "call mom" (video call or reminder?)
-- Edge times: "midnight", "noon"
-
-### 3. Keep Tests Updated
-- Add failing user queries as new tests
-- Update expectations when agent improves
-- Delete obsolete tests
-
-### 4. Use Descriptive Categories
-```json
-{
-  "category": "basic_reminders",  // ✅ Good
-  "category": "test1",            // ❌ Bad
-}
-```
+- **Test Generation:** See `tests/generation/llm_strategy.py`
+- **Component Testers:** See `tests/evaluators/`
+- **Custom Metrics:** Extend `ITester` interface
+- **Report Formats:** Extend `IReportFormatter` interface
 
 ---
 
-## Getting Help
+## 🤝 Contributing
 
-### Check Logs
-```bash
-tail -f tests/test_framework.log
-```
+To add a new agent test suite:
 
-### Debug Mode
-```bash
-python3 -m tests.cli.commands test --module backlog --mode real --verbose
-```
+1. Create seed file: `tests/seed_data/{agent}_seeds.csv`
+2. Generate variations: `python -m tests.cli.commands generate --agent {agent}`
+3. Run tests: `python -m tests.cli.commands test --agent {agent} --mode mock`
 
-### Common Issues
-- Module not found? Check `tests/__init__.py` exists
-- Agent not initializing? Check `tests/config.yaml` settings
-- Tools not loading? Check `tests/adapters/livekit_adapter.py`
+To add a new tester:
 
----
+1. Implement `ITester` interface in `tests/evaluators/`
+2. Add to `test_executor.py`
+3. Update reports to show new tester results
 
-## What's Next?
-
-Your framework is production-ready! Consider:
-
-1. **More coverage:** Test navigation, video calls, settings
-2. **CI/CD:** Run tests automatically on code changes
-3. **LLM Judge:** Evaluate response quality with AI
-4. **Hybrid mode:** 90% mock + 10% real = fast & accurate
-
----
-
-## Summary
-
-```bash
-# Generate tests (once)
-python3 -m tests.cli.commands generate --module backlog --seed-file tests/seeds/backlog_seeds.json --count 10
-
-# Run tests (many times)
-python3 -m tests.cli.commands test --module backlog --mode real
-
-# Check results
-cat tests/results/backlog_real_report.md
-```
+*Built for AI Entourage elderly care voice assistant*

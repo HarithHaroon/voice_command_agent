@@ -1,111 +1,89 @@
-# Test Framework Configuration
+# Test Framework Configuration for Multi-Agent Voice Assistant
 
-# Adapter Configuration
-adapter:
-  type: livekit  # Adapter type: livekit, langchain, etc.
-  user_id: test_user_123  # Default test user ID
-  use_llm_intent: true  # Enable LLM-based intent detection (set to false for regex)
-  
-# Test Generation Configuration
-generation:
-  # LLM-based variation strategy
-  llm_strategy:
-    model: gpt-4o-mini
-    temperature: 0.7
-    max_tokens: 2000
-    variations_per_request: 10
-  
-  # Rule-based variation strategy (future)
-  rule_strategy:
-    enabled: false
-    patterns:
-      - type: synonym_replacement
-      - type: paraphrase
-      - type: typo_injection
-  
-  # Adversarial test generation (future)
-  adversarial_strategy:
-    enabled: false
-    attack_types:
-      - prompt_injection
-      - context_overflow
-      - ambiguous_intent
-
-# Test Execution Configuration
+# Test Execution Settings
 execution:
-  # Mock mode: No LLM calls, uses expected values
+  # Mock mode: No LLM calls, uses expected values (fast, free)
   mock_mode:
     enabled: true
     use_expected_values: true
   
-  # Real mode: Actual LLM calls
+  # Real mode: Actual LLM calls (slow, costs money)
   real_mode:
     enabled: true
     model: gpt-4o-mini
     temperature: 0.2
-    max_tokens: 1000
     timeout: 30  # seconds
   
-  # Hybrid mode: Mix of mock and real (future)
+  # Hybrid mode: Mix of mock and real
   hybrid_mode:
-    enabled: false
+    enabled: true
     real_percentage: 10  # 10% real, 90% mock
 
-# Evaluation Configuration
-evaluation:
-  # LLM-based evaluation (future)
-  llm_judge:
-    enabled: false
-    model: gpt-4o
-    criteria:
-      - relevance
-      - accuracy
-      - completeness
-      - safety
+# Test Generation Settings
+generation:
+  llm_strategy:
+    model: gpt-4o-mini
+    temperature: 0.7
+    max_tokens: 2000
+    variations_per_seed: 10
   
-  # Rule-based evaluation
-  rule_judge:
-    enabled: true
-    strict_matching: false  # Allow partial matches
-    confidence_threshold: 0.7
+  # Cost control
+  cost_limits:
+    max_cost_per_run: 5.00  # dollars
+    warn_threshold: 2.00
 
-# Reporting Configuration
+# Agent-Specific Settings
+agents:
+  orchestrator:
+    test_routing: true
+    test_handoffs: true
+  
+  health:
+    test_tool_calls: true
+    test_parameters: true
+  
+  backlog:
+    test_tool_calls: true
+    test_parameters: true
+  
+  books:
+    test_tool_calls: true
+  
+  settings:
+    test_tool_calls: true
+    test_parameters: true
+  
+  image:
+    test_tool_calls: true
+  
+  form:
+    test_tool_calls: true
+    test_multi_step: true
+
+# Reporting Settings
 reporting:
-  # Markdown formatter
   markdown:
     enabled: true
     include_full_context: true
-    show_passed_tests: true
+    show_passed_tests: false  # Only show failures
   
-  # JSON formatter (future)
-  json:
-    enabled: false
-    pretty_print: true
+  output_directory: tests/reports
   
-  # HTML formatter (future)
-  html:
-    enabled: false
-    include_charts: true
+  include_metrics:
+    - success_rate
+    - avg_duration
+    - tool_accuracy
+    - routing_accuracy
+    - handoff_success
 
-# Storage Configuration
+# Storage Settings
 storage:
-  # Test case storage
-  test_cases:
-    format: json  # json, yaml, sqlite
-    path: tests/variations
-  
-  # Test results storage
-  results:
-    format: markdown  # markdown, json, html
-    path: tests/results
-  
-  # Seed cases
-  seeds:
-    path: tests/seeds
+  seed_data_path: tests/seed_data
+  generated_data_path: tests/generated_data
+  results_path: tests/reports
 
-# Logging Configuration
+# Logging
 logging:
-  level: INFO  # DEBUG, INFO, WARNING, ERROR
-  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  level: INFO
   file: tests/test_framework.log
   console: true

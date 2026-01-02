@@ -54,12 +54,15 @@ class TestGenerator:
             logger.info(f"Generating {variations_per_seed} variations for: {seed.id}")
 
             try:
+                # Extract expected tool for context
+                expected_tool = seed.expected.get("tool", "")
+
                 variations = await self.strategy.generate_variations(
                     seed_input=seed.input,
                     count=variations_per_seed,
                     context={
-                        "category": seed.category,
-                        "expected_behavior": seed.expected.get("tool", ""),
+                        "agent": seed.agent,
+                        "expected_tool": expected_tool,
                         "metadata": seed.metadata,
                     },
                 )
@@ -68,7 +71,7 @@ class TestGenerator:
                 for i, variation_input in enumerate(variations, 1):
                     variation_test = TestCase(
                         id=f"{seed.id}_var_{i}",
-                        category=seed.category,
+                        agent=seed.agent,
                         input=variation_input,
                         expected=seed.expected.copy(),
                         metadata={
@@ -92,7 +95,6 @@ class TestGenerator:
 
     async def save_tests(self, tests: List[TestCase], filepath: str) -> None:
         """Save generated tests to storage"""
-
         try:
             await self.storage.save(tests, filepath)
             logger.info(f"Saved {len(tests)} tests to {filepath}")
@@ -101,7 +103,6 @@ class TestGenerator:
 
     async def load_tests(self, filepath: str) -> List[TestCase]:
         """Load tests from storage"""
-
         try:
             tests = await self.storage.load(filepath)
             logger.info(f"Loaded {len(tests)} tests from {filepath}")
@@ -121,8 +122,35 @@ class TestGenerator:
         Returns:
             Generated test cases
         """
-
         tests = await self.generate_from_seeds(seed_cases, variations_per_seed)
         await self.save_tests(tests, output_path)
-
         return tests
+
+    def estimate_cost(
+        self, seed_count: int, variations_per_seed: int
+    ) -> Dict[str, float]:
+        """
+        Estimate generation cost.
+
+        Returns:
+            {
+                "total_variations": int,
+                "estimated_cost_usd": float,
+                "model": str
+            }
+        """
+        total_variations = seed_count * variations_per_seed
+
+        # Cost estimates for gpt-4o-mini
+        # ~$0.001 per variation (rough estimate)
+        cost_per_variation = 0.001
+
+        estimated_cost = total_variations * cost_per_variation
+
+        return {
+            "total_variations": total_variations,
+            "estimated_cost_usd": round(estimated_cost, 2),
+            "model": (
+                self.strategy.model if hasattr(self.strategy, "model") else "unknown"
+            ),
+        }

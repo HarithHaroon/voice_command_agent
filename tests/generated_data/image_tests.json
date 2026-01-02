@@ -1,0 +1,299 @@
+[
+  {
+    "id": "image_seed_001",
+    "agent": "image",
+    "input": "Show me pictures of my garden",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "garden"
+      }
+    },
+    "metadata": {
+      "description": "Search for photos by content"
+    }
+  },
+  {
+    "id": "image_seed_002",
+    "agent": "image",
+    "input": "Find photos of my vacation",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "vacation"
+      }
+    },
+    "metadata": {
+      "description": "Search for vacation photos"
+    }
+  },
+  {
+    "id": "image_seed_003",
+    "agent": "image",
+    "input": "Do I have any pictures of my grandchildren?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "grandchildren"
+      }
+    },
+    "metadata": {
+      "description": "Search for family photos"
+    }
+  },
+  {
+    "id": "image_seed_001_var_1",
+    "agent": "image",
+    "input": "Can you find some photos of my garden for me?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "garden"
+      }
+    },
+    "metadata": {
+      "description": "Search for photos by content",
+      "generated": true,
+      "seed_id": "image_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "image_seed_001_var_2",
+    "agent": "image",
+    "input": "I’d like to see the pictures of my flowers and plants.",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "garden"
+      }
+    },
+    "metadata": {
+      "description": "Search for photos by content",
+      "generated": true,
+      "seed_id": "image_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "image_seed_001_var_3",
+    "agent": "image",
+    "input": "Show me those garden images, please.",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "garden"
+      }
+    },
+    "metadata": {
+      "description": "Search for photos by content",
+      "generated": true,
+      "seed_id": "image_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "image_seed_001_var_4",
+    "agent": "image",
+    "input": "I want to look at my garden photos, if that’s alright.",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "garden"
+      }
+    },
+    "metadata": {
+      "description": "Search for photos by content",
+      "generated": true,
+      "seed_id": "image_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "image_seed_001_var_5",
+    "agent": "image",
+    "input": "Could you pull up some pictures of my backyard garden?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "garden"
+      }
+    },
+    "metadata": {
+      "description": "Search for photos by content",
+      "generated": true,
+      "seed_id": "image_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "image_seed_002_var_1",
+    "agent": "image",
+    "input": "Can you show me pictures from my trip?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "vacation"
+      }
+    },
+    "metadata": {
+      "description": "Search for vacation photos",
+      "generated": true,
+      "seed_id": "image_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "image_seed_002_var_2",
+    "agent": "image",
+    "input": "I’d like to see my vacation photos, please.",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "vacation"
+      }
+    },
+    "metadata": {
+      "description": "Search for vacation photos",
+      "generated": true,
+      "seed_id": "image_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "image_seed_002_var_3",
+    "agent": "image",
+    "input": "Find my holiday pictures, would you?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "vacation"
+      }
+    },
+    "metadata": {
+      "description": "Search for vacation photos",
+      "generated": true,
+      "seed_id": "image_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "image_seed_002_var_4",
+    "agent": "image",
+    "input": "Show me those vacation snaps, if you can.",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "vacation"
+      }
+    },
+    "metadata": {
+      "description": "Search for vacation photos",
+      "generated": true,
+      "seed_id": "image_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "image_seed_002_var_5",
+    "agent": "image",
+    "input": "Look for photos from my travels, okay?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "vacation"
+      }
+    },
+    "metadata": {
+      "description": "Search for vacation photos",
+      "generated": true,
+      "seed_id": "image_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "image_seed_003_var_1",
+    "agent": "image",
+    "input": "Do I have any photos of my grandkids around?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "grandchildren"
+      }
+    },
+    "metadata": {
+      "description": "Search for family photos",
+      "generated": true,
+      "seed_id": "image_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "image_seed_003_var_2",
+    "agent": "image",
+    "input": "Can you check if there are pictures of my grandchildren?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "grandchildren"
+      }
+    },
+    "metadata": {
+      "description": "Search for family photos",
+      "generated": true,
+      "seed_id": "image_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "image_seed_003_var_3",
+    "agent": "image",
+    "input": "I was wondering, are there any images of my grandbabies?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "grandchildren"
+      }
+    },
+    "metadata": {
+      "description": "Search for family photos",
+      "generated": true,
+      "seed_id": "image_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "image_seed_003_var_4",
+    "agent": "image",
+    "input": "Are there any snapshots of the little ones on here?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "grandchildren"
+      }
+    },
+    "metadata": {
+      "description": "Search for family photos",
+      "generated": true,
+      "seed_id": "image_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "image_seed_003_var_5",
+    "agent": "image",
+    "input": "Hey, do I have any pics of the grandkids, please?",
+    "expected": {
+      "tool": "query_image",
+      "params": {
+        "query": "grandchildren"
+      }
+    },
+    "metadata": {
+      "description": "Search for family photos",
+      "generated": true,
+      "seed_id": "image_seed_003",
+      "variation_number": 5
+    }
+  }
+]

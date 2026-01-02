@@ -1,0 +1,12 @@
+id,agent,input,expected,metadata
+medication_seed_001,medication,"Add my blood pressure medication, Lisinopril 10mg, twice daily at 8am and 8pm","{""tool"": ""add_medication"", ""params"": {""name"": ""Lisinopril"", ""dosage"": ""10mg"", ""times"": [""08:00"", ""20:00""], ""frequency"": ""twice daily""}}","{""description"": ""Add medication with schedule""}"
+medication_seed_002,medication,"What medications am I taking?","{""tool"": ""view_medications"", ""params"": {}}","{""description"": ""View all medications""}"
+medication_seed_003,medication,"I took my Lisinopril","{""tool"": ""confirm_dose"", ""params"": {""medication_name"": ""Lisinopril""}}","{""description"": ""Confirm specific medication""}"
+medication_seed_004,medication,"Skip my morning medication","{""tool"": ""skip_dose"", ""params"": {""time_period"": ""morning""}}","{""description"": ""Skip specific medication dose""}"
+medication_seed_005,medication,"What medications do I need to take today?","{""tool"": ""query_schedule"", ""params"": {""timeframe"": ""today""}}","{""description"": ""Query today's medication schedule""}"
+medication_seed_006,medication,"When is my next dose?","{""tool"": ""query_schedule"", ""params"": {""timeframe"": ""next""}}","{""description"": ""Query next upcoming dose""}"
+medication_seed_007,medication,"How am I doing with my medications?","{""tool"": ""check_adherence"", ""params"": {""period"": ""week""}}","{""description"": ""Check weekly adherence""}"
+medication_seed_008,medication,"I need to refill my Lisinopril","{""tool"": ""request_refill"", ""params"": {""medication_name"": ""Lisinopril""}}","{""description"": ""Request specific refill""}"
+medication_seed_09,medication,"Change my Lisinopril to 20mg","{""tool"": ""edit_medication"", ""params"": {""medication_name"": ""Lisinopril"", ""new_dosage"": ""20mg""}}","{""description"": ""Edit medication dosage""}"
+medication_seed_10,medication,"Delete my Aspirin","{""tool"": ""delete_medication"", ""params"": {""medication_name"": ""Aspirin""}}","{""description"": ""Delete medication""}"
+medication_seed_11,medication,"Show me my adherence this month","{""tool"": ""check_adherence"", ""params"": {""period"": ""month""}}","{""description"": ""Check monthly adherence""}"

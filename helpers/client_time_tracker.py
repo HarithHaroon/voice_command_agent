@@ -8,6 +8,8 @@ then calculates accurate client time on demand.
 import logging
 from datetime import datetime, timedelta
 from typing import Optional
+import pytz
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +19,11 @@ class ClientTimeTracker:
 
     def __init__(self):
         self._client_time_at_connect: Optional[datetime] = None
+
         self._server_time_at_connect: Optional[datetime] = None
+
         self._timezone_offset_minutes: int = 0
+
         self._is_initialized: bool = False
 
     def initialize(self, client_time_iso: str, timezone_offset_minutes: int = 0):
@@ -30,9 +35,36 @@ class ClientTimeTracker:
             timezone_offset_minutes: Client's timezone offset from UTC in minutes
         """
         try:
+            # Validate input - check if it's actually an ISO timestamp
+            if (
+                not client_time_iso
+                or len(client_time_iso) < 10
+                or "T" not in client_time_iso
+            ):
+                logger.warning(
+                    f"Invalid client_time_iso format: '{client_time_iso}'. "
+                    f"Expected ISO format like '2025-11-24T14:30:00'. Using server time instead."
+                )
+                # Fallback to server time
+                now = datetime.now(timezone.utc)
+
+                self._client_time_at_connect = now
+
+                self._server_time_at_connect = now
+
+                self._timezone_offset_minutes = 0
+
+                self._is_initialized = True
+
+                return
+
+            # Parse ISO timestamp
             self._client_time_at_connect = datetime.fromisoformat(client_time_iso)
-            self._server_time_at_connect = datetime.utcnow()
+
+            self._server_time_at_connect = datetime.now(timezone.utc)  # ✅ Fixed
+
             self._timezone_offset_minutes = timezone_offset_minutes
+
             self._is_initialized = True
 
             logger.info(
@@ -41,9 +73,17 @@ class ClientTimeTracker:
                 f"Server: {self._server_time_at_connect} | "
                 f"TZ offset: {timezone_offset_minutes} min"
             )
-
         except Exception as e:
             logger.error(f"Failed to initialize ClientTimeTracker: {e}")
+            # Fallback to server time
+            now = datetime.now(timezone.utc)
+
+            self._client_time_at_connect = now
+
+            self._server_time_at_connect = now
+
+            self._timezone_offset_minutes = 0
+
             self._is_initialized = False
 
     def get_current_client_time(self) -> datetime:
@@ -55,10 +95,11 @@ class ClientTimeTracker:
         """
         if not self._is_initialized:
             logger.warning("ClientTimeTracker not initialized, using server UTC time")
-            return datetime.utcnow()
+
+            return datetime.now(timezone.utc)
 
         # Calculate elapsed time since connection
-        elapsed = datetime.utcnow() - self._server_time_at_connect
+        elapsed = datetime.now(timezone.utc) - self._server_time_at_connect
 
         # Add elapsed to original client time
         current_client_time = self._client_time_at_connect + elapsed
@@ -108,6 +149,7 @@ class ClientTimeTracker:
 
         elif relative_lower == "tomorrow":
             tomorrow = current + timedelta(days=1)
+
             return tomorrow.strftime("%Y-%m-%d")
 
         elif relative_lower in [
@@ -129,16 +171,51 @@ class ClientTimeTracker:
                 "saturday",
                 "sunday",
             ]
+
             target_day = day_names.index(relative_lower)
+
             current_day = current.weekday()
 
             days_ahead = target_day - current_day
+
             if days_ahead <= 0:  # Target day is today or in the past this week
                 days_ahead += 7
 
             target_date = current + timedelta(days=days_ahead)
+
             return target_date.strftime("%Y-%m-%d")
 
         else:
             # Return as-is if not recognized (might already be a date)
             return relative
+
+    def parse_timezone(tz_string: str):
+        """
+        Parse timezone from string (handles abbreviations like 'CAT').
+
+        Args:
+            tz_string: Timezone string (e.g., 'CAT', 'UTC', 'America/New_York')
+
+        Returns:
+            pytz timezone object
+        """
+        # Map common abbreviations to pytz timezones
+        tz_map = {
+            "CAT": "Africa/Johannesburg",  # Central Africa Time
+            "EAT": "Africa/Nairobi",  # East Africa Time
+            "WAT": "Africa/Lagos",  # West Africa Time
+            "EST": "America/New_York",
+            "PST": "America/Los_Angeles",
+            "UTC": "UTC",
+            "GMT": "GMT",
+        }
+
+        # Try abbreviation map first
+        full_tz_name = tz_map.get(tz_string.upper(), tz_string)
+
+        try:
+            return pytz.timezone(full_tz_name)
+        except Exception as e:
+            logger.warning(f"Could not parse timezone '{tz_string}', using UTC: {e}")
+
+            return pytz.UTC

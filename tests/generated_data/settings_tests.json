@@ -1,0 +1,263 @@
+[
+  {
+    "id": "settings_seed_001",
+    "agent": "settings",
+    "input": "Turn on fall detection",
+    "expected": {
+      "tool": "toggle_fall_detection"
+    },
+    "metadata": {
+      "description": "Enable fall detection"
+    }
+  },
+  {
+    "id": "settings_seed_002",
+    "agent": "settings",
+    "input": "Set sensitivity to high",
+    "expected": {
+      "tool": "set_sensitivity",
+      "params": {
+        "level": "sensitive"
+      }
+    },
+    "metadata": {
+      "description": "Change sensitivity level"
+    }
+  },
+  {
+    "id": "settings_seed_003",
+    "agent": "settings",
+    "input": "Enable location tracking",
+    "expected": {
+      "tool": "toggle_location_tracking"
+    },
+    "metadata": {
+      "description": "Turn on location sharing"
+    }
+  },
+  {
+    "id": "settings_seed_001_var_1",
+    "agent": "settings",
+    "input": "Could you turn on the fall detection thing?",
+    "expected": {
+      "tool": "toggle_fall_detection"
+    },
+    "metadata": {
+      "description": "Enable fall detection",
+      "generated": true,
+      "seed_id": "settings_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "settings_seed_001_var_2",
+    "agent": "settings",
+    "input": "I need you to switch on that fall detection feature.",
+    "expected": {
+      "tool": "toggle_fall_detection"
+    },
+    "metadata": {
+      "description": "Enable fall detection",
+      "generated": true,
+      "seed_id": "settings_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "settings_seed_001_var_3",
+    "agent": "settings",
+    "input": "Can you please activate the fall alert?",
+    "expected": {
+      "tool": "toggle_fall_detection"
+    },
+    "metadata": {
+      "description": "Enable fall detection",
+      "generated": true,
+      "seed_id": "settings_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "settings_seed_001_var_4",
+    "agent": "settings",
+    "input": "Turn on the fall detection, if you don’t mind.",
+    "expected": {
+      "tool": "toggle_fall_detection"
+    },
+    "metadata": {
+      "description": "Enable fall detection",
+      "generated": true,
+      "seed_id": "settings_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "settings_seed_001_var_5",
+    "agent": "settings",
+    "input": "Hey, I’d like to have that fall detection turned on now.",
+    "expected": {
+      "tool": "toggle_fall_detection"
+    },
+    "metadata": {
+      "description": "Enable fall detection",
+      "generated": true,
+      "seed_id": "settings_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "settings_seed_002_var_1",
+    "agent": "settings",
+    "input": "Can you turn the sensitivity up to high, please?",
+    "expected": {
+      "tool": "set_sensitivity",
+      "params": {
+        "level": "sensitive"
+      }
+    },
+    "metadata": {
+      "description": "Change sensitivity level",
+      "generated": true,
+      "seed_id": "settings_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "settings_seed_002_var_2",
+    "agent": "settings",
+    "input": "I’d like to make it more sensitive, set it to high.",
+    "expected": {
+      "tool": "set_sensitivity",
+      "params": {
+        "level": "sensitive"
+      }
+    },
+    "metadata": {
+      "description": "Change sensitivity level",
+      "generated": true,
+      "seed_id": "settings_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "settings_seed_002_var_3",
+    "agent": "settings",
+    "input": "Could you bump the sensitivity level to high for me?",
+    "expected": {
+      "tool": "set_sensitivity",
+      "params": {
+        "level": "sensitive"
+      }
+    },
+    "metadata": {
+      "description": "Change sensitivity level",
+      "generated": true,
+      "seed_id": "settings_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "settings_seed_002_var_4",
+    "agent": "settings",
+    "input": "Make it high sensitivity, would ya?",
+    "expected": {
+      "tool": "set_sensitivity",
+      "params": {
+        "level": "sensitive"
+      }
+    },
+    "metadata": {
+      "description": "Change sensitivity level",
+      "generated": true,
+      "seed_id": "settings_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "settings_seed_002_var_5",
+    "agent": "settings",
+    "input": "Set that sensitivity thing to the highest level, if you can.",
+    "expected": {
+      "tool": "set_sensitivity",
+      "params": {
+        "level": "sensitive"
+      }
+    },
+    "metadata": {
+      "description": "Change sensitivity level",
+      "generated": true,
+      "seed_id": "settings_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "settings_seed_003_var_1",
+    "agent": "settings",
+    "input": "Could you turn on the tracking for my location?",
+    "expected": {
+      "tool": "toggle_location_tracking"
+    },
+    "metadata": {
+      "description": "Turn on location sharing",
+      "generated": true,
+      "seed_id": "settings_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "settings_seed_003_var_2",
+    "agent": "settings",
+    "input": "I want you to keep an eye on where I am.",
+    "expected": {
+      "tool": "toggle_location_tracking"
+    },
+    "metadata": {
+      "description": "Turn on location sharing",
+      "generated": true,
+      "seed_id": "settings_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "settings_seed_003_var_3",
+    "agent": "settings",
+    "input": "Please enable that thing that tells where I’m at.",
+    "expected": {
+      "tool": "toggle_location_tracking"
+    },
+    "metadata": {
+      "description": "Turn on location sharing",
+      "generated": true,
+      "seed_id": "settings_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "settings_seed_003_var_4",
+    "agent": "settings",
+    "input": "Can you help me with the location thingy?",
+    "expected": {
+      "tool": "toggle_location_tracking"
+    },
+    "metadata": {
+      "description": "Turn on location sharing",
+      "generated": true,
+      "seed_id": "settings_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "settings_seed_003_var_5",
+    "agent": "settings",
+    "input": "I need the location tracking, if you could do that for me.",
+    "expected": {
+      "tool": "toggle_location_tracking"
+    },
+    "metadata": {
+      "description": "Turn on location sharing",
+      "generated": true,
+      "seed_id": "settings_seed_003",
+      "variation_number": 5
+    }
+  }
+]

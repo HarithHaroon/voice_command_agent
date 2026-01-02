@@ -1,0 +1,53 @@
+# Books Agent Multi-Turn Conversation Tests
+
+books_read_then_ask:
+  name: "Read Book Then Ask Question"
+  description: "User starts reading a book, then asks about its content"
+  turns:
+    - input: "Read Harry Potter to me"
+      expected_agent: books
+      expected_tool: read_book
+      expected_params:
+        book_name: Harry Potter
+      context_check: "Should start reading Harry Potter"
+      
+    - input: "What does it say about magic?"
+      expected_agent: books
+      expected_tool: rag_books_tool
+      expected_params:
+        query: magic
+      context_check: "Should search current book for information about magic"
+
+books_continue_reading:
+  name: "Start and Continue Reading"
+  description: "User starts reading, then asks to continue"
+  turns:
+    - input: "Start reading The Great Gatsby"
+      expected_agent: books
+      expected_tool: read_book
+      expected_params:
+        book_name: The Great Gatsby
+      
+    - input: "Keep going"
+      expected_agent: books
+      expected_tool: read_book
+      expected_params:
+        continue_reading: true
+      context_check: "Should continue reading from where it left off"
+
+books_switch_books:
+  name: "Read Different Books"
+  description: "User reads one book, then switches to another"
+  turns:
+    - input: "Read me some of To Kill a Mockingbird"
+      expected_agent: books
+      expected_tool: read_book
+      expected_params:
+        book_name: To Kill a Mockingbird
+      
+    - input: "Actually, read Pride and Prejudice instead"
+      expected_agent: books
+      expected_tool: read_book
+      expected_params:
+        book_name: Pride and Prejudice
+      context_check: "Should switch to new book"

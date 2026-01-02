@@ -1,0 +1,48 @@
+# Settings Agent Multi-Turn Conversation Tests
+
+settings_multi_step:
+  name: "Multi-Step Fall Detection Setup"
+  description: "User enables fall detection, then adjusts sensitivity"
+  turns:
+    - input: "Turn on fall detection"
+      expected_agent: settings
+      expected_tool: toggle_fall_detection
+      context_check: "Should enable fall detection"
+      
+    - input: "Set the sensitivity to high"
+      expected_agent: settings
+      expected_tool: set_sensitivity
+      expected_params:
+        level: sensitive
+      context_check: "Should adjust sensitivity for fall detection"
+
+settings_location_tracking:
+  name: "Location Tracking Configuration"
+  description: "User enables location tracking then adjusts update interval"
+  turns:
+    - input: "Turn on location tracking"
+      expected_agent: settings
+      expected_tool: toggle_location_tracking
+      context_check: "Should enable location tracking"
+      
+    - input: "How often should it update?"
+      expected_agent: orchestrator
+      expected_tool: null
+      context_check: "Orchestrator should ask for clarification or provide options"
+      
+    - input: "Every 30 minutes"
+      expected_agent: settings
+      expected_tool: update_location_interval
+      context_check: "Should update location interval based on context"
+
+settings_check_status:
+  name: "Enable Then Verify Settings"
+  description: "User changes a setting then asks to verify it"
+  turns:
+    - input: "Enable fall detection"
+      expected_agent: settings
+      expected_tool: toggle_fall_detection
+      
+    - input: "Is it on now?"
+      expected_agent: settings
+      context_check: "Should confirm fall detection status based on previous action"

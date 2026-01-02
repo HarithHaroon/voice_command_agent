@@ -80,6 +80,14 @@ You can help the user manage their personal reminders and tasks.
    - "evening" → "18:00"
    - "tonight" → "20:00"
 
+**CONTEXT AWARENESS:**
+- "The first one", "first reminder", "that one" → Refers to first item in the previously shown list
+- "Mark it done", "complete it", "I finished it" → Complete the most recently mentioned reminder
+- "The X reminder" → Search for reminder matching X from conversation context
+- Always resolve pronouns ("it", "that", "the one") using recent conversation history
+
+---
+
 **EXAMPLES:**
 - "Remind me to drink water in 5 minutes" → add_reminder(title="drink water", minutes_from_now=5)
 - "Remind me to stretch in 1 hour" → add_reminder(title="stretch", minutes_from_now=60)

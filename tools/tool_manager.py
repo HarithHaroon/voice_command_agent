@@ -52,7 +52,8 @@ class ToolManager:
         for tool in self._tools.values():
             if hasattr(tool, "set_user_id"):
                 tool.set_user_id(user_id)
-                logger.info(f"Set user_id for {tool.tool_name}")
+
+                # logger.info(f"Set user_id for {tool.tool_name}")
 
     def set_time_tracker_for_all_tools(self, time_tracker):
         """Set the time_tracker for all registered tools that support it."""
@@ -106,3 +107,24 @@ class ToolManager:
     def get_tool_count(self) -> int:
         """Get number of registered tools."""
         return len(self._tools)
+
+    def get_tool(self, tool_name: str):
+        """
+        Get a tool instance by name.
+
+        Args:
+            tool_name: Name of the tool to retrieve
+
+        Returns:
+            Tool instance or None if not found
+        """
+        return self._tools.get(tool_name)
+
+    def set_session_for_all_tools(self, session):
+        """Set session for all registered tools."""
+        for tool in self._tools.values():
+            if hasattr(tool, "set_session"):
+
+                tool.set_session(session)
+
+        logger.info(f"Session set for {len(self._tools)} tools")

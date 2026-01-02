@@ -1,0 +1,1313 @@
+[
+  {
+    "id": "medication_seed_001",
+    "agent": "medication",
+    "input": "Add my blood pressure medication, Lisinopril 10mg, twice daily at 8am and 8pm",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule"
+    }
+  },
+  {
+    "id": "medication_seed_002",
+    "agent": "medication",
+    "input": "What medications am I taking?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications"
+    }
+  },
+  {
+    "id": "medication_seed_003",
+    "agent": "medication",
+    "input": "I took my Lisinopril",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication"
+    }
+  },
+  {
+    "id": "medication_seed_004",
+    "agent": "medication",
+    "input": "Skip my morning medication",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose"
+    }
+  },
+  {
+    "id": "medication_seed_005",
+    "agent": "medication",
+    "input": "What medications do I need to take today?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule"
+    }
+  },
+  {
+    "id": "medication_seed_006",
+    "agent": "medication",
+    "input": "When is my next dose?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose"
+    }
+  },
+  {
+    "id": "medication_seed_007",
+    "agent": "medication",
+    "input": "How am I doing with my medications?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence"
+    }
+  },
+  {
+    "id": "medication_seed_008",
+    "agent": "medication",
+    "input": "I need to refill my Lisinopril",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill"
+    }
+  },
+  {
+    "id": "medication_seed_09",
+    "agent": "medication",
+    "input": "Change my Lisinopril to 20mg",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage"
+    }
+  },
+  {
+    "id": "medication_seed_10",
+    "agent": "medication",
+    "input": "Delete my Aspirin",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication"
+    }
+  },
+  {
+    "id": "medication_seed_11",
+    "agent": "medication",
+    "input": "Show me my adherence this month",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence"
+    }
+  },
+  {
+    "id": "medication_seed_001_var_1",
+    "agent": "medication",
+    "input": "Could you please add my Lisinopril, that's the blood pressure medicine, 10mg, to take twice a day at 8 in the morning and 8 in the evening?",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule",
+      "generated": true,
+      "seed_id": "medication_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_001_var_2",
+    "agent": "medication",
+    "input": "I need to add my blood pressure pill, Lisinopril 10mg, twice daily, once in the morning and once at night.",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule",
+      "generated": true,
+      "seed_id": "medication_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_001_var_3",
+    "agent": "medication",
+    "input": "Can you put in my Lisinopril, 10mg for blood pressure, I take it two times a day, 8am and then again at 8pm, alright?",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule",
+      "generated": true,
+      "seed_id": "medication_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_001_var_4",
+    "agent": "medication",
+    "input": "Add my Lisinopril, uh, it’s 10mg, twice a day, like 8am and 8pm, okay?",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule",
+      "generated": true,
+      "seed_id": "medication_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_001_var_5",
+    "agent": "medication",
+    "input": "Please add my blood pressure medication, Lisinopril, I take it twice, morning and evening, 10mg, if you can.",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule",
+      "generated": true,
+      "seed_id": "medication_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_001_var_6",
+    "agent": "medication",
+    "input": "I want to add my Lisinopril, that’s the one for my blood pressure, 10mg, I take it two times, morning and night, but I’m not sure about the times.",
+    "expected": {
+      "tool": "add_medication",
+      "params": {
+        "name": "Lisinopril",
+        "dosage": "10mg",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "frequency": "twice daily"
+      }
+    },
+    "metadata": {
+      "description": "Add medication with schedule",
+      "generated": true,
+      "seed_id": "medication_seed_001",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_002_var_1",
+    "agent": "medication",
+    "input": "Can you remind me what pills I’m taking?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications",
+      "generated": true,
+      "seed_id": "medication_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_002_var_2",
+    "agent": "medication",
+    "input": "What are those medicines I’m on again?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications",
+      "generated": true,
+      "seed_id": "medication_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_002_var_3",
+    "agent": "medication",
+    "input": "Hey, can you tell me my medications?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications",
+      "generated": true,
+      "seed_id": "medication_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_002_var_4",
+    "agent": "medication",
+    "input": "Um, could you check what meds I have?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications",
+      "generated": true,
+      "seed_id": "medication_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_002_var_5",
+    "agent": "medication",
+    "input": "What did the doctor say about my prescriptions?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications",
+      "generated": true,
+      "seed_id": "medication_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_002_var_6",
+    "agent": "medication",
+    "input": "I can't remember my medicine names, can you help with that?",
+    "expected": {
+      "tool": "view_medications",
+      "params": {}
+    },
+    "metadata": {
+      "description": "View all medications",
+      "generated": true,
+      "seed_id": "medication_seed_002",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_003_var_1",
+    "agent": "medication",
+    "input": "I just took my Lisinopril, you know.",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication",
+      "generated": true,
+      "seed_id": "medication_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_003_var_2",
+    "agent": "medication",
+    "input": "I’ve had my Lisinopril for today.",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication",
+      "generated": true,
+      "seed_id": "medication_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_003_var_3",
+    "agent": "medication",
+    "input": "I took that Lisi...Lisinopril thing this morning.",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication",
+      "generated": true,
+      "seed_id": "medication_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_003_var_4",
+    "agent": "medication",
+    "input": "I already took my blood pressure pill, the Lisinopril.",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication",
+      "generated": true,
+      "seed_id": "medication_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_003_var_5",
+    "agent": "medication",
+    "input": "Oh, I took my medication, that Lisinopril, earlier today, just so you know.",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication",
+      "generated": true,
+      "seed_id": "medication_seed_003",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_003_var_6",
+    "agent": "medication",
+    "input": "I’m not sure if I mentioned, but I did take my Lisinopril already.",
+    "expected": {
+      "tool": "confirm_dose",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Confirm specific medication",
+      "generated": true,
+      "seed_id": "medication_seed_003",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_004_var_1",
+    "agent": "medication",
+    "input": "Could you skip my morning pills today?",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose",
+      "generated": true,
+      "seed_id": "medication_seed_004",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_004_var_2",
+    "agent": "medication",
+    "input": "I want to pass on the meds for the morning.",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose",
+      "generated": true,
+      "seed_id": "medication_seed_004",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_004_var_3",
+    "agent": "medication",
+    "input": "Please don’t remind me about my medication right now.",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose",
+      "generated": true,
+      "seed_id": "medication_seed_004",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_004_var_4",
+    "agent": "medication",
+    "input": "I’m not taking my morning meds, thanks.",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose",
+      "generated": true,
+      "seed_id": "medication_seed_004",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_004_var_5",
+    "agent": "medication",
+    "input": "Can you let me skip my meds for this morning?",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose",
+      "generated": true,
+      "seed_id": "medication_seed_004",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_004_var_6",
+    "agent": "medication",
+    "input": "Forget about my pills for the morning, will ya?",
+    "expected": {
+      "tool": "skip_dose",
+      "params": {
+        "time_period": "morning"
+      }
+    },
+    "metadata": {
+      "description": "Skip specific medication dose",
+      "generated": true,
+      "seed_id": "medication_seed_004",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_005_var_1",
+    "agent": "medication",
+    "input": "What meds am I supposed to take today?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule",
+      "generated": true,
+      "seed_id": "medication_seed_005",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_005_var_2",
+    "agent": "medication",
+    "input": "Could you remind me what pills I need to take today?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule",
+      "generated": true,
+      "seed_id": "medication_seed_005",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_005_var_3",
+    "agent": "medication",
+    "input": "I need to know my medication for today, please.",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule",
+      "generated": true,
+      "seed_id": "medication_seed_005",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_005_var_4",
+    "agent": "medication",
+    "input": "What do I need to take today for my health?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule",
+      "generated": true,
+      "seed_id": "medication_seed_005",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_005_var_5",
+    "agent": "medication",
+    "input": "Hey, what’s on my list of medications for today?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule",
+      "generated": true,
+      "seed_id": "medication_seed_005",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_005_var_6",
+    "agent": "medication",
+    "input": "Can you tell me what I’m supposed to take, I forget sometimes?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "today"
+      }
+    },
+    "metadata": {
+      "description": "Query today's medication schedule",
+      "generated": true,
+      "seed_id": "medication_seed_005",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_006_var_1",
+    "agent": "medication",
+    "input": "When do I need to take my medicine again?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose",
+      "generated": true,
+      "seed_id": "medication_seed_006",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_006_var_2",
+    "agent": "medication",
+    "input": "Could you tell me when my next pill is due, please?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose",
+      "generated": true,
+      "seed_id": "medication_seed_006",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_006_var_3",
+    "agent": "medication",
+    "input": "What time do I have to take my next dose?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose",
+      "generated": true,
+      "seed_id": "medication_seed_006",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_006_var_4",
+    "agent": "medication",
+    "input": "When's my next dose, honey?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose",
+      "generated": true,
+      "seed_id": "medication_seed_006",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_006_var_5",
+    "agent": "medication",
+    "input": "I forgot when I’m supposed to take my meds next.",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose",
+      "generated": true,
+      "seed_id": "medication_seed_006",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_006_var_6",
+    "agent": "medication",
+    "input": "Can you remind me about my meds schedule?",
+    "expected": {
+      "tool": "query_schedule",
+      "params": {
+        "timeframe": "next"
+      }
+    },
+    "metadata": {
+      "description": "Query next upcoming dose",
+      "generated": true,
+      "seed_id": "medication_seed_006",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_007_var_1",
+    "agent": "medication",
+    "input": "Am I taking my pills right?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_007",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_007_var_2",
+    "agent": "medication",
+    "input": "Could you check how I’m doing with my meds, please?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_007",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_007_var_3",
+    "agent": "medication",
+    "input": "How's my medication schedule looking these days?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_007",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_007_var_4",
+    "agent": "medication",
+    "input": "I wonder if I'm keeping up with my medicine?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_007",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_007_var_5",
+    "agent": "medication",
+    "input": "Did I take my meds today or not?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_007",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_007_var_6",
+    "agent": "medication",
+    "input": "Hey, can you tell me if I'm on track with my medications?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "week"
+      }
+    },
+    "metadata": {
+      "description": "Check weekly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_007",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_008_var_1",
+    "agent": "medication",
+    "input": "I need a refill on my Lisinopril, please.",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill",
+      "generated": true,
+      "seed_id": "medication_seed_008",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_008_var_2",
+    "agent": "medication",
+    "input": "Can you help me get more of my Lisinopril?",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill",
+      "generated": true,
+      "seed_id": "medication_seed_008",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_008_var_3",
+    "agent": "medication",
+    "input": "I’m running low on that Lisinopril medicine.",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill",
+      "generated": true,
+      "seed_id": "medication_seed_008",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_008_var_4",
+    "agent": "medication",
+    "input": "I think I need a refill for that pill, Lisinopril, or whatever it's called.",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill",
+      "generated": true,
+      "seed_id": "medication_seed_008",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_008_var_5",
+    "agent": "medication",
+    "input": "Could you please help me order some more Lisinopril?",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill",
+      "generated": true,
+      "seed_id": "medication_seed_008",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_008_var_6",
+    "agent": "medication",
+    "input": "I’m out of my Lisinopril, can you do something about that?",
+    "expected": {
+      "tool": "request_refill",
+      "params": {
+        "medication_name": "Lisinopril"
+      }
+    },
+    "metadata": {
+      "description": "Request specific refill",
+      "generated": true,
+      "seed_id": "medication_seed_008",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_09_var_1",
+    "agent": "medication",
+    "input": "Could you switch my Lisinopril to twenty milligrams?",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage",
+      "generated": true,
+      "seed_id": "medication_seed_09",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_09_var_2",
+    "agent": "medication",
+    "input": "I need to change my Lisinopril dose to 20 mg, please.",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage",
+      "generated": true,
+      "seed_id": "medication_seed_09",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_09_var_3",
+    "agent": "medication",
+    "input": "Can you make my Lisinopril 20, uh, milligrams?",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage",
+      "generated": true,
+      "seed_id": "medication_seed_09",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_09_var_4",
+    "agent": "medication",
+    "input": "Hey, can you adjust my Lisinopril to 20mg?",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage",
+      "generated": true,
+      "seed_id": "medication_seed_09",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_09_var_5",
+    "agent": "medication",
+    "input": "I think I need my Lisinopril changed to twenty.",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage",
+      "generated": true,
+      "seed_id": "medication_seed_09",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_09_var_6",
+    "agent": "medication",
+    "input": "Change my Lisinopril, I mean the dose, to twenty, if you can.",
+    "expected": {
+      "tool": "edit_medication",
+      "params": {
+        "medication_name": "Lisinopril",
+        "new_dosage": "20mg"
+      }
+    },
+    "metadata": {
+      "description": "Edit medication dosage",
+      "generated": true,
+      "seed_id": "medication_seed_09",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_10_var_1",
+    "agent": "medication",
+    "input": "Could you take away my Aspirin?",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication",
+      "generated": true,
+      "seed_id": "medication_seed_10",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_10_var_2",
+    "agent": "medication",
+    "input": "I need to get rid of the Aspirin, please.",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication",
+      "generated": true,
+      "seed_id": "medication_seed_10",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_10_var_3",
+    "agent": "medication",
+    "input": "Please delete the pills for my headaches.",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication",
+      "generated": true,
+      "seed_id": "medication_seed_10",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_10_var_4",
+    "agent": "medication",
+    "input": "I want to stop taking that Aspirin stuff.",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication",
+      "generated": true,
+      "seed_id": "medication_seed_10",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_10_var_5",
+    "agent": "medication",
+    "input": "Can you erase my Aspirin prescription?",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication",
+      "generated": true,
+      "seed_id": "medication_seed_10",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_10_var_6",
+    "agent": "medication",
+    "input": "Uh, I think I don’t need the Aspirin anymore, so… just, you know, remove it?",
+    "expected": {
+      "tool": "delete_medication",
+      "params": {
+        "medication_name": "Aspirin"
+      }
+    },
+    "metadata": {
+      "description": "Delete medication",
+      "generated": true,
+      "seed_id": "medication_seed_10",
+      "variation_number": 6
+    }
+  },
+  {
+    "id": "medication_seed_11_var_1",
+    "agent": "medication",
+    "input": "Can you tell me how I'm doing with my meds this month?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_11",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "medication_seed_11_var_2",
+    "agent": "medication",
+    "input": "I’d like to see if I’ve been taking my pills on time this month, please.",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_11",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "medication_seed_11_var_3",
+    "agent": "medication",
+    "input": "What’s my medicine schedule like for this month?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_11",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "medication_seed_11_var_4",
+    "agent": "medication",
+    "input": "Could you check if I’ve kept up with my medications this month?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_11",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "medication_seed_11_var_5",
+    "agent": "medication",
+    "input": "How am I doing with my meds, you know, for this month?",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_11",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "medication_seed_11_var_6",
+    "agent": "medication",
+    "input": "Show me my pill-taking record for the month, if you don’t mind.",
+    "expected": {
+      "tool": "check_adherence",
+      "params": {
+        "period": "month"
+      }
+    },
+    "metadata": {
+      "description": "Check monthly adherence",
+      "generated": true,
+      "seed_id": "medication_seed_11",
+      "variation_number": 6
+    }
+  }
+]

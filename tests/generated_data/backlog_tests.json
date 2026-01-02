@@ -1,0 +1,164 @@
+[
+  {
+    "id": "backlog_seed_001",
+    "agent": "backlog",
+    "input": "What's my schedule today?",
+    "expected": {
+      "tool": "view_upcoming_reminders"
+    },
+    "metadata": {
+      "description": "View today's reminders"
+    }
+  },
+  {
+    "id": "backlog_seed_003",
+    "agent": "backlog",
+    "input": "Cancel the dentist reminder",
+    "expected": {
+      "tool": "delete_reminder"
+    },
+    "metadata": {
+      "description": "Delete specific reminder"
+    }
+  },
+  {
+    "id": "backlog_seed_001_var_1",
+    "agent": "backlog",
+    "input": "What do I have planned for today?",
+    "expected": {
+      "tool": "view_upcoming_reminders"
+    },
+    "metadata": {
+      "description": "View today's reminders",
+      "generated": true,
+      "seed_id": "backlog_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "backlog_seed_001_var_2",
+    "agent": "backlog",
+    "input": "Can you remind me what’s on my agenda today, please?",
+    "expected": {
+      "tool": "view_upcoming_reminders"
+    },
+    "metadata": {
+      "description": "View today's reminders",
+      "generated": true,
+      "seed_id": "backlog_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "backlog_seed_001_var_3",
+    "agent": "backlog",
+    "input": "Hey, what’s coming up for me today?",
+    "expected": {
+      "tool": "view_upcoming_reminders"
+    },
+    "metadata": {
+      "description": "View today's reminders",
+      "generated": true,
+      "seed_id": "backlog_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "backlog_seed_001_var_4",
+    "agent": "backlog",
+    "input": "I need to know my schedule for today, if you don’t mind.",
+    "expected": {
+      "tool": "view_upcoming_reminders"
+    },
+    "metadata": {
+      "description": "View today's reminders",
+      "generated": true,
+      "seed_id": "backlog_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "backlog_seed_001_var_5",
+    "agent": "backlog",
+    "input": "What do I need to do today?",
+    "expected": {
+      "tool": "view_upcoming_reminders"
+    },
+    "metadata": {
+      "description": "View today's reminders",
+      "generated": true,
+      "seed_id": "backlog_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "backlog_seed_003_var_1",
+    "agent": "backlog",
+    "input": "Can you please get rid of that dentist reminder?",
+    "expected": {
+      "tool": "delete_reminder"
+    },
+    "metadata": {
+      "description": "Delete specific reminder",
+      "generated": true,
+      "seed_id": "backlog_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "backlog_seed_003_var_2",
+    "agent": "backlog",
+    "input": "I need to cancel my appointment reminder for the dentist.",
+    "expected": {
+      "tool": "delete_reminder"
+    },
+    "metadata": {
+      "description": "Delete specific reminder",
+      "generated": true,
+      "seed_id": "backlog_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "backlog_seed_003_var_3",
+    "agent": "backlog",
+    "input": "Oh, I don’t want that reminder for the dentist anymore, can you delete it?",
+    "expected": {
+      "tool": "delete_reminder"
+    },
+    "metadata": {
+      "description": "Delete specific reminder",
+      "generated": true,
+      "seed_id": "backlog_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "backlog_seed_003_var_4",
+    "agent": "backlog",
+    "input": "Forget about the dentist reminder, will you?",
+    "expected": {
+      "tool": "delete_reminder"
+    },
+    "metadata": {
+      "description": "Delete specific reminder",
+      "generated": true,
+      "seed_id": "backlog_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "backlog_seed_003_var_5",
+    "agent": "backlog",
+    "input": "Um, could you take off the dentist notice? It’s not needed now.",
+    "expected": {
+      "tool": "delete_reminder"
+    },
+    "metadata": {
+      "description": "Delete specific reminder",
+      "generated": true,
+      "seed_id": "backlog_seed_003",
+      "variation_number": 5
+    }
+  }
+]

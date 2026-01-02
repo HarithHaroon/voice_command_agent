@@ -1,0 +1,3 @@
+id,agent,input,expected,metadata
+backlog_seed_001,backlog,"What's my schedule today?","{""tool"": ""view_upcoming_reminders""}","{""description"": ""View today's reminders""}"
+backlog_seed_003,backlog,"Cancel the dentist reminder","{""tool"": ""delete_reminder""}","{""description"": ""Delete specific reminder""}"

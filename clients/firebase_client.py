@@ -55,17 +55,19 @@ class FirebaseClient:
             }
 
             # Log what we're about to save
-            logger.info(
-                f"Saving to Firestore - User: {user_id}, Role: {role.upper()}, Content: {content[:100]}..."
-                if len(content) > 100
-                else f"Saving to Firestore - User: {user_id}, Role: {role.upper()}, Content: {content}"
-            )
+            # logger.info(
+            #     f"Saving to Firestore - User: {user_id}, Role: {role.upper()}, Content: {content[:100]}..."
+            #     if len(content) > 100
+            #     else f"Saving to Firestore - User: {user_id}, Role: {role.upper()}, Content: {content}"
+            # )
 
             # Add to messages collection
             doc_ref = self.db.collection("messages").add(message_data)
-            logger.info(
-                f"Successfully saved message to Firestore with ID: {doc_ref[1].id}, Role: {role.upper()}"
-            )
+
+            # logger.info(
+            #     f"Successfully saved message to Firestore with ID: {doc_ref[1].id}, Role: {role.upper()}"
+            # )
+
             return True
 
         except Exception as e:

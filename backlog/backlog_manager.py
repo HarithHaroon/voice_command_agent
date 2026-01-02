@@ -170,10 +170,12 @@ class BacklogManager:
             )
 
             items = response.get("Items", [])
-            logger.info(
-                f"Found {len(items)} upcoming items for user {user_id} "
-                f"(next {hours_ahead} hours)"
-            )
+
+            # logger.info(
+            #     f"Found {len(items)} upcoming items for user {user_id} "
+            #     f"(next {hours_ahead} hours)"
+            # )
+
             return items
 
         except ClientError as e:
@@ -220,7 +222,8 @@ class BacklogManager:
 
                 due_items.append(item)
 
-        logger.info(f"Found {len(due_items)} due reminders for user {user_id}")
+        # logger.info(f"Found {len(due_items)} due reminders for user {user_id}")
+
         return due_items
 
     def update_reminded_timestamp(self, user_id: str, item_id: str) -> bool:
@@ -268,7 +271,9 @@ class BacklogManager:
             )
 
             items = response.get("Items", [])
+
             logger.info(f"Found {len(items)} active items for user {user_id}")
+
             return items
 
         except ClientError as e:
@@ -289,6 +294,7 @@ class BacklogManager:
         """
         # Get the item first
         item = self.get_item(user_id, item_id)
+
         if not item:
             raise ValueError(f"Item not found: {item_id}")
 
@@ -317,8 +323,10 @@ class BacklogManager:
 
         # If recurring, create next occurrence
         recurrence = item.get("recurrence", "once")
+
         if recurrence != "once":
             current_scheduled = datetime.fromisoformat(item["scheduled_time"])
+
             next_scheduled = self._calculate_next_occurrence(
                 current_scheduled, recurrence
             )
@@ -333,6 +341,7 @@ class BacklogManager:
             )
 
             result["next_item"] = next_item
+
             logger.info(
                 f"Created next occurrence for recurring item: {next_item['item_id']} "
                 f"scheduled for {next_scheduled.isoformat()}"
@@ -355,10 +364,13 @@ class BacklogManager:
         """
         if recurrence == "daily":
             return current_time + timedelta(days=1)
+
         elif recurrence == "weekly":
             return current_time + timedelta(weeks=1)
+
         elif recurrence == "monthly":
             return current_time + relativedelta(months=1)
+
         else:
             # Default to daily if unknown
             logger.warning(
@@ -381,6 +393,7 @@ class BacklogManager:
             First matching item or None
         """
         items = self.list_all_active(user_id)
+
         title_lower = title_search.lower()
 
         for item in items:
@@ -407,8 +420,11 @@ class BacklogManager:
             current_time = datetime.utcnow()
 
         today_start = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
+
         today_end = today_start + timedelta(days=1)
+
         tomorrow_end = today_start + timedelta(days=2)
+
         week_end = today_start + timedelta(days=7)
 
         if timeframe == "all":

@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+health_seed_001,health,"How am I doing today?","{""tool"": ""get_health_summary"", ""params"": {""period"": ""today""}}","{""description"": ""Basic health summary request""}"
+health_seed_002,health,"What's my blood pressure?","{""tool"": ""get_specific_metric"", ""params"": {""metric_type"": ""bloodPressure"", ""period"": ""today""}}","{""description"": ""Specific metric query""}"
+health_seed_003,health,"Good morning, how's my health today?","{""tool"": ""get_health_summary"", ""params"": {""period"": ""today""}}","{}"

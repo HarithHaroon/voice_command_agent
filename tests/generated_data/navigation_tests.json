@@ -1,0 +1,299 @@
+[
+  {
+    "id": "nav_seed_001",
+    "agent": "orchestrator",
+    "input": "Navigate to settings",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation command"
+    }
+  },
+  {
+    "id": "nav_seed_002",
+    "agent": "orchestrator",
+    "input": "Take me to medication",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "medication"
+      }
+    },
+    "metadata": {
+      "description": "Navigation with natural language"
+    }
+  },
+  {
+    "id": "nav_seed_003",
+    "agent": "orchestrator",
+    "input": "Go to health screen",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "health"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to health"
+    }
+  },
+  {
+    "id": "nav_seed_001_var_1",
+    "agent": "orchestrator",
+    "input": "Could you help me find the settings?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation command",
+      "generated": true,
+      "seed_id": "nav_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "nav_seed_001_var_2",
+    "agent": "orchestrator",
+    "input": "I’d like to go to the settings, please.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation command",
+      "generated": true,
+      "seed_id": "nav_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "nav_seed_001_var_3",
+    "agent": "orchestrator",
+    "input": "Can you take me to that place where I change things?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation command",
+      "generated": true,
+      "seed_id": "nav_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "nav_seed_001_var_4",
+    "agent": "orchestrator",
+    "input": "Navigate to the screen for adjustments, will you?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation command",
+      "generated": true,
+      "seed_id": "nav_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "nav_seed_001_var_5",
+    "agent": "orchestrator",
+    "input": "I need to check my settings, if that’s alright.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "settings"
+      }
+    },
+    "metadata": {
+      "description": "Basic navigation command",
+      "generated": true,
+      "seed_id": "nav_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "nav_seed_002_var_1",
+    "agent": "orchestrator",
+    "input": "Could you show me my meds?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "medication"
+      }
+    },
+    "metadata": {
+      "description": "Navigation with natural language",
+      "generated": true,
+      "seed_id": "nav_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "nav_seed_002_var_2",
+    "agent": "orchestrator",
+    "input": "I need to find my medication screen, please.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "medication"
+      }
+    },
+    "metadata": {
+      "description": "Navigation with natural language",
+      "generated": true,
+      "seed_id": "nav_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "nav_seed_002_var_3",
+    "agent": "orchestrator",
+    "input": "Take me to where I can see my pills.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "medication"
+      }
+    },
+    "metadata": {
+      "description": "Navigation with natural language",
+      "generated": true,
+      "seed_id": "nav_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "nav_seed_002_var_4",
+    "agent": "orchestrator",
+    "input": "I want to look at my medicines now.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "medication"
+      }
+    },
+    "metadata": {
+      "description": "Navigation with natural language",
+      "generated": true,
+      "seed_id": "nav_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "nav_seed_002_var_5",
+    "agent": "orchestrator",
+    "input": "Hey, can you get me to the spot for my meds, please?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "medication"
+      }
+    },
+    "metadata": {
+      "description": "Navigation with natural language",
+      "generated": true,
+      "seed_id": "nav_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "nav_seed_003_var_1",
+    "agent": "orchestrator",
+    "input": "Could you take me to the health screen, please?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "health"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to health",
+      "generated": true,
+      "seed_id": "nav_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "nav_seed_003_var_2",
+    "agent": "orchestrator",
+    "input": "I want to see my health info now.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "health"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to health",
+      "generated": true,
+      "seed_id": "nav_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "nav_seed_003_var_3",
+    "agent": "orchestrator",
+    "input": "Can you show me where my health things are?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "health"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to health",
+      "generated": true,
+      "seed_id": "nav_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "nav_seed_003_var_4",
+    "agent": "orchestrator",
+    "input": "Go to that health page, would you?",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "health"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to health",
+      "generated": true,
+      "seed_id": "nav_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "nav_seed_003_var_5",
+    "agent": "orchestrator",
+    "input": "Take me to the screen about my health, if you don’t mind.",
+    "expected": {
+      "tool": "navigate_to_screen",
+      "params": {
+        "target_screen": "health"
+      }
+    },
+    "metadata": {
+      "description": "Navigate to health",
+      "generated": true,
+      "seed_id": "nav_seed_003",
+      "variation_number": 5
+    }
+  }
+]

@@ -1,4 +1,12 @@
 ## BOOK READING & SEARCH
+
+**CONTEXT AWARENESS:**
+- "Keep going", "continue", "keep reading" → Use read_book with continue_reading=True
+- "It" or "the book" → Refers to the most recently mentioned book
+- Always maintain context of which book is being read
+
+---
+
 You have TWO book tools with different purposes:
 
 ### 1. read_book tool - For reading books aloud page by page:

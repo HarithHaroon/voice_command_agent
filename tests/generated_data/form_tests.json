@@ -1,0 +1,329 @@
+[
+  {
+    "id": "form_seed_001",
+    "agent": "form",
+    "input": "Create a reminder to call my son at 3pm",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "call my son",
+        "time": "15:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with time"
+    }
+  },
+  {
+    "id": "form_seed_002",
+    "agent": "form",
+    "input": "Remind me to take medication daily at 9am",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "take medication",
+        "time": "09:00",
+        "recurrence": "daily"
+      }
+    },
+    "metadata": {
+      "description": "Create recurring reminder"
+    }
+  },
+  {
+    "id": "form_seed_003",
+    "agent": "form",
+    "input": "Set a reminder for my dentist appointment tomorrow at 2pm",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "dentist appointment",
+        "date": "tomorrow",
+        "time": "14:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with date"
+    }
+  },
+  {
+    "id": "form_seed_001_var_1",
+    "agent": "form",
+    "input": "Can you remind me to give my son a ring at three this afternoon?",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "call my son",
+        "time": "15:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with time",
+      "generated": true,
+      "seed_id": "form_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "form_seed_001_var_2",
+    "agent": "form",
+    "input": "I need a nudge to call my boy at three o'clock, okay?",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "call my son",
+        "time": "15:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with time",
+      "generated": true,
+      "seed_id": "form_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "form_seed_001_var_3",
+    "agent": "form",
+    "input": "Please set a reminder for me to talk to my son around three.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "call my son",
+        "time": "15:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with time",
+      "generated": true,
+      "seed_id": "form_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "form_seed_001_var_4",
+    "agent": "form",
+    "input": "Hey, can you help me remember to call my son at 3? I don’t want to forget.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "call my son",
+        "time": "15:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with time",
+      "generated": true,
+      "seed_id": "form_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "form_seed_001_var_5",
+    "agent": "form",
+    "input": "Can you jot down a note to ring my son at three? Maybe I’ll forget if you don’t.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "call my son",
+        "time": "15:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with time",
+      "generated": true,
+      "seed_id": "form_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "form_seed_002_var_1",
+    "agent": "form",
+    "input": "Could you remind me to take my pills every day at 9 in the morning?",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "take medication",
+        "time": "09:00",
+        "recurrence": "daily"
+      }
+    },
+    "metadata": {
+      "description": "Create recurring reminder",
+      "generated": true,
+      "seed_id": "form_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "form_seed_002_var_2",
+    "agent": "form",
+    "input": "I need a nudge to take my meds daily at nine o'clock, please.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "take medication",
+        "time": "09:00",
+        "recurrence": "daily"
+      }
+    },
+    "metadata": {
+      "description": "Create recurring reminder",
+      "generated": true,
+      "seed_id": "form_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "form_seed_002_var_3",
+    "agent": "form",
+    "input": "Don’t forget to tell me to grab my medicine each day at 9 AM, okay?",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "take medication",
+        "time": "09:00",
+        "recurrence": "daily"
+      }
+    },
+    "metadata": {
+      "description": "Create recurring reminder",
+      "generated": true,
+      "seed_id": "form_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "form_seed_002_var_4",
+    "agent": "form",
+    "input": "Uh, can you help me remember my medication at nine? I don’t want to skip it.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "take medication",
+        "time": "09:00",
+        "recurrence": "daily"
+      }
+    },
+    "metadata": {
+      "description": "Create recurring reminder",
+      "generated": true,
+      "seed_id": "form_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "form_seed_002_var_5",
+    "agent": "form",
+    "input": "Hey, I need a reminder for my daily meds at around 9, if you don’t mind.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "take medication",
+        "time": "09:00",
+        "recurrence": "daily"
+      }
+    },
+    "metadata": {
+      "description": "Create recurring reminder",
+      "generated": true,
+      "seed_id": "form_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "form_seed_003_var_1",
+    "agent": "form",
+    "input": "Can you remind me about my dentist visit tomorrow at two?",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "dentist appointment",
+        "date": "tomorrow",
+        "time": "14:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with date",
+      "generated": true,
+      "seed_id": "form_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "form_seed_003_var_2",
+    "agent": "form",
+    "input": "Please set a reminder for my appointment with the tooth doctor at 2pm tomorrow.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "dentist appointment",
+        "date": "tomorrow",
+        "time": "14:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with date",
+      "generated": true,
+      "seed_id": "form_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "form_seed_003_var_3",
+    "agent": "form",
+    "input": "I need a nudge for my dental check-up, it’s at 2 o'clock tomorrow.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "dentist appointment",
+        "date": "tomorrow",
+        "time": "14:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with date",
+      "generated": true,
+      "seed_id": "form_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "form_seed_003_var_4",
+    "agent": "form",
+    "input": "Hey, remind me about my dentist thing tomorrow, it’s at twoish.",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "dentist appointment",
+        "date": "tomorrow",
+        "time": "14:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with date",
+      "generated": true,
+      "seed_id": "form_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "form_seed_003_var_5",
+    "agent": "form",
+    "input": "Could you help me remember my dentist appointment, it’s at two tomorrow, I think?",
+    "expected": {
+      "tool": "submit_reminder",
+      "params": {
+        "title": "dentist appointment",
+        "date": "tomorrow",
+        "time": "14:00"
+      }
+    },
+    "metadata": {
+      "description": "Create reminder with date",
+      "generated": true,
+      "seed_id": "form_seed_003",
+      "variation_number": 5
+    }
+  }
+]

@@ -1,0 +1,4 @@
+id,agent,input,expected,metadata
+nav_seed_001,orchestrator,"Navigate to settings","{""tool"": ""navigate_to_screen"", ""params"": {""target_screen"": ""settings""}}","{""description"": ""Basic navigation command""}"
+nav_seed_002,orchestrator,"Take me to medication","{""tool"": ""navigate_to_screen"", ""params"": {""target_screen"": ""medication""}}","{""description"": ""Navigation with natural language""}"
+nav_seed_003,orchestrator,"Go to health screen","{""tool"": ""navigate_to_screen"", ""params"": {""target_screen"": ""health""}}","{""description"": ""Navigate to health""}"

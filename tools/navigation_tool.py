@@ -13,11 +13,13 @@ logger = logging.getLogger(__name__)
 class NavigationTool(BaseTool):
     """Tool for handling navigation requests to Flutter client."""
 
-    def __init__(self, agent=None) -> None:
+    def __init__(self, navigation_state=None) -> None:
         super().__init__("navigation")
-        self.agent = agent
+
+        self.navigation_state = navigation_state
+
         logger.info(
-            f"NavigationTool initialized with agent: {id(agent) if agent else 'None'}"
+            f"NavigationTool initialized with navigation_state: {navigation_state is not None}"
         )
 
     def get_tool_methods(self) -> list:
@@ -51,10 +53,10 @@ class NavigationTool(BaseTool):
             )
 
             # Check NavigationState instead of navigation_context
-            if not self.agent or not hasattr(self.agent, "navigation_state"):
+            if not self.navigation_state:
                 return "Navigation state not available - agent not properly initialized"
 
-            nav_state = self.agent.navigation_state
+            nav_state = self.navigation_state
             if not nav_state.is_initialized():
                 return "Navigation state not available - no session data received"
 
@@ -102,13 +104,13 @@ class NavigationTool(BaseTool):
         Returns a dictionary with current_screen and a list of screen entries.
         """
         try:
-            if not self.agent or not hasattr(self.agent, "navigation_state"):
+            if not self.navigation_state:
                 return {
                     "success": False,
                     "error": "Navigation state not available",
                 }
 
-            nav_state = self.agent.navigation_state
+            nav_state = self.navigation_state
             if not nav_state.is_initialized():
                 return {"success": False, "error": "No session navigation data"}
 
@@ -140,13 +142,13 @@ class NavigationTool(BaseTool):
         with simple keyword scoring over route_name, display_name, and description.
         """
         try:
-            if not self.agent or not hasattr(self.agent, "navigation_state"):
+            if not self.navigation_state:
                 return {
                     "success": False,
                     "error": "Navigation state not available",
                 }
 
-            nav_state = self.agent.navigation_state
+            nav_state = self.navigation_state
             if not nav_state.is_initialized():
                 return {"success": False, "error": "No session navigation data"}
 

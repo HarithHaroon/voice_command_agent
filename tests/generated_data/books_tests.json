@@ -1,0 +1,299 @@
+[
+  {
+    "id": "books_seed_001",
+    "agent": "books",
+    "input": "Read Harry Potter to me",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "book_name": "Harry Potter"
+      }
+    },
+    "metadata": {
+      "description": "Request to read a book aloud"
+    }
+  },
+  {
+    "id": "books_seed_002",
+    "agent": "books",
+    "input": "Continue reading the book",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "continue_reading": true
+      }
+    },
+    "metadata": {
+      "description": "Continue from last position"
+    }
+  },
+  {
+    "id": "books_seed_003",
+    "agent": "books",
+    "input": "What does the book say about magic?",
+    "expected": {
+      "tool": "rag_books_tool",
+      "params": {
+        "query": "magic"
+      }
+    },
+    "metadata": {
+      "description": "Question about book content"
+    }
+  },
+  {
+    "id": "books_seed_001_var_1",
+    "agent": "books",
+    "input": "Could you read me that Harry Potter book?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "book_name": "Harry Potter"
+      }
+    },
+    "metadata": {
+      "description": "Request to read a book aloud",
+      "generated": true,
+      "seed_id": "books_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "books_seed_001_var_2",
+    "agent": "books",
+    "input": "I’d like to listen to Harry Potter, please.",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "book_name": "Harry Potter"
+      }
+    },
+    "metadata": {
+      "description": "Request to read a book aloud",
+      "generated": true,
+      "seed_id": "books_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "books_seed_001_var_3",
+    "agent": "books",
+    "input": "Hey, can you read that book about the boy wizard?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "book_name": "Harry Potter"
+      }
+    },
+    "metadata": {
+      "description": "Request to read a book aloud",
+      "generated": true,
+      "seed_id": "books_seed_001",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "books_seed_001_var_4",
+    "agent": "books",
+    "input": "Read me some of that Harry Potter story, would you?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "book_name": "Harry Potter"
+      }
+    },
+    "metadata": {
+      "description": "Request to read a book aloud",
+      "generated": true,
+      "seed_id": "books_seed_001",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "books_seed_001_var_5",
+    "agent": "books",
+    "input": "Can you put on Harry Potter for me?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "book_name": "Harry Potter"
+      }
+    },
+    "metadata": {
+      "description": "Request to read a book aloud",
+      "generated": true,
+      "seed_id": "books_seed_001",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "books_seed_002_var_1",
+    "agent": "books",
+    "input": "Can you keep reading that book for me?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "continue_reading": true
+      }
+    },
+    "metadata": {
+      "description": "Continue from last position",
+      "generated": true,
+      "seed_id": "books_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "books_seed_002_var_2",
+    "agent": "books",
+    "input": "I'd like to hear more of the story, please.",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "continue_reading": true
+      }
+    },
+    "metadata": {
+      "description": "Continue from last position",
+      "generated": true,
+      "seed_id": "books_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "books_seed_002_var_3",
+    "agent": "books",
+    "input": "Could you go back to the last chapter and read it again?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "continue_reading": true
+      }
+    },
+    "metadata": {
+      "description": "Continue from last position",
+      "generated": true,
+      "seed_id": "books_seed_002",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "books_seed_002_var_4",
+    "agent": "books",
+    "input": "Just read that book, okay?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "continue_reading": true
+      }
+    },
+    "metadata": {
+      "description": "Continue from last position",
+      "generated": true,
+      "seed_id": "books_seed_002",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "books_seed_002_var_5",
+    "agent": "books",
+    "input": "What was I saying? Oh right, could you continue with the book?",
+    "expected": {
+      "tool": "read_book",
+      "params": {
+        "continue_reading": true
+      }
+    },
+    "metadata": {
+      "description": "Continue from last position",
+      "generated": true,
+      "seed_id": "books_seed_002",
+      "variation_number": 5
+    }
+  },
+  {
+    "id": "books_seed_003_var_1",
+    "agent": "books",
+    "input": "Can you tell me what that book says about magic?",
+    "expected": {
+      "tool": "rag_books_tool",
+      "params": {
+        "query": "magic"
+      }
+    },
+    "metadata": {
+      "description": "Question about book content",
+      "generated": true,
+      "seed_id": "books_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "books_seed_003_var_2",
+    "agent": "books",
+    "input": "What does the story mention about... uh, magic?",
+    "expected": {
+      "tool": "rag_books_tool",
+      "params": {
+        "query": "magic"
+      }
+    },
+    "metadata": {
+      "description": "Question about book content",
+      "generated": true,
+      "seed_id": "books_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "books_seed_003_var_3",
+    "agent": "books",
+    "input": "Hey, what’s the book got to say about that magic stuff?",
+    "expected": {
+      "tool": "rag_books_tool",
+      "params": {
+        "query": "magic"
+      }
+    },
+    "metadata": {
+      "description": "Question about book content",
+      "generated": true,
+      "seed_id": "books_seed_003",
+      "variation_number": 3
+    }
+  },
+  {
+    "id": "books_seed_003_var_4",
+    "agent": "books",
+    "input": "Could you look up what the book says on magic, please?",
+    "expected": {
+      "tool": "rag_books_tool",
+      "params": {
+        "query": "magic"
+      }
+    },
+    "metadata": {
+      "description": "Question about book content",
+      "generated": true,
+      "seed_id": "books_seed_003",
+      "variation_number": 4
+    }
+  },
+  {
+    "id": "books_seed_003_var_5",
+    "agent": "books",
+    "input": "I’m curious, what’s in the book regarding magic?",
+    "expected": {
+      "tool": "rag_books_tool",
+      "params": {
+        "query": "magic"
+      }
+    },
+    "metadata": {
+      "description": "Question about book content",
+      "generated": true,
+      "seed_id": "books_seed_003",
+      "variation_number": 5
+    }
+  }
+]

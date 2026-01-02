@@ -1,0 +1,129 @@
+"""
+Conversation report formatter.
+Generates human-readable reports for multi-turn conversation tests.
+"""
+
+import logging
+from datetime import datetime
+
+from tests.core.interfaces import IReportFormatter, ConversationResult, TestContext
+
+logger = logging.getLogger(__name__)
+
+
+class ConversationFormatter(IReportFormatter):
+    """Formats conversation test results as Markdown"""
+
+    @property
+    def file_extension(self) -> str:
+        return "md"
+
+    async def format(self, result: ConversationResult, context: TestContext) -> str:
+        """Generate Markdown report from conversation result"""
+
+        sections = [
+            self._generate_header(result, context),
+            self._generate_summary(result),
+            self._generate_turn_results(result),
+            self._generate_footer(),
+        ]
+
+        return "\n\n".join(filter(None, sections))
+
+    def _generate_header(self, result: ConversationResult, context: TestContext) -> str:
+        """Generate report header"""
+        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+
+        return f"""# Conversation Test Report: {result.test_name}
+
+**Date:** {timestamp}  
+**Scenario ID:** {result.test_id}  
+**Description:** {result.details.get('description', 'N/A')}  
+**Mode:** {context.mode}
+
+---"""
+
+    def _generate_summary(self, result: ConversationResult) -> str:
+        """Generate summary section"""
+        status_emoji = "✅" if result.passed else "❌"
+
+        lines = ["## 📊 Summary", ""]
+        lines.append("| Metric | Value |")
+        lines.append("|--------|-------|")
+        lines.append(f"| **Status** | {status_emoji} {result.status.value.upper()} |")
+        lines.append(f"| **Total Turns** | {result.total_turns} |")
+        lines.append(f"| **Passed Turns** | {result.passed_turns} ✅ |")
+        lines.append(f"| **Failed Turns** | {result.failed_turns} ❌ |")
+        lines.append(f"| **Overall Score** | {result.overall_score:.1f}% |")
+        lines.append(f"| **Total Duration** | {result.duration_ms:.0f}ms |")
+
+        return "\n".join(lines)
+
+    def _generate_turn_results(self, result: ConversationResult) -> str:
+        """Generate turn-by-turn results"""
+        lines = ["## 💬 Turn-by-Turn Results", ""]
+
+        for i, turn_result in enumerate(result.turn_results, 1):
+            status_emoji = "✅" if turn_result.passed else "❌"
+
+            lines.append(f"### Turn {i}: {status_emoji}")
+            lines.append(f'**Input:** "{turn_result.test_input}"')
+            lines.append(f"**Score:** {turn_result.score:.1f}/100")
+            lines.append(f"**Duration:** {turn_result.duration_ms:.0f}ms")
+            lines.append("")
+
+            # Show expected vs actual
+            expected = turn_result.details.get("expected", {})
+            lines.append("**Expected:**")
+            if expected.get("agent"):
+                lines.append(f"  - Agent: {expected['agent']}")
+            if expected.get("tool"):
+                lines.append(f"  - Tool: {expected['tool']}")
+            if expected.get("params"):
+                lines.append(f"  - Params: {expected['params']}")
+
+            lines.append("")
+            lines.append("**Actual:**")
+            lines.append(f"  - Agent Path: {turn_result.details.get('agent_path', [])}")
+            lines.append(
+                f"  - Tools Called: {turn_result.details.get('tools_called', [])}"
+            )
+            lines.append(
+                f"  - Tool Params: {turn_result.details.get('tool_params', {})}"
+            )
+
+            # Show context check if present
+            context_check = turn_result.details.get("context_check")
+            if context_check:
+                lines.append("")
+                lines.append(f"**Context Check:** {context_check}")
+
+            # Show tester results for failures
+            if not turn_result.passed:
+                lines.append("")
+                lines.append("**Test Results:**")
+                tester_results = turn_result.details.get("tester_results", {})
+                for tester_name, tester_result in tester_results.items():
+                    if not tester_result.get("passed", False):
+                        lines.append(f"  - {tester_name.title()}: ❌ FAIL")
+                        if "error" in tester_result:
+                            lines.append(f"    - {tester_result['error']}")
+
+            # Show response snippet
+            response = turn_result.details.get("response", "")
+            if response:
+                response_preview = (
+                    response[:150] + "..." if len(response) > 150 else response
+                )
+                lines.append("")
+                lines.append(f"**Response:** {response_preview}")
+
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+
+        return "\n".join(lines)
+
+    def _generate_footer(self) -> str:
+        """Generate report footer"""
+        return "---\n\n*Generated by Multi-Agent Voice Assistant Test Framework - Conversation Testing*"
