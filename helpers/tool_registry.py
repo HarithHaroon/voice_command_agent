@@ -10,6 +10,8 @@ from clients.firebase_client import FirebaseClient
 from backlog.backlog_manager import BacklogManager
 from clients.health_data_client import HealthDataClient
 from tools.health_query_tool import HealthQueryTool
+from clients.memory_client import MemoryClient
+
 
 if TYPE_CHECKING:
     from tools.tool_manager import ToolManager
@@ -27,6 +29,7 @@ class ToolRegistry:
         navigation_state: "NavigationState",
         firebase_client: "FirebaseClient",
         backlog_manager: "BacklogManager",
+        memory_client: "MemoryClient",  # ADD THIS LINE
     ) -> None:
         """
         Register all available tools with the tool manager.
@@ -68,6 +71,7 @@ class ToolRegistry:
         from tools.medication_tools.request_refill_tool import RequestRefillTool
         from tools.medication_tools.edit_medication_tool import EditMedicationTool
         from tools.medication_tools.delete_medication_tool import DeleteMedicationTool
+        from tools.memory_tool import MemoryTool
 
         # Navigation tool
         navigation_tool = NavigationTool(navigation_state=navigation_state)
@@ -202,5 +206,9 @@ class ToolRegistry:
         delete_medication_tool = DeleteMedicationTool()
 
         tool_manager.register_tool(delete_medication_tool)
+
+        memory_tool = MemoryTool(memory_client=memory_client)
+
+        tool_manager.register_tool(memory_tool)
 
         logger.info("✅ Registered medication tools")

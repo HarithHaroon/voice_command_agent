@@ -216,3 +216,21 @@ class OrchestratorAgent(Agent):
 
         # Return message that preserves context
         return (agent, f"Continuing with medication request: {reason}")
+
+    @function_tool
+    async def handoff_to_memory_agent(self, reason: str = "") -> tuple:
+        """
+        Transfer to memory specialist for personal information and item tracking.
+        Use for: remembering item locations, storing/recalling information, daily activities.
+        """
+        from agents.memory_agent import MemoryAgent
+
+        self.shared_state.is_transitioning = True
+
+        agent = MemoryAgent(
+            self.shared_state, instructions=self.shared_state.agent_prompts.memory
+        )
+
+        logger.info(f"🔀 Orchestrator → MemoryAgent: {reason}")
+
+        return (agent, "Routing to memory specialist")

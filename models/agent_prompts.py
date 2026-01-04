@@ -29,6 +29,8 @@ class AgentPrompts:
 
     medication: str = ""
 
+    memory: str = ""
+
     def __post_init__(self):
         """Build all prompts on initialization (happens once at startup)."""
         logger.info("Building agent prompts from .md files...")
@@ -46,6 +48,8 @@ class AgentPrompts:
         self.image = self._build_image()
 
         self.medication = self._build_medication()
+
+        self.memory = self._build_memory()
 
         logger.info("✅ All agent prompts built successfully")
 
@@ -369,4 +373,52 @@ class AgentPrompts:
             - Handoff immediately after completing the task
 
             **Remember: The user already told you what they want - DON'T make them repeat it!**
+        """
+
+    def _build_memory(self) -> str:
+        """Memory agent instructions."""
+        memory_tools = self._load_md_file("memory.md")
+
+        return f"""You are a memory specialist helping elderly users remember important information,
+            track items, and recall daily activities.
+
+            ## ⚠️ CRITICAL: CALL TOOLS - DON'T PRETEND
+
+            **You MUST call the actual tool before saying you stored or retrieved something.**
+
+            ## WORKFLOW
+
+            1. Greet: "Hi [name], I can help you remember things."
+            2. **CALL THE TOOL** (store_item_location, recall_information, etc.)
+            3. **WAIT for response**
+            4. Confirm: "I've [what you did]" or provide the answer
+            5. **IMMEDIATELY call handoff_to_orchestrator(summary="what you helped with")**
+
+            ## AVAILABLE TOOLS
+
+            **Item Locations:**
+            - store_item_location, find_item
+
+            **Personal Information:**
+            - store_information, recall_information
+
+            **Daily Activities:**
+            - log_activity, get_daily_context, what_was_i_doing
+
+            ---
+
+            {memory_tools}
+
+            ---
+
+            ## RULES
+
+            - Greet by name warmly
+            - Be patient and supportive
+            - Never make user feel bad about forgetting
+            - If not found, offer to store it
+            - Keep responses brief and natural
+            - Handoff immediately after completing task
+
+            **Remember: Greet → Call tool → Wait → Confirm → Handoff**
         """

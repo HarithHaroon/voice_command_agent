@@ -25,6 +25,7 @@ from clients.health_data_client import HealthDataClient
 from backlog.backlog_manager import BacklogManager
 from helpers.tool_registry import ToolRegistry
 from agents.orchestrator_agent import OrchestratorAgent
+from clients.memory_client import MemoryClient
 
 dotenv.load_dotenv(".env.local")
 
@@ -89,11 +90,18 @@ async def entrypoint(ctx: agents.JobContext):
 
     # Initialize shared components
     navigation_state = NavigationState()
+
     time_tracker = ClientTimeTracker()
+
     tool_manager = ToolManager()
+
     firebase_client = FirebaseClient()
+
     health_client = HealthDataClient()
+
     backlog_manager = BacklogManager()
+
+    memory_client = MemoryClient()
 
     # Register all tools
     ToolRegistry.register_all_tools(
@@ -101,6 +109,7 @@ async def entrypoint(ctx: agents.JobContext):
         navigation_state=navigation_state,
         firebase_client=firebase_client,
         backlog_manager=backlog_manager,
+        memory_client=memory_client,
     )
 
     logger.info(f"✅ Registered {tool_manager.get_tool_count()} tools")

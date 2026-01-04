@@ -11,7 +11,7 @@ from typing import Dict, Any, List, Optional
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms
 from cryptography.hazmat.backends import default_backend
 import requests
 from dotenv import load_dotenv
