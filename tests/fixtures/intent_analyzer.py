@@ -16,10 +16,12 @@ class IntentAnalyzer:
         "health": "Health metrics, vitals, wellness, blood pressure, heart rate, steps, sleep",
         "backlog": "General reminders and tasks (NOT medications) - groceries, calls, appointments, to-dos",
         "medication": "ALL medication requests - add/view/edit/delete medications, take pills, dose tracking, refills, prescriptions",
+        "memory": "Storing/finding item locations, personal information, daily activities - where are my keys, remember my doctor, I just had lunch",
+        "story": "Recording and retrieving life stories, memories, family history - tell a story, find stories about childhood, my wedding story",  # ← ADD THIS
         "settings": "Device configuration, fall detection, location tracking",
         "books": "Read books aloud, play books, answer questions about book content",
         "image": "Search for photos",
-        "orchestrator": "Navigation between screens, video calls, memory recall",
+        "orchestrator": "Navigation between screens, video calls, conversation recall",
     }
 
     SYSTEM_PROMPT = """You are a routing assistant. Analyze the user's request and determine which specialist should handle it.
@@ -28,23 +30,38 @@ class IntentAnalyzer:
         - health: {health}
         - backlog: {backlog}
         - medication: {medication}
+        - memory: {memory}
         - settings: {settings}
         - books: {books}
         - image: {image}
         - orchestrator: {orchestrator}
 
         CRITICAL ROUTING RULES:
-        1. ANY mention of medications, pills, prescriptions, doses → "medication"
-        Examples: "add my medication", "remind me to take pills", "I took my Lisinopril"
-        
-        2. General reminders (groceries, calls, tasks) → "backlog"
-        Examples: "remind me to call mom", "buy groceries", "water plants"
-        
-        3. Navigation requests → "orchestrator"
-        Examples: "go to settings", "navigate to health", "take me to medications screen"
-        Even if mentioning a specialist area, NAVIGATION = orchestrator
+        1. Memory requests (storing/finding items, personal info, activities) → "memory"
+        - Storing locations: "I put X on Y", "my keys are on the table"
+        - Finding items: "where are my X?"
+        - Storing facts: "remember X is Y", "my doctor is Dr. Smith", "I'm allergic to X", "trash day is Tuesday"
+        - Recalling facts: "what's my X?", "what am I allergic to?"
+        - Logging activities: "I just had lunch", "my daughter visited"
 
-        Respond ONLY with the specialist name (e.g., "health", "medication", "backlog").
+        2. Story requests (recording life stories, retrieving memories) → "story"
+        Examples: "I want to tell a story", "tell me about when I was young", "record my memory", "find my childhood stories"
+        
+        3. ANY mention of medications, pills, prescriptions, doses → "medication"
+        Examples: "add my medication", "remind me to take pills"
+        
+        4. FUTURE reminders (groceries, calls, tasks) → "backlog"
+        Examples: "remind me to call mom tomorrow", "don't let me forget to buy groceries"
+        NOT: "trash day is Tuesday" (that's storing a FACT = memory)
+        
+        5. Health DATA queries (metrics, readings) → "health"
+        Examples: "what's my blood pressure?", "how many steps today?"
+        NOT: "what am I allergic to?" (that's recalling a FACT = memory)
+        
+        6. Navigation requests → "orchestrator"
+        Examples: "go to settings", "navigate to health"
+
+        Respond ONLY with the specialist name.
     """
 
     def __init__(self, client: openai.AsyncOpenAI):

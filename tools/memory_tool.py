@@ -17,6 +17,7 @@ class MemoryTool(ServerSideTool):
 
     def __init__(self, memory_client: MemoryClient):
         super().__init__("memory")
+
         self.memory_client = memory_client
 
         self._user_id = None

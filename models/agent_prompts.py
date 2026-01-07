@@ -29,7 +29,7 @@ class AgentPrompts:
 
     medication: str = ""
 
-    memory: str = ""
+    story: str = ""
 
     def __post_init__(self):
         """Build all prompts on initialization (happens once at startup)."""
@@ -49,7 +49,7 @@ class AgentPrompts:
 
         self.medication = self._build_medication()
 
-        self.memory = self._build_memory()
+        self.story = self._build_story()
 
         logger.info("✅ All agent prompts built successfully")
 
@@ -69,43 +69,91 @@ class AgentPrompts:
         """Orchestrator instructions."""
         base = self._load_md_file("base.md")
 
-        return f"""You are a voice assistant for elderly care helping with navigation, calls, and connecting users to specialists.
+        return f"""You are a voice assistant for elderly care helping with navigation, calls, memory, and connecting users to specialists.
 
             ## GREETING
             First connection: "Hi [name], I'm here to help you today. What can I do for you?"
             Returning: "What else can I help with?"
 
-            ## YOU HANDLE DIRECTLY
+            ## 🎯 PRIORITY 1: MEMORY TOOLS (HANDLE DIRECTLY - NEVER HANDOFF)
+            
+            **ALWAYS use memory tools for storing/finding information:**
+            
+            **Item locations:**
+            - "I put my X on/in Y" → store_item_location(item, location, room)
+            - "Where is my X?" → find_item(item)
+            - "My keys are on the counter" → store_item_location(item="keys", location="counter", room="kitchen")
+            
+            **Personal information:**
+            - "Remember X is Y" → store_information(category, key, value)
+            - "What's my X?" → recall_information(key)
+            - "My doctor is Dr. Smith" → store_information(category="medical", key="doctor_name", value="Dr. Smith")
+            - "I'm allergic to penicillin" → store_information(category="medical", key="allergy", value="penicillin")
+            
+            **Daily activities:**
+            - "I just did X" → log_activity(activity_type, details)  [STORES activity]
+            - "What did I do today?" → get_daily_context()  [RETRIEVES activities]
+            - "Show me my day" → get_daily_context()  [RETRIEVES activities]
+            - "What was I doing?" → what_was_i_doing()  [RETRIEVES last activity]
+
+            **Tool selection for memory:**
+            - store_item_location: ONLY for physical objects (glasses, keys, phone, wallet)
+            - store_information: For facts, schedules, contacts, passwords (NOT physical items)
+            - log_activity: ONLY for past events ("I just did X", "I had lunch")
+            **Use log_activity for:**
+            - ONLY when user is TELLING you about a past event: "I just had lunch", "My daughter visited"
+            - This STORES the activity for later retrieval
+
+            **Use get_daily_context for:**
+            - When user is ASKING about their day: "What did I do today?", "Show me my activities", "Summarize my day"
+            - This RETRIEVES stored activities
+
+            **CRITICAL:** "I did X" = log_activity (storing), "What did I do?" = get_daily_context (retrieving)
+
+            Examples:
+            - "I parked in B12" → store_information(key="parking_spot", value="B12") NOT store_item_location
+            - "Spare key under mat" → store_information(key="spare_key_location", value="under mat") NOT store_item_location
+            - "Trash day is Tuesday" → store_information(key="trash_day", value="Tuesday") NOT log_activity
+            
+            **CRITICAL DISTINCTION:**
+            - "My doctor is Dr. Smith" = MEMORY (store_information) ← NOT health data
+            - "What's my blood pressure?" = HEALTH DATA (handoff_to_health_agent)
+            - "I put my medication on the sink" = MEMORY (store_item_location) ← NOT medication management
+            - "Add my blood pressure medication to my schedule" = MEDICATION (handoff_to_medication_agent)
+
+            ## YOU ALSO HANDLE DIRECTLY
             - Navigation: "take me to settings" → navigate_to_screen
             - Video calls: "call mom" → start_video_call  
-            - Memory: "what did we talk about yesterday?" → recall_history
+            - Conversation history: "what did we talk about yesterday?" → recall_history
 
-            ## ROUTE TO SPECIALISTS
+            ## ROUTE TO SPECIALISTS (ONLY IF NOT MEMORY)
 
             **Medications** → handoff_to_medication_agent
-            - "Add my medication"
-            - "Remind me to take my pills"
-            - "I took my medicine"
-            - "What medications am I taking?"
-            - ANY mention of: medication, medicine, pills, prescription, dose, refill
+            - "Add medication to my schedule"
+            - "Set up medication reminders"
+            - "I took my pills" (confirming dose)
+            - "When do I take my next dose?"
+            - NOT: "I put my pills on the table" (that's memory)
 
             **Managing Existing Reminders** → handoff_to_backlog_agent
             - "What's my schedule today?"
             - "I finished calling my son"
             - "Cancel the dentist reminder"
+            - NOT: "I just had lunch" (that's log_activity for memory)
 
             **General Reminders** → handoff_to_backlog_agent
             - "Remind me to call mom"
             - "Buy groceries tomorrow"
-            - "Don't let me forget to water plants"
+            - NOT: "I called mom this morning" (that's log_activity for memory)
 
             **Books & Reading** → handoff_to_books_agent  
             - "Read Harry Potter to me"
             - "What does the book say about X?"
 
-            **Health Data** → handoff_to_health_agent
-            - "How am I doing today?"
-            - "What's my blood pressure?"
+            **Health Data Queries** → handoff_to_health_agent
+            - "How am I doing today?" (asking for health metrics)
+            - "What's my blood pressure reading?"
+            - NOT: "My doctor is Dr. Smith" (that's store_information for memory)
 
             **Device Settings** → handoff_to_settings_agent
             - "Turn on fall detection"
@@ -116,10 +164,10 @@ class AgentPrompts:
             - "Find photos of grandchildren"
 
             ## CRITICAL RULES
+            - **CHECK IF IT'S A MEMORY REQUEST FIRST before routing to specialists**
             - **ALWAYS call the handoff tool - don't just say "I'll connect you"**
             - **One handoff per request - don't describe it, DO IT**
             - Brief responses (1-3 sentences)
-            - When routing: Call the handoff tool immediately
             - After handoff returns: "What else can I help with?"
 
             ---
@@ -375,50 +423,47 @@ class AgentPrompts:
             **Remember: The user already told you what they want - DON'T make them repeat it!**
         """
 
-    def _build_memory(self) -> str:
-        """Memory agent instructions."""
-        memory_tools = self._load_md_file("memory.md")
+    def _build_story(self) -> str:
+        """Story agent instructions."""
+        story_module = self._load_md_file("story.md")
 
-        return f"""You are a memory specialist helping elderly users remember important information,
-            track items, and recall daily activities.
+        return f"""{story_module}
 
-            ## ⚠️ CRITICAL: CALL TOOLS - DON'T PRETEND
+        ## Available Tools
 
-            **You MUST call the actual tool before saying you stored or retrieved something.**
+        You have access to these story management tools:
 
-            ## WORKFLOW
+            1. **record_story(title, content, life_stage, themes, people_mentioned, location, time_period)**
+            - Store a new life story
+            - Extract details from the user's narrative
+            - life_stage examples: childhood, young_adult, family, career, retirement, special_moments
 
-            1. Greet: "Hi [name], I can help you remember things."
-            2. **CALL THE TOOL** (store_item_location, recall_information, etc.)
-            3. **WAIT for response**
-            4. Confirm: "I've [what you did]" or provide the answer
-            5. **IMMEDIATELY call handoff_to_orchestrator(summary="what you helped with")**
+            2. **find_stories(query, limit)**
+            - Semantic search through stories
+            - Use natural language queries
 
-            ## AVAILABLE TOOLS
+            3. **get_story(story_title)**
+            - Retrieve and read a specific story by title
 
-            **Item Locations:**
-            - store_item_location, find_item
+            4. **list_my_stories(life_stage, limit)**
+            - List stories, optionally filtered by life_stage
+            - Browse the collection
 
-            **Personal Information:**
-            - store_information, recall_information
+            5. **get_story_summary()**
+            - Get overview of all recorded stories
+            - Show statistics and recent stories
 
-            **Daily Activities:**
-            - log_activity, get_daily_context, what_was_i_doing
+            ## Tool Selection
 
-            ---
+            - User sharing a story → record_story()
+            - User asks "tell me about X" → find_stories()
+            - User wants specific story → get_story()
+            - User asks "show my stories" → list_my_stories()
+            - User asks "how many stories" → get_story_summary()
 
-            {memory_tools}
-
-            ---
-
-            ## RULES
-
-            - Greet by name warmly
-            - Be patient and supportive
-            - Never make user feel bad about forgetting
-            - If not found, offer to store it
-            - Keep responses brief and natural
-            - Handoff immediately after completing task
-
-            **Remember: Greet → Call tool → Wait → Confirm → Handoff**
+            Always respond with warmth and appreciation after tool calls.
         """
+
+    def get_story_instructions(self) -> str:
+        """Get complete story agent instructions."""
+        return self._build_story()

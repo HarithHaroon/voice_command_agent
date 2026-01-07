@@ -106,16 +106,13 @@ class EmotionHandler:
                 logger.info(f"⏸️ Skipping check-in - no session")
                 return
 
-            # Check if session is running
-            if not hasattr(self.session, "_started") or not self.session._started:
-                logger.info(f"⏸️ Skipping check-in - session not running")
-                return
-
             # NEW: Check if speech scheduling is available
             if hasattr(self.session, "_speech_state"):
                 speech_state = getattr(self.session, "_speech_state", None)
+
                 if speech_state and speech_state in ["draining", "paused", "pausing"]:
                     logger.info(f"⏸️ Skipping check-in - speech is {speech_state}")
+
                     return
 
             logger.info(f"🎤 Speaking check-in: {check_in_message}")
@@ -132,18 +129,26 @@ class EmotionHandler:
             )
 
         except RuntimeError as e:
-            if "isn't running" in str(e) or "speech scheduling" in str(
-                e
-            ):  # ← Also catch speech scheduling errors
+            if "isn't running" in str(e) or "speech scheduling" in str(e):
                 logger.info(f"⏸️ Session not ready, skipping check-in")
             else:
                 logger.error(f"❌ Error speaking check-in: {e}")
 
+            # Reset waiting state on error
+            self.waiting_for_response = False
+
+            self.check_in_question = None
+
         except Exception as e:
-            if "speech scheduling" in str(e):  # ← Catch the specific error
+            if "speech scheduling" in str(e):
                 logger.info(f"⏸️ Speech paused, skipping check-in")
             else:
                 logger.error(f"❌ Error speaking check-in: {e}")
+
+            # Reset waiting state on error
+            self.waiting_for_response = False
+
+            self.check_in_question = None
 
     def track_user_response(self, user_message: str) -> None:
         """

@@ -5,12 +5,12 @@ logger = logging.getLogger(__name__)
 
 def extract_user_id(room_name: str) -> str:
     """
-    Extract user_id from room name format: room_{userId}_{userName}
+    Extract user_id from room name format: room_{userId}_{userName}_{timestamp}
 
-    Example: room_user_20250601111146_bc2d2766-bac9-4271-89d9-9b15c33cab8a_Harith
+    Example: room_user_20250601111146_bc2d2766-bac9-4271-89d9-9b15c33cab8a_Harith_1704384000000
     Result: user_20250601111146_bc2d2766-bac9-4271-89d9-9b15c33cab8a
 
-    Note: userId can contain underscores, userName cannot
+    Note: userId can contain underscores, userName and timestamp cannot
     """
     logger.info(f"🔍 FULL ROOM NAME: {room_name}")
 
@@ -24,20 +24,23 @@ def extract_user_id(room_name: str) -> str:
 
     logger.info(f"After removing 'room_': {rest}")
 
-    # Split from the RIGHT by last underscore to separate userName
-    # Format: {userId}_{userName}
-    # userName is everything after the LAST underscore
-    parts = rest.rsplit("_", 1)
+    # Split from the RIGHT by last 2 underscores to separate timestamp and userName
+    # Format: {userId}_{userName}_{timestamp}
+    parts = rest.rsplit("_", 2)
 
-    if len(parts) != 2:
-        logger.warning(f"❌ Could not parse room name (no userName found): {room_name}")
+    if len(parts) != 3:
+        logger.warning(f"❌ Could not parse room name (expected 3 parts): {room_name}")
 
         return None
 
-    user_id = parts[0]  # Everything before last underscore
+    user_id = parts[0]
 
-    user_name = parts[1]  # Everything after last underscore
+    user_name = parts[1]
 
-    logger.info(f"✅ Extracted user_id: {user_id}, userName: {user_name}")
+    timestamp = parts[2]
+
+    logger.info(
+        f"✅ Extracted user_id: {user_id}, userName: {user_name}, timestamp: {timestamp}"
+    )
 
     return user_id

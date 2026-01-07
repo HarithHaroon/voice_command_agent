@@ -212,13 +212,19 @@ async def _generate_tests(
     default="tests/reports",
     help="Output directory for reports",
 )
-def test(agent, mode, test_file, config, output):
+@click.option(
+    "--limit",
+    default=None,
+    type=int,
+    help="Limit number of tests to run (for debugging)",
+)
+def test(agent, mode, test_file, config, output, limit):
     """Run tests for a specific agent"""
-    asyncio.run(_run_tests(agent, mode, test_file, config, output))
+    asyncio.run(_run_tests(agent, mode, test_file, config, output, limit))
 
 
 async def _run_tests(
-    agent: str, mode: str, test_file: str, config_path: str, output_dir: str
+    agent: str, mode: str, test_file: str, config_path: str, output_dir: str, limit: int
 ):
     """Async test execution"""
     try:
@@ -226,6 +232,7 @@ async def _run_tests(
 
         # Load configuration
         config_manager = ConfigManager(config_path)
+
         config_manager.load()
 
         # Default test file path
@@ -241,15 +248,25 @@ async def _run_tests(
 
         # Load test cases
         storage = JSONStorage()
+
         test_cases = await storage.load(test_file)
+
+        # Apply limit if specified
+        if limit is not None:
+            test_cases = test_cases[:limit]
+
+            logger.info(f"Limited to {limit} test cases")
+
         logger.info(f"Loaded {len(test_cases)} test cases from {test_file}")
 
         # Initialize adapter
         from tests.fixtures.multi_agent_adapter import MultiAgentAdapter
 
         click.echo(f"🔧 Initializing multi-agent system...")
+
         adapter = MultiAgentAdapter()
         await adapter.initialize(user_id="test_user_123")
+
         click.echo(f"✅ Agent system initialized")
 
         # Create test context

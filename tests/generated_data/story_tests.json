@@ -1,0 +1,332 @@
+[
+  {
+    "id": "story_seed_001",
+    "agent": "story",
+    "input": "I want to record a story about my childhood",
+    "expected": {
+      "tool": "record_story",
+      "params": {
+        "title": "childhood story",
+        "content": "story content",
+        "life_stage": "childhood"
+      }
+    },
+    "metadata": {
+      "description": "Record childhood story"
+    }
+  },
+  {
+    "id": "story_seed_002",
+    "agent": "story",
+    "input": "Tell me about my wedding day story",
+    "expected": {
+      "tool": "get_story",
+      "params": {
+        "story_title": "wedding day"
+      }
+    },
+    "metadata": {
+      "description": "Get specific story by topic"
+    }
+  },
+  {
+    "id": "story_seed_003",
+    "agent": "story",
+    "input": "Show me all my stories",
+    "expected": {
+      "tool": "list_my_stories",
+      "params": {}
+    },
+    "metadata": {
+      "description": "List all stories"
+    }
+  },
+  {
+    "id": "story_seed_004",
+    "agent": "story",
+    "input": "How many stories have I recorded?",
+    "expected": {
+      "tool": "get_story_summary",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get story summary"
+    }
+  },
+  {
+    "id": "story_seed_005",
+    "agent": "story",
+    "input": "Find stories about my childhood",
+    "expected": {
+      "tool": "find_stories",
+      "params": {
+        "query": "childhood"
+      }
+    },
+    "metadata": {
+      "description": "Find childhood stories"
+    }
+  },
+  {
+    "id": "story_seed_006",
+    "agent": "story",
+    "input": "Read me the story about my first job",
+    "expected": {
+      "tool": "get_story",
+      "params": {
+        "story_title": "my first job"
+      }
+    },
+    "metadata": {
+      "description": "Get specific story"
+    }
+  },
+  {
+    "id": "story_seed_007",
+    "agent": "story",
+    "input": "Show me my family stories",
+    "expected": {
+      "tool": "list_my_stories",
+      "params": {
+        "life_stage": "family"
+      }
+    },
+    "metadata": {
+      "description": "List family stories"
+    }
+  },
+  {
+    "id": "story_seed_001_var_1",
+    "agent": "story",
+    "input": "I'd like to tell you a bit about when I was a kid and save that as a story.",
+    "expected": {
+      "tool": "record_story",
+      "params": {
+        "title": "childhood story",
+        "content": "story content",
+        "life_stage": "childhood"
+      }
+    },
+    "metadata": {
+      "description": "Record childhood story",
+      "generated": true,
+      "seed_id": "story_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_001_var_2",
+    "agent": "story",
+    "input": "Can you help me record a tale from my younger days, please?",
+    "expected": {
+      "tool": "record_story",
+      "params": {
+        "title": "childhood story",
+        "content": "story content",
+        "life_stage": "childhood"
+      }
+    },
+    "metadata": {
+      "description": "Record childhood story",
+      "generated": true,
+      "seed_id": "story_seed_001",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "story_seed_002_var_1",
+    "agent": "story",
+    "input": "Can you share my wedding day tale?",
+    "expected": {
+      "tool": "get_story",
+      "params": {
+        "story_title": "wedding day"
+      }
+    },
+    "metadata": {
+      "description": "Get specific story by topic",
+      "generated": true,
+      "seed_id": "story_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_002_var_2",
+    "agent": "story",
+    "input": "I'd love to hear about my wedding day, please.",
+    "expected": {
+      "tool": "get_story",
+      "params": {
+        "story_title": "wedding day"
+      }
+    },
+    "metadata": {
+      "description": "Get specific story by topic",
+      "generated": true,
+      "seed_id": "story_seed_002",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "story_seed_003_var_1",
+    "agent": "story",
+    "input": "Can you tell me about all the stories I’ve shared?",
+    "expected": {
+      "tool": "list_my_stories",
+      "params": {}
+    },
+    "metadata": {
+      "description": "List all stories",
+      "generated": true,
+      "seed_id": "story_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_003_var_2",
+    "agent": "story",
+    "input": "I’d like to see my stories, please.",
+    "expected": {
+      "tool": "list_my_stories",
+      "params": {}
+    },
+    "metadata": {
+      "description": "List all stories",
+      "generated": true,
+      "seed_id": "story_seed_003",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "story_seed_004_var_1",
+    "agent": "story",
+    "input": "Can you tell me how many stories I’ve recorded so far?",
+    "expected": {
+      "tool": "get_story_summary",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get story summary",
+      "generated": true,
+      "seed_id": "story_seed_004",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_004_var_2",
+    "agent": "story",
+    "input": "I was wondering, how many tales have I shared with you?",
+    "expected": {
+      "tool": "get_story_summary",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get story summary",
+      "generated": true,
+      "seed_id": "story_seed_004",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "story_seed_005_var_1",
+    "agent": "story",
+    "input": "Can you look up some tales from when I was a kid?",
+    "expected": {
+      "tool": "find_stories",
+      "params": {
+        "query": "childhood"
+      }
+    },
+    "metadata": {
+      "description": "Find childhood stories",
+      "generated": true,
+      "seed_id": "story_seed_005",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_005_var_2",
+    "agent": "story",
+    "input": "I’d like to hear some stories about my younger days, please.",
+    "expected": {
+      "tool": "find_stories",
+      "params": {
+        "query": "childhood"
+      }
+    },
+    "metadata": {
+      "description": "Find childhood stories",
+      "generated": true,
+      "seed_id": "story_seed_005",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "story_seed_006_var_1",
+    "agent": "story",
+    "input": "Can you tell me that story from when I got my first job?",
+    "expected": {
+      "tool": "get_story",
+      "params": {
+        "story_title": "my first job"
+      }
+    },
+    "metadata": {
+      "description": "Get specific story",
+      "generated": true,
+      "seed_id": "story_seed_006",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_006_var_2",
+    "agent": "story",
+    "input": "Would you mind reading the tale about my first work experience?",
+    "expected": {
+      "tool": "get_story",
+      "params": {
+        "story_title": "my first job"
+      }
+    },
+    "metadata": {
+      "description": "Get specific story",
+      "generated": true,
+      "seed_id": "story_seed_006",
+      "variation_number": 2
+    }
+  },
+  {
+    "id": "story_seed_007_var_1",
+    "agent": "story",
+    "input": "Can you tell me the stories about my family?",
+    "expected": {
+      "tool": "list_my_stories",
+      "params": {
+        "life_stage": "family"
+      }
+    },
+    "metadata": {
+      "description": "List family stories",
+      "generated": true,
+      "seed_id": "story_seed_007",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "story_seed_007_var_2",
+    "agent": "story",
+    "input": "I'd like to hear those family tales, please.",
+    "expected": {
+      "tool": "list_my_stories",
+      "params": {
+        "life_stage": "family"
+      }
+    },
+    "metadata": {
+      "description": "List family stories",
+      "generated": true,
+      "seed_id": "story_seed_007",
+      "variation_number": 2
+    }
+  }
+]

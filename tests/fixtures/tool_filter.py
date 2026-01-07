@@ -14,7 +14,27 @@ class ToolFilter:
     INTENT_FILTERS = {
         "health": lambda name: "health" in name,
         "medication": lambda name: "medication" in name,
-        "backlog": lambda name: "backlog" in name,
+        "backlog": lambda name: "backlog" in name or "reminder" in name,
+        "memory": lambda name: "memory" in name
+        or name
+        in [
+            "store_item_location",
+            "find_item",
+            "store_information",
+            "recall_information",
+            "log_activity",
+            "get_daily_context",
+            "what_was_i_doing",
+        ],
+        "story": lambda name: "story" in name  # ← ADD THIS LINE
+        or name
+        in [
+            "record_story",
+            "find_stories",
+            "get_story",
+            "list_my_stories",
+            "get_story_summary",
+        ],
         "settings": lambda name: "settings" in name,
         "books": lambda name: "books" in name,
         "image": lambda name: "image" in name,

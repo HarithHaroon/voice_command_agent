@@ -38,9 +38,22 @@ class OrchestratorAgent(Agent):
         # Build personalized instructions with user's name
         user_name = self.shared_state.user_name
 
-        personalized_instructions = f"""User's name: {user_name}
+        # 🚨 CRITICAL RULE AT THE VERY TOP
+        personalized_instructions = f"""🚨 CRITICAL FIRST RULE: 
 
-        {self.shared_state.agent_prompts.orchestrator}
+            If user input contains "story", "stories", "tale", or "tales":
+            - IMMEDIATELY call handoff_to_story_agent(reason="story request")
+            - Do NOT call list_available_screens
+            - Do NOT call any other tool
+            - JUST handoff to story agent
+
+            Examples:
+            - "Show me all my stories" → handoff_to_story_agent("view collection")
+            - "How many stories have I recorded?" → handoff_to_story_agent("get count")
+
+            User's name: {user_name}
+
+            {self.shared_state.agent_prompts.orchestrator}
         """
 
         # Initialize Agent
@@ -62,6 +75,7 @@ class OrchestratorAgent(Agent):
             "navigation",
             "start_video_call",
             "recall_history",
+            "memory",
         ]
 
         for name in tool_names:
@@ -96,6 +110,8 @@ class OrchestratorAgent(Agent):
             self.shared_state, instructions=self.shared_state.agent_prompts.backlog
         )
 
+        self.shared_state.is_transitioning = False
+
         logger.info(f"🔀 Orchestrator → BacklogAgent: {reason}")
 
         return (agent, "Routing to reminder management specialist")
@@ -113,6 +129,8 @@ class OrchestratorAgent(Agent):
         agent = BooksAgent(
             self.shared_state, instructions=self.shared_state.agent_prompts.books
         )
+
+        self.shared_state.is_transitioning = False
 
         logger.info(f"🔀 Orchestrator → BooksAgent: {reason}")
 
@@ -146,6 +164,8 @@ class OrchestratorAgent(Agent):
             self.shared_state, instructions=self.shared_state.agent_prompts.health
         )
 
+        self.shared_state.is_transitioning = False
+
         logger.info(f"🔀 Orchestrator → HealthAgent: {reason}")
 
         return (agent, "Routing to health data specialist")
@@ -164,6 +184,8 @@ class OrchestratorAgent(Agent):
             self.shared_state, instructions=self.shared_state.agent_prompts.settings
         )
 
+        self.shared_state.is_transitioning = False
+
         logger.info(f"🔀 Orchestrator → SettingsAgent: {reason}")
 
         return (agent, "Routing to settings specialist")
@@ -181,6 +203,8 @@ class OrchestratorAgent(Agent):
         agent = ImageAgent(
             self.shared_state, instructions=self.shared_state.agent_prompts.image
         )
+
+        self.shared_state.is_transitioning = False
 
         logger.info(f"🔀 Orchestrator → ImageAgent: {reason}")
 
@@ -212,25 +236,42 @@ class OrchestratorAgent(Agent):
             self.shared_state, instructions=self.shared_state.agent_prompts.medication
         )
 
+        self.shared_state.is_transitioning = False
+
         logger.info(f"🔀 Orchestrator → MedicationAgent: {reason}")
 
         # Return message that preserves context
         return (agent, f"Continuing with medication request: {reason}")
 
     @function_tool
-    async def handoff_to_memory_agent(self, reason: str = "") -> tuple:
+    async def handoff_to_story_agent(self, reason: str = "") -> tuple:
         """
-        Transfer to memory specialist for personal information and item tracking.
-        Use for: remembering item locations, storing/recalling information, daily activities.
+        Transfer to story preservation specialist.
+
+        Use for:
+        - Recording life stories and memories
+        - Finding and retrieving stories
+        - Browsing story collections
+        - Getting story summaries
+
+        Examples:
+        - "I want to tell a story about my childhood"
+        - "Show me all my stories"
+        - "How many stories have I recorded?"
+        - "Tell me about my wedding day"
+        - "Find stories about my family"
         """
-        from agents.memory_agent import MemoryAgent
+        from agents.story_agent import StoryAgent
 
         self.shared_state.is_transitioning = True
 
-        agent = MemoryAgent(
-            self.shared_state, instructions=self.shared_state.agent_prompts.memory
+        agent = StoryAgent(
+            self.shared_state, instructions=self.shared_state.agent_prompts.story
         )
 
-        logger.info(f"🔀 Orchestrator → MemoryAgent: {reason}")
+        self.shared_state.is_transitioning = False
 
-        return (agent, "Routing to memory specialist")
+        logger.info(f"🔀 Orchestrator → StoryAgent: {reason}")
+
+        # Return message that preserves context
+        return (agent, f"Continuing with story request: {reason}")

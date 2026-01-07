@@ -16,6 +16,7 @@ from helpers.client_time_tracker import ClientTimeTracker
 from tools.tool_manager import ToolManager
 from clients.firebase_client import FirebaseClient
 from backlog.backlog_manager import BacklogManager
+from clients.memory_client import MemoryClient
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,8 @@ class MultiAgentAdapter:
 
             backlog_manager = BacklogManager()
 
+            memory_client = MemoryClient()
+
             # Use mock health client for testing (returns test data)
             from tests.fixtures.mock_health_data_client import MockHealthDataClient
 
@@ -78,7 +81,9 @@ class MultiAgentAdapter:
                 navigation_state=navigation_state,
                 firebase_client=firebase_client,
                 backlog_manager=backlog_manager,
+                memory_client=memory_client,
             )
+
             logger.info("✅ All tools registered")
 
             # Initialize time tracker
@@ -186,6 +191,7 @@ class MultiAgentAdapter:
             "SettingsAgent",
             "ImageAgent",
             "MedicationAgent",
+            "StoryAgent",
         ]
 
     def reset(self) -> None:

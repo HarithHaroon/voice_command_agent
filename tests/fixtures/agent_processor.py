@@ -71,11 +71,19 @@ class AgentProcessor:
             return self._merge_results(orchestrator_result, specialist_result)
         else:
             # Orchestrator handled directly
+            tools_called = orchestrator_result.get("tools_called", [])
+
+            # Generate synthetic response showing what was done
+            if tools_called:
+                response_text = f"Completed: {', '.join(tools_called)}"
+            else:
+                response_text = orchestrator_result.get("response_text", "Done")
+
             return {
                 "agent_path": ["Orchestrator"],
-                "tools_called": orchestrator_result.get("tools_called", []),
+                "tools_called": tools_called,
                 "tool_params": orchestrator_result.get("tool_params", {}),
-                "response": orchestrator_result.get("response_text", ""),
+                "response": response_text,  # ← Now returns "Completed: log_activity"
                 "handoffs": [],
                 "mode": "real",
             }
@@ -214,11 +222,19 @@ class AgentProcessor:
         """Merge orchestrator and specialist results"""
         specialist_name = specialist_result["agent"]
 
+        # Generate synthetic confirmation
+        tools_called = specialist_result["tools_called"]
+        response_text = (
+            f"Completed: {', '.join(tools_called)}"
+            if tools_called
+            else specialist_result.get("response_text", "Done")
+        )
+
         return {
             "agent_path": ["Orchestrator", specialist_name, "Orchestrator"],
             "tools_called": specialist_result["tools_called"],
             "tool_params": specialist_result["tool_params"],
-            "response": specialist_result["response_text"],
+            "response": response_text,  # ← Use synthetic response
             "handoffs": [{"from": "Orchestrator", "to": specialist_name}],
             "mode": "real",
         }

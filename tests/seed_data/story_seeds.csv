@@ -1,0 +1,8 @@
+id,agent,input,expected,metadata
+story_seed_001,story,"I want to record a story about my childhood","{""tool"": ""record_story"", ""params"": {""title"": ""childhood story"", ""content"": ""story content"", ""life_stage"": ""childhood""}}","{""description"": ""Record childhood story""}"
+story_seed_002,story,"Tell me about my wedding day story","{""tool"": ""get_story"", ""params"": {""story_title"": ""wedding day""}}","{""description"": ""Get specific story by topic""}"
+story_seed_003,story,"Show me all my stories","{""tool"": ""list_my_stories"", ""params"": {}}","{""description"": ""List all stories""}"
+story_seed_004,story,"How many stories have I recorded?","{""tool"": ""get_story_summary"", ""params"": {}}","{""description"": ""Get story summary""}"
+story_seed_005,story,"Find stories about my childhood","{""tool"": ""find_stories"", ""params"": {""query"": ""childhood""}}","{""description"": ""Find childhood stories""}"
+story_seed_006,story,"Read me the story about my first job","{""tool"": ""get_story"", ""params"": {""story_title"": ""my first job""}}","{""description"": ""Get specific story""}"
+story_seed_007,story,"Show me my family stories","{""tool"": ""list_my_stories"", ""params"": {""life_stage"": ""family""}}","{""description"": ""List family stories""}"

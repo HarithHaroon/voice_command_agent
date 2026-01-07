@@ -61,8 +61,18 @@ class ConversationExecutor:
             conversation_history.append(
                 {
                     "role": "assistant",
-                    "content": turn_result.details.get("response", ""),
+                    "content": turn_result.details.get("response_text")
+                    or turn_result.details.get("response", ""),
                 }
+            )
+
+            # Right after creating TestResult
+            logger.info(f"🔍 Turn result details keys: {turn_result.details.keys()}")
+            logger.info(
+                f"🔍 Response in details: {turn_result.details.get('response', 'MISSING')[:100]}"
+            )
+            logger.info(
+                f"🔍 Response_text in details: {turn_result.details.get('response_text', 'MISSING')[:100]}"
             )
 
         # Calculate overall results

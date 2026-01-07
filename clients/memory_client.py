@@ -6,14 +6,15 @@ Manages item locations, personal information, and daily activities.
 import os
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, Any, List, Optional
 import boto3
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from pinecone import Pinecone
 from openai import OpenAI
 from dotenv import load_dotenv
+from clients.pinecone_client import PineconeClient
+
 
 load_dotenv(".env.local")
 load_dotenv(".env.secrets")
@@ -33,11 +34,6 @@ class MemoryClient:
 
     # Pinecone index
     PINECONE_INDEX_NAME = "elderly-memory"
-
-    # OpenAI embedding model
-    EMBEDDING_MODEL = "text-embedding-3-small"
-
-    EMBEDDING_DIMENSION = 1536
 
     def __init__(self, dynamodb_resource=None):
         """Initialize MemoryClient with DynamoDB and Pinecone."""
@@ -59,28 +55,9 @@ class MemoryClient:
 
         self.context_table = self.dynamodb.Table(self.DAILY_CONTEXT_TABLE)
 
-        # Pinecone setup
-        self.pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-
-        self.index = self.pc.Index(self.PINECONE_INDEX_NAME)
-
-        # OpenAI setup
-        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.pinecone_client = PineconeClient()
 
         logger.info("MemoryClient initialized with DynamoDB and Pinecone")
-
-    def _generate_embedding(self, text: str) -> List[float]:
-        """Generate embedding vector for text using OpenAI."""
-        try:
-            response = self.openai_client.embeddings.create(
-                model=self.EMBEDDING_MODEL, input=text
-            )
-
-            return response.data[0].embedding
-        except Exception as e:
-            logger.error(f"Failed to generate embedding: {e}")
-
-            raise
 
     def _get_today_date(self) -> str:
         """Get today's date in YYYY-MM-DD format."""
@@ -156,7 +133,6 @@ class MemoryClient:
         """Store personal information with Pinecone indexing."""
         try:
             key_lower = key.lower().strip()
-
             timestamp = datetime.now().isoformat()
 
             # Store in DynamoDB
@@ -172,40 +148,34 @@ class MemoryClient:
                 }
             )
 
-            # Generate embedding and store in Pinecone
+            # Generate embedding and store in Pinecone - USE NEW CLIENT
             embedding_text = f"{key}: {value}"
-
-            embedding = self._generate_embedding(embedding_text)
+            embedding = self.pinecone_client.generate_embedding(embedding_text)
 
             vector_id = f"{user_id}_{key_lower}"
 
-            self.index.upsert(
+            self.pinecone_client.upsert(
+                index_name=self.PINECONE_INDEX_NAME,
                 vectors=[
-                    {
-                        "id": vector_id,
-                        "values": embedding,
-                        "metadata": {
+                    (
+                        vector_id,
+                        embedding,
+                        {
                             "user_id": user_id,
                             "key": key_lower,
                             "category": category,
                             "value": value,
                         },
-                    }
-                ]
+                    )
+                ],
+                namespace=None,  # Not using namespaces for memory
             )
 
             logger.info(f"Stored information: {key} = {value} (category: {category})")
-
-            return {
-                "success": True,
-                "key": key,
-                "value": value,
-                "category": category,
-            }
+            return {"success": True, "key": key, "value": value, "category": category}
 
         except Exception as e:
             logger.error(f"Failed to store information: {e}")
-
             return {"success": False, "error": str(e)}
 
     def recall_information(
@@ -246,19 +216,20 @@ class MemoryClient:
                     "category": item["category"],
                 }
 
-            # Step 2: Semantic search via Pinecone
+            # Step 2: Semantic search via Pinecone - USE NEW CLIENT
             logger.info(f"No exact match, trying semantic search for '{search_key}'")
 
-            query_embedding = self._generate_embedding(search_key)
+            query_embedding = self.pinecone_client.generate_embedding(search_key)
 
-            results = self.index.query(
+            results = self.pinecone_client.query(
+                index_name=self.PINECONE_INDEX_NAME,
                 vector=query_embedding,
-                filter={"user_id": {"$eq": user_id}},
                 top_k=1,
+                filter={"user_id": {"$eq": user_id}},
                 include_metadata=True,
             )
 
-            if results["matches"] and len(results["matches"]) > 0:
+            if results.get("matches") and len(results["matches"]) > 0:
                 best_match = results["matches"][0]
 
                 score = best_match["score"]
@@ -269,6 +240,7 @@ class MemoryClient:
                     logger.info(
                         f"Semantic match for '{search_key}': {metadata['value']} (score: {score:.2f})"
                     )
+
                     return {
                         "found": True,
                         "match_type": "semantic",

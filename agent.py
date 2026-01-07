@@ -212,6 +212,12 @@ async def entrypoint(ctx: agents.JobContext):
 
     logger.info("✅ OrchestratorAgent created")
 
+    # In agent.py, register shutdown callback
+    @ctx.add_shutdown_callback
+    async def on_shutdown():
+        logger.info("🔌 Shutting down - cleaning up")
+        await lifecycle.teardown()
+
     # Start the session with orchestrator
     await session.start(room=ctx.room, agent=orchestrator)
 

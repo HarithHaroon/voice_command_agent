@@ -33,6 +33,8 @@ class AssistantLifecycle:
 
         self.time_monitor = None
 
+        self._data_handler_fn = None
+
         logger.info("AssistantLifecycle initialized")
 
     async def setup(self):
@@ -95,8 +97,11 @@ class AssistantLifecycle:
             ctx = get_job_context()
 
             if ctx and ctx.room:
+                # Store the handler reference for cleanup
+                self._data_handler_fn = self.data_handler.handle_data
+
                 # Use the data handler's handle_data method
-                ctx.room.on("data_received", self.data_handler.handle_data)
+                ctx.room.on("data_received", self._data_handler_fn)
 
                 logger.info("Data handler registered successfully")
             else:
@@ -111,6 +116,17 @@ class AssistantLifecycle:
         Called once at session end.
         """
         logger.info("Multi-agent system leaving the room - cleaning up")
+
+        # Unregister data handler
+        try:
+            ctx = get_job_context()
+
+            if ctx and ctx.room and hasattr(self, "_data_handler_fn"):
+                ctx.room.off("data_received", self._data_handler_fn)
+
+                logger.info("✅ Data handler unregistered")
+        except Exception as e:
+            logger.error(f"Error unregistering data handler: {e}")
 
         # Stop time monitor
         if self.time_monitor:

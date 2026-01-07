@@ -29,7 +29,7 @@ class ToolRegistry:
         navigation_state: "NavigationState",
         firebase_client: "FirebaseClient",
         backlog_manager: "BacklogManager",
-        memory_client: "MemoryClient",  # ADD THIS LINE
+        memory_client: "MemoryClient",
     ) -> None:
         """
         Register all available tools with the tool manager.
@@ -72,6 +72,8 @@ class ToolRegistry:
         from tools.medication_tools.edit_medication_tool import EditMedicationTool
         from tools.medication_tools.delete_medication_tool import DeleteMedicationTool
         from tools.memory_tool import MemoryTool
+        from tools.story_tool import StoryTool
+        from clients.story_client import StoryClient
 
         # Navigation tool
         navigation_tool = NavigationTool(navigation_state=navigation_state)
@@ -153,11 +155,6 @@ class ToolRegistry:
 
         tool_manager.register_tool(list_all_reminders_tool)
 
-        logger.info(
-            f"✅ Registered {tool_manager.get_tool_count()} tools: "
-            f"{tool_manager.get_registered_tools()}"
-        )
-
         logger.info("Registering health query tools...")
 
         # Create health data client
@@ -212,3 +209,14 @@ class ToolRegistry:
         tool_manager.register_tool(memory_tool)
 
         logger.info("✅ Registered medication tools")
+
+        story_client = StoryClient()
+
+        story_tool = StoryTool(story_client=story_client)
+
+        tool_manager.register_tool(story_tool)
+
+        logger.info(
+            f"✅ Registered {tool_manager.get_tool_count()} tools: "
+            f"{tool_manager.get_registered_tools()}"
+        )

@@ -1,278 +1,163 @@
+"""
+Pinecone Client - Reusable wrapper for Pinecone operations.
+Used by MemoryClient and StoryClient for vector storage and semantic search.
+"""
+
 import os
 import logging
-import hashlib
-from datetime import datetime
 from typing import List, Dict, Any, Optional
-from pinecone import Pinecone, ServerlessSpec
+from pinecone import Pinecone
+from openai import OpenAI
 from dotenv import load_dotenv
-from services.embedding_service import EmbeddingService
 
-load_dotenv()
+load_dotenv(".env.local")
+load_dotenv(".env.secrets")
 
 logger = logging.getLogger(__name__)
 
 
 class PineconeClient:
+    """Reusable client for Pinecone vector operations"""
+
+    EMBEDDING_MODEL = "text-embedding-3-small"
+
+    EMBEDDING_DIMENSION = 1536
+
     def __init__(self):
-        self.pc = None
+        """Initialize Pinecone and OpenAI clients"""
+        self.pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
-        self.index = None
+        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-        self.embedding_service = EmbeddingService()
+        logger.info("PineconeClient initialized")
 
-        # Allow index name to be configured via environment variable
-        self.index_name = os.getenv("PINECONE_INDEX_NAME", "nova-sonic-history")
+    def generate_embedding(self, text: str) -> List[float]:
+        """
+        Generate embedding vector for text using OpenAI.
 
-        self._initialize_pinecone()
+        Args:
+            text: Text to embed
 
-    def _initialize_pinecone(self):
-        """Initialize Pinecone client and index"""
+        Returns:
+            Embedding vector
+        """
         try:
-            api_key = os.getenv("PINECONE_API_KEY")
-            if not api_key:
-                raise ValueError("PINECONE_API_KEY environment variable not set")
-
-            # Add timeout to prevent indefinite hangs (30 seconds)
-            self.pc = Pinecone(api_key=api_key)
-
-            # Check if index exists
-            existing_indexes = [index.name for index in self.pc.list_indexes()]
-
-            if self.index_name not in existing_indexes:
-                logger.warning(
-                    f"Pinecone index '{self.index_name}' not found. Available indexes: {existing_indexes}"
-                )
-                logger.info("Please create the index manually or use an existing one.")
-                # Don't create, just log available indexes
-                if existing_indexes:
-                    logger.info(f"Using first available index: {existing_indexes[0]}")
-                    self.index_name = existing_indexes[0]
-                else:
-                    raise ValueError(
-                        "No Pinecone indexes available. Please create one manually."
-                    )
-
-            # Create index connection with timeout configuration
-            # Note: Pinecone SDK v3+ uses connection pooling internally with default timeouts
-            # We rely on the SDK's built-in timeout handling (default: 30s for most operations)
-            self.index = self.pc.Index(self.index_name)
-            logger.info(
-                f"Pinecone initialized successfully with index: {self.index_name}"
+            response = self.openai_client.embeddings.create(
+                model=self.EMBEDDING_MODEL, input=text
             )
 
+            return response.data[0].embedding
+
         except Exception as e:
-            logger.error(f"Failed to initialize Pinecone: {e}")
+            logger.error(f"Failed to generate embedding: {e}")
+
             raise
 
-    def _generate_vector_id(
-        self, user_id: str, role: str, content: str, timestamp: str
-    ) -> str:
-        """Generate a unique ID for the vector"""
-        unique_string = f"{user_id}_{role}_{content[:50]}_{timestamp}"
-        return hashlib.md5(unique_string.encode()).hexdigest()
+    def upsert(
+        self, index_name: str, vectors: List[tuple], namespace: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Upsert vectors to Pinecone index.
 
-    async def upsert_message(self, user_id: str, role: str, content: str) -> bool:
-        """Create embedding and store message in Pinecone (async)"""
+        Args:
+            index_name: Name of the Pinecone index
+            vectors: List of (id, values, metadata) tuples
+            namespace: Optional namespace for isolation
+
+        Returns:
+            Upsert response
+        """
         try:
-            # Filter out short messages
-            if len(content.strip()) <= 20:
-                logger.debug(f"Skipping short message: {content[:20]}...")
-                return True
+            index = self.pc.Index(index_name)
 
-            # Filter out common short responses
-            short_responses = {
-                "ok",
-                "thanks",
-                "thank you",
-                "yes",
-                "no",
-                "sure",
-                "alright",
-                "got it",
-            }
-            if content.lower().strip() in short_responses:
-                logger.debug(f"Skipping common short response: {content}")
-                return True
+            # Format vectors for Pinecone
+            formatted_vectors = [
+                {
+                    "id": vec[0],
+                    "values": vec[1],
+                    "metadata": vec[2] if len(vec) > 2 else {},
+                }
+                for vec in vectors
+            ]
 
-            # Generate embedding asynchronously
-            embedding = await self.embedding_service.create_embedding_async(content)
+            index.upsert(vectors=formatted_vectors, namespace=namespace or "")
 
-            if not embedding:
-                logger.error("Failed to create embedding")
-                return False
+            logger.info(f"Upserted {len(vectors)} vectors to {index_name}")
 
-            # Create unique ID
-            timestamp = datetime.now().isoformat()
-            vector_id = self._generate_vector_id(user_id, role, content, timestamp)
-
-            # Prepare metadata
-            metadata = {
-                "userId": user_id,
-                "role": role.upper(),
-                "content": content,
-                "timestamp": timestamp,
-                "content_length": len(content),
-            }
-
-            # Upsert to Pinecone asynchronously
-            import asyncio
-
-            loop = asyncio.get_event_loop()
-            await loop.run_in_executor(
-                None,
-                lambda: self.index.upsert(
-                    vectors=[
-                        {"id": vector_id, "values": embedding, "metadata": metadata}
-                    ]
-                ),
-            )
-
-            logger.debug(f"Message upserted to Pinecone: {vector_id}")
-            return True
+            return {"success": True, "upserted_count": len(vectors)}
 
         except Exception as e:
-            logger.error(f"Error upserting message to Pinecone: {e}")
-            return False
+            logger.error(f"Failed to upsert vectors: {e}")
 
-    async def search_similar_messages(
+            return {"success": False, "error": str(e)}
+
+    def query(
         self,
-        user_id: str,
-        query: str,
-        top_k: int = 10,
-        timeframe_hours: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
-        """Search for similar messages using vector similarity (async)"""
+        index_name: str,
+        vector: List[float],
+        top_k: int = 5,
+        filter: Optional[Dict] = None,
+        namespace: Optional[str] = None,
+        include_metadata: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Query Pinecone index for similar vectors.
+
+        Args:
+            index_name: Name of the Pinecone index
+            vector: Query vector
+            top_k: Number of results to return
+            filter: Metadata filter
+            namespace: Optional namespace
+            include_metadata: Whether to include metadata in results
+
+        Returns:
+            Query results with matches
+        """
         try:
-            # Generate embedding for query asynchronously
-            query_embedding = await self.embedding_service.create_embedding_async(query)
+            index = self.pc.Index(index_name)
 
-            if not query_embedding:
-                logger.error("Failed to create query embedding")
-                return []
-
-            # Prepare filter
-            filter_dict = {"userId": user_id}
-
-            # Add timeframe filter if specified
-            if timeframe_hours:
-                from datetime import datetime, timedelta
-
-                cutoff_time = (
-                    datetime.now() - timedelta(hours=timeframe_hours)
-                ).isoformat()
-                filter_dict["timestamp"] = {"$gte": cutoff_time}
-
-            # Search in Pinecone asynchronously
-            import asyncio
-
-            loop = asyncio.get_event_loop()
-            search_results = await loop.run_in_executor(
-                None,
-                lambda: self.index.query(
-                    vector=query_embedding,
-                    filter=filter_dict,
-                    top_k=top_k,
-                    include_metadata=True,
-                ),
+            results = index.query(
+                vector=vector,
+                top_k=top_k,
+                filter=filter,
+                namespace=namespace or "",
+                include_metadata=include_metadata,
             )
 
-            # Format results
-            results = []
-            for match in search_results.matches:
-                if match.score > 0.7:  # Only return high similarity matches
-                    metadata = match.metadata
-                    results.append(
-                        {
-                            "role": metadata["role"],
-                            "content": metadata["content"],
-                            "timestamp": metadata["timestamp"],
-                            "similarity_score": match.score,
-                        }
-                    )
+            logger.info(f"Query returned {len(results.get('matches', []))} results")
 
-            logger.info(
-                f"Found {len(results)} similar messages for query: {query[:50]}..."
-            )
             return results
 
         except Exception as e:
-            logger.error(f"Error searching Pinecone: {e}")
-            return []
+            logger.error(f"Failed to query vectors: {e}")
 
-    def get_recent_vectors(self, user_id: str, limit: int = 50) -> List[Dict[str, Any]]:
-        """Get recent vectors for a user (for testing/debugging)"""
+            return {"matches": []}
+
+    def delete(
+        self, index_name: str, ids: List[str], namespace: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Delete vectors from Pinecone index.
+
+        Args:
+            index_name: Name of the Pinecone index
+            ids: List of vector IDs to delete
+            namespace: Optional namespace
+
+        Returns:
+            Delete response
+        """
         try:
-            # Note: Pinecone doesn't have a direct "get recent" function
-            # This is a workaround using a broad query
-            dummy_query = self.embedding_service.create_embedding("recent messages")
+            index = self.pc.Index(index_name)
 
-            if not dummy_query:
-                return []
+            index.delete(ids=ids, namespace=namespace or "")
 
-            search_results = self.index.query(
-                vector=dummy_query,
-                filter={"userId": user_id},
-                top_k=limit,
-                include_metadata=True,
-            )
+            logger.info(f"Deleted {len(ids)} vectors from {index_name}")
 
-            results = []
-            for match in search_results.matches:
-                metadata = match.metadata
-                results.append(
-                    {
-                        "role": metadata["role"],
-                        "content": metadata["content"],
-                        "timestamp": metadata["timestamp"],
-                    }
-                )
-
-            # Sort by timestamp
-            results.sort(key=lambda x: x["timestamp"], reverse=True)
-            return results
+            return {"success": True, "deleted_count": len(ids)}
 
         except Exception as e:
-            logger.error(f"Error getting recent vectors: {e}")
-            return []
+            logger.error(f"Failed to delete vectors: {e}")
 
-    def delete_user_vectors(self, user_id: str) -> bool:
-        """Delete all vectors for a user (for testing/cleanup)"""
-        try:
-            # Get all vector IDs for the user
-            dummy_query = self.embedding_service.create_embedding("delete user")
-
-            if not dummy_query:
-                return False
-
-            search_results = self.index.query(
-                vector=dummy_query,
-                filter={"userId": user_id},
-                top_k=10000,  # Large number to get all
-                include_metadata=False,
-            )
-
-            # Extract IDs
-            vector_ids = [match.id for match in search_results.matches]
-
-            if vector_ids:
-                self.index.delete(ids=vector_ids)
-                logger.info(f"Deleted {len(vector_ids)} vectors for user {user_id}")
-
-            return True
-
-        except Exception as e:
-            logger.error(f"Error deleting user vectors: {e}")
-            return False
-
-    def get_index_stats(self) -> Dict[str, Any]:
-        """Get index statistics"""
-        try:
-            stats = self.index.describe_index_stats()
-            return {
-                "total_vector_count": stats.total_vector_count,
-                "dimension": stats.dimension,
-                "index_fullness": stats.index_fullness,
-            }
-        except Exception as e:
-            logger.error(f"Error getting index stats: {e}")
-            return {}
+            return {"success": False, "error": str(e)}

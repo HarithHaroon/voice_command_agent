@@ -1,0 +1,219 @@
+# Memory Agent Multi-Turn Conversation Tests
+
+memory_store_and_find_001:
+  name: "Store Item Then Find It"
+  description: "User stores item location, then asks where it is"
+  turns:
+    - input: "I'm putting my glasses on the nightstand"
+      expected_agent: orchestrator
+      expected_tool: store_item_location
+      expected_params:
+        item: glasses
+        location: nightstand
+      context_check: "Should store item location"
+      
+    - input: "Where are my glasses?"
+      expected_agent: orchestrator
+      expected_tool: find_item
+      expected_params:
+        item: glasses
+      context_check: "Should retrieve stored location"
+
+memory_store_and_find_002:
+  name: "Multiple Items Storage"
+  description: "User stores multiple items, then finds one"
+  turns:
+    - input: "I put my keys on the kitchen counter"
+      expected_agent: orchestrator
+      expected_tool: store_item_location
+      expected_params:
+        item: keys
+        location: kitchen counter
+        room: kitchen
+      
+    - input: "My phone is charging by my bed"
+      expected_agent: orchestrator
+      expected_tool: store_item_location
+      expected_params:
+        item: phone
+        location: charging by bed
+        room: bedroom
+      
+    - input: "Where did I put my keys?"
+      expected_agent: orchestrator
+      expected_tool: find_item
+      expected_params:
+        item: keys
+      context_check: "Should remember first item among multiple stored items"
+
+memory_info_store_recall_001:
+  name: "Store Info Then Recall"
+  description: "User stores personal information, then recalls it"
+  turns:
+    - input: "Remember my doctor's name is Dr. Smith"
+      expected_agent: orchestrator
+      expected_tool: store_information
+      expected_params:
+        category: medical
+        key: doctor_name
+        value: Dr. Smith
+      context_check: "Should store medical information"
+      
+    - input: "What's my doctor's name?"
+      expected_agent: orchestrator
+      expected_tool: recall_information
+      expected_params:
+        key: doctor
+      context_check: "Should recall stored information"
+
+memory_info_store_recall_002:
+  name: "Store Multiple Facts Then Recall"
+  description: "User stores multiple facts, then recalls specific ones"
+  turns:
+    - input: "My WiFi password is HomeNet123"
+      expected_agent: orchestrator
+      expected_tool: store_information
+      expected_params:
+        category: practical
+        key: wifi_password
+        value: HomeNet123
+      
+    - input: "My son's birthday is June 15th"
+      expected_agent: orchestrator
+      expected_tool: store_information
+      expected_params:
+        category: personal
+        key: son_birthday
+        value: June 15th
+      
+    - input: "What's my WiFi password?"
+      expected_agent: orchestrator
+      expected_tool: recall_information
+      expected_params:
+        key: wifi password
+      context_check: "Should recall correct fact among multiple stored"
+
+memory_activity_logging_001:
+  name: "Log Activities Then Review"
+  description: "User logs activities, then asks what they did"
+  turns:
+    - input: "I just had breakfast"
+      expected_agent: orchestrator
+      expected_tool: log_activity
+      expected_params:
+        activity_type: meal
+        details: had breakfast
+      
+    - input: "My daughter visited me this morning"
+      expected_agent: orchestrator
+      expected_tool: log_activity
+      expected_params:
+        activity_type: visitor
+        details: daughter visited this morning
+      
+    - input: "Can you show me what I did today?"
+      expected_agent: orchestrator
+      expected_tool: get_daily_context
+      expected_params:
+        date: ""
+      context_check: "Should summarize logged activities"
+
+memory_activity_logging_002:
+  name: "Recent Activity Recall"
+  description: "User logs activity, then asks what they were doing"
+  turns:
+    - input: "I went for a walk in the park"
+      expected_agent: orchestrator
+      expected_tool: log_activity
+      expected_params:
+        activity_type: outing
+        details: went for a walk in the park
+      
+    - input: "What was I just doing?"
+      expected_agent: orchestrator
+      expected_tool: what_was_i_doing
+      expected_params: {}
+      context_check: "Should retrieve most recent activity"
+
+memory_mixed_context_001:
+  name: "Items and Info Mixed"
+  description: "User mixes item locations and personal info storage"
+  turns:
+    - input: "I put my medication on the bathroom sink"
+      expected_agent: orchestrator
+      expected_tool: store_item_location
+      expected_params:
+        item: medication
+        location: bathroom sink
+        room: bathroom
+      
+    - input: "Remember I'm allergic to penicillin"
+      expected_agent: orchestrator
+      expected_tool: store_information
+      expected_params:
+        category: medical
+        key: allergy_penicillin
+        value: allergic to penicillin
+      
+    - input: "Where's my medication bottle?"
+      expected_agent: orchestrator
+      expected_tool: find_item
+      expected_params:
+        item: medication
+      context_check: "Should find item despite info storage in between"
+
+memory_fuzzy_matching_001:
+  name: "Fuzzy Recall Test"
+  description: "User stores with one term, recalls with similar term"
+  turns:
+    - input: "My doctor is Dr. Smith at Main Street Clinic"
+      expected_agent: orchestrator
+      expected_tool: store_information
+      expected_params:
+        category: medical
+        key: doctor
+        value: Dr. Smith at Main Street Clinic
+      
+    - input: "Who is my physician?"
+      expected_agent: orchestrator
+      expected_tool: recall_information
+      expected_params:
+        key: physician
+      context_check: "Should use semantic search to match doctor/physician"
+
+multi_agent_memory_001:
+  name: "Memory to Health Query"
+  description: "Store allergy info, then check health"
+  turns:
+    - input: "Remember I'm allergic to penicillin"
+      expected_agent: orchestrator
+      expected_tool: store_information
+      expected_params:
+        category: medical
+        key: allergy_penicillin
+        value: allergic to penicillin
+      
+    - input: "How's my health today?"
+      expected_agent: health
+      expected_tool: get_health_summary
+      expected_params:
+        period: today
+      context_check: "Should switch to HealthAgent for health query"
+
+multi_agent_memory_002:
+  name: "Memory to Reminder Creation"
+  description: "Log activity, then create related reminder"
+  turns:
+    - input: "I just called my son"
+      expected_agent: orchestrator
+      expected_tool: log_activity
+      expected_params:
+        activity_type: conversation
+        details: called my son
+      
+    - input: "Remind me to call him again next week"
+      expected_agent: backlog
+      expected_tool: add_reminder
+      expected_params:
+        title: call son
+      context_check: "Should switch to BacklogAgent, understanding 'him' refers to son"

@@ -30,6 +30,7 @@ class SpecialistFactory:
         from agents.settings_agent import SettingsAgent
         from agents.image_agent import ImageAgent
         from agents.medication_agent import MedicationAgent
+        from agents.story_agent import StoryAgent
 
         agent_map = {
             "HealthAgent": HealthAgent,
@@ -38,6 +39,7 @@ class SpecialistFactory:
             "SettingsAgent": SettingsAgent,
             "ImageAgent": ImageAgent,
             "MedicationAgent": MedicationAgent,
+            "StoryAgent": StoryAgent,
         }
 
         agent_class = agent_map.get(specialist_name)
@@ -69,6 +71,7 @@ class SpecialistFactory:
             "SettingsAgent": agent_prompts.settings,
             "ImageAgent": agent_prompts.image,
             "MedicationAgent": agent_prompts.medication,
+            "StoryAgent": agent_prompts.story,
         }
 
         return prompt_map.get(specialist_name, "")

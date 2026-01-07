@@ -1,0 +1,1669 @@
+[
+  {
+    "id": "memory_seed_001",
+    "agent": "orchestrator",
+    "input": "I'm putting my glasses on the nightstand",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "glasses",
+        "location": "nightstand",
+        "room": ""
+      }
+    },
+    "metadata": {
+      "description": "Store item without room"
+    }
+  },
+  {
+    "id": "memory_seed_002",
+    "agent": "orchestrator",
+    "input": "My keys are on the kitchen counter",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "keys",
+        "location": "kitchen counter",
+        "room": "kitchen"
+      }
+    },
+    "metadata": {
+      "description": "Store item with room"
+    }
+  },
+  {
+    "id": "memory_seed_003",
+    "agent": "orchestrator",
+    "input": "I left my phone charging by my bed",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "phone",
+        "location": "charging by bed",
+        "room": "bedroom"
+      }
+    },
+    "metadata": {
+      "description": "Store item with specific location"
+    }
+  },
+  {
+    "id": "memory_seed_004",
+    "agent": "orchestrator",
+    "input": "My wallet is in the drawer",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "wallet",
+        "location": "in the drawer",
+        "room": ""
+      }
+    },
+    "metadata": {
+      "description": "Store item vague location"
+    }
+  },
+  {
+    "id": "memory_seed_005",
+    "agent": "orchestrator",
+    "input": "I put my medication on the bathroom sink",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "medication",
+        "location": "bathroom sink",
+        "room": "bathroom"
+      }
+    },
+    "metadata": {
+      "description": "Store medical item"
+    }
+  },
+  {
+    "id": "memory_seed_006",
+    "agent": "orchestrator",
+    "input": "Where are my glasses?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "glasses"
+      }
+    },
+    "metadata": {
+      "description": "Find item basic"
+    }
+  },
+  {
+    "id": "memory_seed_007",
+    "agent": "orchestrator",
+    "input": "Where did I put my phone?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "phone"
+      }
+    },
+    "metadata": {
+      "description": "Find item natural language"
+    }
+  },
+  {
+    "id": "memory_seed_008",
+    "agent": "orchestrator",
+    "input": "Can you find my keys?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "keys"
+      }
+    },
+    "metadata": {
+      "description": "Find item polite request"
+    }
+  },
+  {
+    "id": "memory_seed_009",
+    "agent": "orchestrator",
+    "input": "Help me locate my wallet",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "wallet"
+      }
+    },
+    "metadata": {
+      "description": "Find item different phrasing"
+    }
+  },
+  {
+    "id": "memory_seed_010",
+    "agent": "orchestrator",
+    "input": "Where are my slippers?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "slippers"
+      }
+    },
+    "metadata": {
+      "description": "Find item not found edge case"
+    }
+  },
+  {
+    "id": "memory_seed_011",
+    "agent": "orchestrator",
+    "input": "Where are my reading glasses?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "reading glasses"
+      }
+    },
+    "metadata": {
+      "description": "Find multi-word item"
+    }
+  },
+  {
+    "id": "memory_seed_012",
+    "agent": "orchestrator",
+    "input": "Remember my doctor's name is Dr. Smith",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "medical",
+        "key": "doctor_name",
+        "value": "Dr. Smith"
+      }
+    },
+    "metadata": {
+      "description": "Store medical info - doctor"
+    }
+  },
+  {
+    "id": "memory_seed_013",
+    "agent": "orchestrator",
+    "input": "I'm allergic to penicillin",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "medical",
+        "key": "allergy_penicillin",
+        "value": "allergic to penicillin"
+      }
+    },
+    "metadata": {
+      "description": "Store medical info - allergy"
+    }
+  },
+  {
+    "id": "memory_seed_014",
+    "agent": "orchestrator",
+    "input": "My pharmacy is CVS on Main Street",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "medical",
+        "key": "pharmacy",
+        "value": "CVS on Main Street"
+      }
+    },
+    "metadata": {
+      "description": "Store medical info - pharmacy"
+    }
+  },
+  {
+    "id": "memory_seed_015",
+    "agent": "orchestrator",
+    "input": "My WiFi password is HomeNet123",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "practical",
+        "key": "wifi_password",
+        "value": "HomeNet123"
+      }
+    },
+    "metadata": {
+      "description": "Store practical info - wifi"
+    }
+  },
+  {
+    "id": "memory_seed_016",
+    "agent": "orchestrator",
+    "input": "The alarm code is 1234",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "practical",
+        "key": "alarm_code",
+        "value": "1234"
+      }
+    },
+    "metadata": {
+      "description": "Store practical info - alarm"
+    }
+  },
+  {
+    "id": "memory_seed_017",
+    "agent": "orchestrator",
+    "input": "I parked in spot B12",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "practical",
+        "key": "parking_spot",
+        "value": "B12"
+      }
+    },
+    "metadata": {
+      "description": "Store practical info - parking"
+    }
+  },
+  {
+    "id": "memory_seed_018",
+    "agent": "orchestrator",
+    "input": "My son's birthday is June 15th",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "personal",
+        "key": "son_birthday",
+        "value": "June 15th"
+      }
+    },
+    "metadata": {
+      "description": "Store personal info - birthday"
+    }
+  },
+  {
+    "id": "memory_seed_019",
+    "agent": "orchestrator",
+    "input": "My daughter's name is Sarah",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "personal",
+        "key": "daughter_name",
+        "value": "Sarah"
+      }
+    },
+    "metadata": {
+      "description": "Store personal info - family name"
+    }
+  },
+  {
+    "id": "memory_seed_020",
+    "agent": "orchestrator",
+    "input": "My favorite restaurant is Olive Garden",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "personal",
+        "key": "favorite_restaurant",
+        "value": "Olive Garden"
+      }
+    },
+    "metadata": {
+      "description": "Store personal info - preference"
+    }
+  },
+  {
+    "id": "memory_seed_021",
+    "agent": "orchestrator",
+    "input": "The plumber's number is 555-7890",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "household",
+        "key": "plumber_phone",
+        "value": "555-7890"
+      }
+    },
+    "metadata": {
+      "description": "Store household info - contact"
+    }
+  },
+  {
+    "id": "memory_seed_022",
+    "agent": "orchestrator",
+    "input": "Trash day is Tuesday",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "household",
+        "key": "trash_day",
+        "value": "Tuesday"
+      }
+    },
+    "metadata": {
+      "description": "Store household info - schedule"
+    }
+  },
+  {
+    "id": "memory_seed_023",
+    "agent": "orchestrator",
+    "input": "The spare key is under the mat",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "household",
+        "key": "spare_key_location",
+        "value": "under the mat"
+      }
+    },
+    "metadata": {
+      "description": "Store household info - location"
+    }
+  },
+  {
+    "id": "memory_seed_024",
+    "agent": "orchestrator",
+    "input": "What's my doctor's name?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "doctor"
+      }
+    },
+    "metadata": {
+      "description": "Recall medical info"
+    }
+  },
+  {
+    "id": "memory_seed_025",
+    "agent": "orchestrator",
+    "input": "What am I allergic to?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "allergy"
+      }
+    },
+    "metadata": {
+      "description": "Recall allergy info"
+    }
+  },
+  {
+    "id": "memory_seed_026",
+    "agent": "orchestrator",
+    "input": "What's my WiFi password?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "wifi password"
+      }
+    },
+    "metadata": {
+      "description": "Recall practical info"
+    }
+  },
+  {
+    "id": "memory_seed_027",
+    "agent": "orchestrator",
+    "input": "What's the alarm code?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "alarm code"
+      }
+    },
+    "metadata": {
+      "description": "Recall alarm code"
+    }
+  },
+  {
+    "id": "memory_seed_028",
+    "agent": "orchestrator",
+    "input": "When is my son's birthday?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "son birthday"
+      }
+    },
+    "metadata": {
+      "description": "Recall personal info"
+    }
+  },
+  {
+    "id": "memory_seed_029",
+    "agent": "orchestrator",
+    "input": "What's the plumber's number?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "plumber"
+      }
+    },
+    "metadata": {
+      "description": "Recall household info"
+    }
+  },
+  {
+    "id": "memory_seed_030",
+    "agent": "orchestrator",
+    "input": "Who is my physician?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "physician"
+      }
+    },
+    "metadata": {
+      "description": "Recall fuzzy match - doctor"
+    }
+  },
+  {
+    "id": "memory_seed_031",
+    "agent": "orchestrator",
+    "input": "What's my internet password?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "internet password"
+      }
+    },
+    "metadata": {
+      "description": "Recall fuzzy match - wifi"
+    }
+  },
+  {
+    "id": "memory_seed_032",
+    "agent": "orchestrator",
+    "input": "What's my garage code?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "garage code"
+      }
+    },
+    "metadata": {
+      "description": "Recall not found"
+    }
+  },
+  {
+    "id": "memory_seed_033",
+    "agent": "orchestrator",
+    "input": "Who is my dentist?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "dentist"
+      }
+    },
+    "metadata": {
+      "description": "Recall not found - offer to store"
+    }
+  },
+  {
+    "id": "memory_seed_034",
+    "agent": "orchestrator",
+    "input": "I just had breakfast",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "meal",
+        "details": "had breakfast"
+      }
+    },
+    "metadata": {
+      "description": "Log meal - breakfast"
+    }
+  },
+  {
+    "id": "memory_seed_035",
+    "agent": "orchestrator",
+    "input": "I ate lunch with my daughter",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "meal",
+        "details": "ate lunch with daughter"
+      }
+    },
+    "metadata": {
+      "description": "Log meal with context"
+    }
+  },
+  {
+    "id": "memory_seed_036",
+    "agent": "orchestrator",
+    "input": "I had dinner at 6pm",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "meal",
+        "details": "had dinner at 6pm"
+      }
+    },
+    "metadata": {
+      "description": "Log meal with time"
+    }
+  },
+  {
+    "id": "memory_seed_037",
+    "agent": "orchestrator",
+    "input": "My daughter visited me this morning",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "visitor",
+        "details": "daughter visited this morning"
+      }
+    },
+    "metadata": {
+      "description": "Log visitor - daughter"
+    }
+  },
+  {
+    "id": "memory_seed_038",
+    "agent": "orchestrator",
+    "input": "My friend John stopped by",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "visitor",
+        "details": "friend John stopped by"
+      }
+    },
+    "metadata": {
+      "description": "Log visitor - friend"
+    }
+  },
+  {
+    "id": "memory_seed_039",
+    "agent": "orchestrator",
+    "input": "The nurse came to check on me",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "visitor",
+        "details": "nurse came to check on me"
+      }
+    },
+    "metadata": {
+      "description": "Log visitor - caregiver"
+    }
+  },
+  {
+    "id": "memory_seed_040",
+    "agent": "orchestrator",
+    "input": "I went for a walk in the park",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "outing",
+        "details": "went for a walk in the park"
+      }
+    },
+    "metadata": {
+      "description": "Log outing - walk"
+    }
+  },
+  {
+    "id": "memory_seed_041",
+    "agent": "orchestrator",
+    "input": "I went to the grocery store",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "outing",
+        "details": "went to grocery store"
+      }
+    },
+    "metadata": {
+      "description": "Log outing - errands"
+    }
+  },
+  {
+    "id": "memory_seed_042",
+    "agent": "orchestrator",
+    "input": "I had a doctor's appointment",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "outing",
+        "details": "had doctor's appointment"
+      }
+    },
+    "metadata": {
+      "description": "Log outing - appointment"
+    }
+  },
+  {
+    "id": "memory_seed_043",
+    "agent": "orchestrator",
+    "input": "I watched a movie",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "activity",
+        "details": "watched a movie"
+      }
+    },
+    "metadata": {
+      "description": "Log general activity"
+    }
+  },
+  {
+    "id": "memory_seed_044",
+    "agent": "orchestrator",
+    "input": "I read a book for an hour",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "activity",
+        "details": "read a book for an hour"
+      }
+    },
+    "metadata": {
+      "description": "Log activity with duration"
+    }
+  },
+  {
+    "id": "memory_seed_045",
+    "agent": "orchestrator",
+    "input": "I called my son",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "conversation",
+        "details": "called my son"
+      }
+    },
+    "metadata": {
+      "description": "Log conversation - phone"
+    }
+  },
+  {
+    "id": "memory_seed_046",
+    "agent": "orchestrator",
+    "input": "I talked to my neighbor",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "conversation",
+        "details": "talked to my neighbor"
+      }
+    },
+    "metadata": {
+      "description": "Log conversation - in person"
+    }
+  },
+  {
+    "id": "memory_seed_047",
+    "agent": "orchestrator",
+    "input": "What did I do today?",
+    "expected": {
+      "tool": "get_daily_context",
+      "params": {
+        "date": ""
+      }
+    },
+    "metadata": {
+      "description": "Get today's activities"
+    }
+  },
+  {
+    "id": "memory_seed_048",
+    "agent": "orchestrator",
+    "input": "What did I do on January 3rd?",
+    "expected": {
+      "tool": "get_daily_context",
+      "params": {
+        "date": "2026-01-03"
+      }
+    },
+    "metadata": {
+      "description": "Get specific date activities"
+    }
+  },
+  {
+    "id": "memory_seed_049",
+    "agent": "orchestrator",
+    "input": "What did I do yesterday?",
+    "expected": {
+      "tool": "get_daily_context",
+      "params": {
+        "date": "yesterday"
+      }
+    },
+    "metadata": {
+      "description": "Get yesterday's activities"
+    }
+  },
+  {
+    "id": "memory_seed_050",
+    "agent": "orchestrator",
+    "input": "What was I just doing?",
+    "expected": {
+      "tool": "what_was_i_doing",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get recent activity"
+    }
+  },
+  {
+    "id": "memory_seed_051",
+    "agent": "orchestrator",
+    "input": "Remind me what I was doing",
+    "expected": {
+      "tool": "what_was_i_doing",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get recent activity alt phrasing"
+    }
+  },
+  {
+    "id": "memory_seed_001_var_1",
+    "agent": "orchestrator",
+    "input": "I'm setting my glasses down on the nightstand.",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "glasses",
+        "location": "nightstand",
+        "room": ""
+      }
+    },
+    "metadata": {
+      "description": "Store item without room",
+      "generated": true,
+      "seed_id": "memory_seed_001",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_002_var_1",
+    "agent": "orchestrator",
+    "input": "I left my keys on the counter in the kitchen.",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "keys",
+        "location": "kitchen counter",
+        "room": "kitchen"
+      }
+    },
+    "metadata": {
+      "description": "Store item with room",
+      "generated": true,
+      "seed_id": "memory_seed_002",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_003_var_1",
+    "agent": "orchestrator",
+    "input": "I think I left my phone by the bed charging.",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "phone",
+        "location": "charging by bed",
+        "room": "bedroom"
+      }
+    },
+    "metadata": {
+      "description": "Store item with specific location",
+      "generated": true,
+      "seed_id": "memory_seed_003",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_004_var_1",
+    "agent": "orchestrator",
+    "input": "I think my wallet’s in that drawer over there.",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "wallet",
+        "location": "in the drawer",
+        "room": ""
+      }
+    },
+    "metadata": {
+      "description": "Store item vague location",
+      "generated": true,
+      "seed_id": "memory_seed_004",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_005_var_1",
+    "agent": "orchestrator",
+    "input": "I left my pills on the sink in the bathroom.",
+    "expected": {
+      "tool": "store_item_location",
+      "params": {
+        "item": "medication",
+        "location": "bathroom sink",
+        "room": "bathroom"
+      }
+    },
+    "metadata": {
+      "description": "Store medical item",
+      "generated": true,
+      "seed_id": "memory_seed_005",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_006_var_1",
+    "agent": "orchestrator",
+    "input": "I can’t seem to find my glasses, could you help?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "glasses"
+      }
+    },
+    "metadata": {
+      "description": "Find item basic",
+      "generated": true,
+      "seed_id": "memory_seed_006",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_007_var_1",
+    "agent": "orchestrator",
+    "input": "I can’t seem to remember where I left my phone.",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "phone"
+      }
+    },
+    "metadata": {
+      "description": "Find item natural language",
+      "generated": true,
+      "seed_id": "memory_seed_007",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_008_var_1",
+    "agent": "orchestrator",
+    "input": "Could you help me look for my keys?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "keys"
+      }
+    },
+    "metadata": {
+      "description": "Find item polite request",
+      "generated": true,
+      "seed_id": "memory_seed_008",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_009_var_1",
+    "agent": "orchestrator",
+    "input": "I can’t seem to find my wallet, can you help?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "wallet"
+      }
+    },
+    "metadata": {
+      "description": "Find item different phrasing",
+      "generated": true,
+      "seed_id": "memory_seed_009",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_010_var_1",
+    "agent": "orchestrator",
+    "input": "Can you help me find my slippers?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "slippers"
+      }
+    },
+    "metadata": {
+      "description": "Find item not found edge case",
+      "generated": true,
+      "seed_id": "memory_seed_010",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_011_var_1",
+    "agent": "orchestrator",
+    "input": "I can't seem to find my reading glasses, can you help?",
+    "expected": {
+      "tool": "find_item",
+      "params": {
+        "item": "reading glasses"
+      }
+    },
+    "metadata": {
+      "description": "Find multi-word item",
+      "generated": true,
+      "seed_id": "memory_seed_011",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_012_var_1",
+    "agent": "orchestrator",
+    "input": "Can you jot down that my doctor is Dr. Smith?",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "medical",
+        "key": "doctor_name",
+        "value": "Dr. Smith"
+      }
+    },
+    "metadata": {
+      "description": "Store medical info - doctor",
+      "generated": true,
+      "seed_id": "memory_seed_012",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_013_var_1",
+    "agent": "orchestrator",
+    "input": "I'm sensitive to penicillin.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "medical",
+        "key": "allergy_penicillin",
+        "value": "allergic to penicillin"
+      }
+    },
+    "metadata": {
+      "description": "Store medical info - allergy",
+      "generated": true,
+      "seed_id": "memory_seed_013",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_014_var_1",
+    "agent": "orchestrator",
+    "input": "My CVS pharmacy is on Main Street.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "medical",
+        "key": "pharmacy",
+        "value": "CVS on Main Street"
+      }
+    },
+    "metadata": {
+      "description": "Store medical info - pharmacy",
+      "generated": true,
+      "seed_id": "memory_seed_014",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_015_var_1",
+    "agent": "orchestrator",
+    "input": "My WiFi password is HomeNet123, if you could remember that for me.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "practical",
+        "key": "wifi_password",
+        "value": "HomeNet123"
+      }
+    },
+    "metadata": {
+      "description": "Store practical info - wifi",
+      "generated": true,
+      "seed_id": "memory_seed_015",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_016_var_1",
+    "agent": "orchestrator",
+    "input": "The code for the alarm is one-two-three-four.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "practical",
+        "key": "alarm_code",
+        "value": "1234"
+      }
+    },
+    "metadata": {
+      "description": "Store practical info - alarm",
+      "generated": true,
+      "seed_id": "memory_seed_016",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_017_var_1",
+    "agent": "orchestrator",
+    "input": "I left my car in B12.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "practical",
+        "key": "parking_spot",
+        "value": "B12"
+      }
+    },
+    "metadata": {
+      "description": "Store practical info - parking",
+      "generated": true,
+      "seed_id": "memory_seed_017",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_018_var_1",
+    "agent": "orchestrator",
+    "input": "My boy's birthday is on June 15th.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "personal",
+        "key": "son_birthday",
+        "value": "June 15th"
+      }
+    },
+    "metadata": {
+      "description": "Store personal info - birthday",
+      "generated": true,
+      "seed_id": "memory_seed_018",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_019_var_1",
+    "agent": "orchestrator",
+    "input": "My girl, Sarah, is my daughter.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "personal",
+        "key": "daughter_name",
+        "value": "Sarah"
+      }
+    },
+    "metadata": {
+      "description": "Store personal info - family name",
+      "generated": true,
+      "seed_id": "memory_seed_019",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_020_var_1",
+    "agent": "orchestrator",
+    "input": "I really like that place, Olive Garden, you know?",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "personal",
+        "key": "favorite_restaurant",
+        "value": "Olive Garden"
+      }
+    },
+    "metadata": {
+      "description": "Store personal info - preference",
+      "generated": true,
+      "seed_id": "memory_seed_020",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_021_var_1",
+    "agent": "orchestrator",
+    "input": "I need to remember the plumber's phone number, it's five-five-five, seven-eight-nine-zero.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "household",
+        "key": "plumber_phone",
+        "value": "555-7890"
+      }
+    },
+    "metadata": {
+      "description": "Store household info - contact",
+      "generated": true,
+      "seed_id": "memory_seed_021",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_022_var_1",
+    "agent": "orchestrator",
+    "input": "It's Tuesday when the garbage needs to go out.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "household",
+        "key": "trash_day",
+        "value": "Tuesday"
+      }
+    },
+    "metadata": {
+      "description": "Store household info - schedule",
+      "generated": true,
+      "seed_id": "memory_seed_022",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_023_var_1",
+    "agent": "orchestrator",
+    "input": "The extra key is hiding under the mat.",
+    "expected": {
+      "tool": "store_information",
+      "params": {
+        "category": "household",
+        "key": "spare_key_location",
+        "value": "under the mat"
+      }
+    },
+    "metadata": {
+      "description": "Store household info - location",
+      "generated": true,
+      "seed_id": "memory_seed_023",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_024_var_1",
+    "agent": "orchestrator",
+    "input": "Can you remind me who my doctor is?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "doctor"
+      }
+    },
+    "metadata": {
+      "description": "Recall medical info",
+      "generated": true,
+      "seed_id": "memory_seed_024",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_025_var_1",
+    "agent": "orchestrator",
+    "input": "What do I need to watch out for, allergy-wise?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "allergy"
+      }
+    },
+    "metadata": {
+      "description": "Recall allergy info",
+      "generated": true,
+      "seed_id": "memory_seed_025",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_026_var_1",
+    "agent": "orchestrator",
+    "input": "Can you tell me the password for my WiFi?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "wifi password"
+      }
+    },
+    "metadata": {
+      "description": "Recall practical info",
+      "generated": true,
+      "seed_id": "memory_seed_026",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_027_var_1",
+    "agent": "orchestrator",
+    "input": "Can you tell me what the code for the alarm is?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "alarm code"
+      }
+    },
+    "metadata": {
+      "description": "Recall alarm code",
+      "generated": true,
+      "seed_id": "memory_seed_027",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_028_var_1",
+    "agent": "orchestrator",
+    "input": "What day is my boy's birthday?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "son birthday"
+      }
+    },
+    "metadata": {
+      "description": "Recall personal info",
+      "generated": true,
+      "seed_id": "memory_seed_028",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_029_var_1",
+    "agent": "orchestrator",
+    "input": "Can you tell me the number for the plumber?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "plumber"
+      }
+    },
+    "metadata": {
+      "description": "Recall household info",
+      "generated": true,
+      "seed_id": "memory_seed_029",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_030_var_1",
+    "agent": "orchestrator",
+    "input": "Who’s my doctor again?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "physician"
+      }
+    },
+    "metadata": {
+      "description": "Recall fuzzy match - doctor",
+      "generated": true,
+      "seed_id": "memory_seed_030",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_031_var_1",
+    "agent": "orchestrator",
+    "input": "Can you remind me what my Wi-Fi password is?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "internet password"
+      }
+    },
+    "metadata": {
+      "description": "Recall fuzzy match - wifi",
+      "generated": true,
+      "seed_id": "memory_seed_031",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_032_var_1",
+    "agent": "orchestrator",
+    "input": "Can you tell me what my garage code is?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "garage code"
+      }
+    },
+    "metadata": {
+      "description": "Recall not found",
+      "generated": true,
+      "seed_id": "memory_seed_032",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_033_var_1",
+    "agent": "orchestrator",
+    "input": "Can you tell me who my tooth doctor is?",
+    "expected": {
+      "tool": "recall_information",
+      "params": {
+        "key": "dentist"
+      }
+    },
+    "metadata": {
+      "description": "Recall not found - offer to store",
+      "generated": true,
+      "seed_id": "memory_seed_033",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_034_var_1",
+    "agent": "orchestrator",
+    "input": "I just finished my breakfast.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "meal",
+        "details": "had breakfast"
+      }
+    },
+    "metadata": {
+      "description": "Log meal - breakfast",
+      "generated": true,
+      "seed_id": "memory_seed_034",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_035_var_1",
+    "agent": "orchestrator",
+    "input": "I had lunch with my girl.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "meal",
+        "details": "ate lunch with daughter"
+      }
+    },
+    "metadata": {
+      "description": "Log meal with context",
+      "generated": true,
+      "seed_id": "memory_seed_035",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_036_var_1",
+    "agent": "orchestrator",
+    "input": "I had my evening meal at six o'clock.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "meal",
+        "details": "had dinner at 6pm"
+      }
+    },
+    "metadata": {
+      "description": "Log meal with time",
+      "generated": true,
+      "seed_id": "memory_seed_036",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_037_var_1",
+    "agent": "orchestrator",
+    "input": "My daughter came by to see me this morning.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "visitor",
+        "details": "daughter visited this morning"
+      }
+    },
+    "metadata": {
+      "description": "Log visitor - daughter",
+      "generated": true,
+      "seed_id": "memory_seed_037",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_038_var_1",
+    "agent": "orchestrator",
+    "input": "My buddy John came over today.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "visitor",
+        "details": "friend John stopped by"
+      }
+    },
+    "metadata": {
+      "description": "Log visitor - friend",
+      "generated": true,
+      "seed_id": "memory_seed_038",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_039_var_1",
+    "agent": "orchestrator",
+    "input": "The nurse just dropped by to see how I’m doing.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "visitor",
+        "details": "nurse came to check on me"
+      }
+    },
+    "metadata": {
+      "description": "Log visitor - caregiver",
+      "generated": true,
+      "seed_id": "memory_seed_039",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_040_var_1",
+    "agent": "orchestrator",
+    "input": "I took a stroll at the park today.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "outing",
+        "details": "went for a walk in the park"
+      }
+    },
+    "metadata": {
+      "description": "Log outing - walk",
+      "generated": true,
+      "seed_id": "memory_seed_040",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_041_var_1",
+    "agent": "orchestrator",
+    "input": "I just came back from the grocery store.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "outing",
+        "details": "went to grocery store"
+      }
+    },
+    "metadata": {
+      "description": "Log outing - errands",
+      "generated": true,
+      "seed_id": "memory_seed_041",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_042_var_1",
+    "agent": "orchestrator",
+    "input": "I went to see the doctor today.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "outing",
+        "details": "had doctor's appointment"
+      }
+    },
+    "metadata": {
+      "description": "Log outing - appointment",
+      "generated": true,
+      "seed_id": "memory_seed_042",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_043_var_1",
+    "agent": "orchestrator",
+    "input": "I just finished watching a film.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "activity",
+        "details": "watched a movie"
+      }
+    },
+    "metadata": {
+      "description": "Log general activity",
+      "generated": true,
+      "seed_id": "memory_seed_043",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_044_var_1",
+    "agent": "orchestrator",
+    "input": "I spent an hour reading a book.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "activity",
+        "details": "read a book for an hour"
+      }
+    },
+    "metadata": {
+      "description": "Log activity with duration",
+      "generated": true,
+      "seed_id": "memory_seed_044",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_045_var_1",
+    "agent": "orchestrator",
+    "input": "I gave my boy a ring.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "conversation",
+        "details": "called my son"
+      }
+    },
+    "metadata": {
+      "description": "Log conversation - phone",
+      "generated": true,
+      "seed_id": "memory_seed_045",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_046_var_1",
+    "agent": "orchestrator",
+    "input": "I had a chat with my neighbor.",
+    "expected": {
+      "tool": "log_activity",
+      "params": {
+        "activity_type": "conversation",
+        "details": "talked to my neighbor"
+      }
+    },
+    "metadata": {
+      "description": "Log conversation - in person",
+      "generated": true,
+      "seed_id": "memory_seed_046",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_047_var_1",
+    "agent": "orchestrator",
+    "input": "What did I get up to today?",
+    "expected": {
+      "tool": "get_daily_context",
+      "params": {
+        "date": ""
+      }
+    },
+    "metadata": {
+      "description": "Get today's activities",
+      "generated": true,
+      "seed_id": "memory_seed_047",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_048_var_1",
+    "agent": "orchestrator",
+    "input": "What was I up to on the third of January?",
+    "expected": {
+      "tool": "get_daily_context",
+      "params": {
+        "date": "2026-01-03"
+      }
+    },
+    "metadata": {
+      "description": "Get specific date activities",
+      "generated": true,
+      "seed_id": "memory_seed_048",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_049_var_1",
+    "agent": "orchestrator",
+    "input": "What did I do yesterday, can you remind me?",
+    "expected": {
+      "tool": "get_daily_context",
+      "params": {
+        "date": "yesterday"
+      }
+    },
+    "metadata": {
+      "description": "Get yesterday's activities",
+      "generated": true,
+      "seed_id": "memory_seed_049",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_050_var_1",
+    "agent": "orchestrator",
+    "input": "What was I up to just now?",
+    "expected": {
+      "tool": "what_was_i_doing",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get recent activity",
+      "generated": true,
+      "seed_id": "memory_seed_050",
+      "variation_number": 1
+    }
+  },
+  {
+    "id": "memory_seed_051_var_1",
+    "agent": "orchestrator",
+    "input": "Can you remind me what I was up to?",
+    "expected": {
+      "tool": "what_was_i_doing",
+      "params": {}
+    },
+    "metadata": {
+      "description": "Get recent activity alt phrasing",
+      "generated": true,
+      "seed_id": "memory_seed_051",
+      "variation_number": 1
+    }
+  }
+]
